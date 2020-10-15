@@ -1,0 +1,5 @@
+internal_name,external_name,data_type,monthly,reach_file,lake_file,lentic,flow_file
+comid,comid,object,,10,10,10,10
+hydroseq,hydroseq,np.float64,,120,,30,
+q,q0001e,np.float32,1,160,,40,20
+wb_comid,wbareacomi,object,,300,,20,

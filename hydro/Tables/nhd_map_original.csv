@@ -1,0 +1,1860 @@
+feature_type,path,table,field,lake_file,reach_file,format,desc
+reach,EROMExtension,EROM_010001,A,,,"Num(11,5) ",Reference gage regression coefficient a
+reach,EROMExtension,EROM_010001,AreaSqKm,,,"Num(14,6) ",See Catchment
+reach,EROMExtension,EROM_010001,ARQ0001Nav,,,"Num(14,3) ",PlusflowAR flow not available on flowline (cfs)
+reach,EROMExtension,EROM_010001,AvgQAdj,,,"Num(14,3) ",Gage Q adjusted for bottom of an NHDflowline feature (cfs)
+reach,EROMExtension,EROM_010001,B,,,"Num(11,5) ",Reference gage regression coefficient b
+reach,EROMExtension,EROM_010001,BCF,,,"Num(11,5) ",Reference gage regression Bias Correction Factor
+reach,EROMExtension,EROM_010001,ComID,,1,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROM_010001,DivDASqKm,,,"Num(14,6) ",Divergence-routed cumulative area
+reach,EROMExtension,EROM_010001,ETFract1,,,"Num(5,3) ",Excess ET Fraction 1
+reach,EROMExtension,EROM_010001,ETFract2,,,"Num(5,3) ",Excess ET Fraction 2
+reach,EROMExtension,EROM_010001,GageAdj,,,Text(1),"Flag indicating that Q<eeee>E and Qincr0001E have been adjusted by gage flow. 0 = not adjusted, 2 = adjusted, including the NHDFlowline feature at the gage and the NHDFlowline features upstream. "
+reach,EROMExtension,EROM_010001,GageSeq,,,"Num(5,3) ","0 = gage not sequestered, 1= gage sequestered "
+reach,EROMExtension,EROM_010001,GageSeqP,,,"Num(5,3) ",Proportion of gages to sequester in the gage sequestration step. Values 0 to 1.
+reach,EROMExtension,EROM_010001,Lat,,,"Num(9,5) ",Average Latitude of catchment in decimal degrees
+reach,EROMExtension,EROM_010001,NRef,,,"Num(5,4) ",Number of Reference gages used in the regression
+reach,EROMExtension,EROM_010001,PET0001,,,"Num(14,5) ",Catchment PET (mm)
+reach,EROMExtension,EROM_010001,PPT0001,,,"Num(14,5) ",Catchment precipitation (mm)
+reach,EROMExtension,EROM_010001,Q0001A,,,"Num(14,3) ",Flow from runoff (cfs)
+reach,EROMExtension,EROM_010001,Q0001B,,,"Num(14,3) ",Flow with Excess ET (cfs)
+reach,EROMExtension,EROM_010001,Q0001C,,,"Num(14,3) ",Flow with Reference Gage Regression applied to Q0001B
+reach,EROMExtension,EROM_010001,Q0001D,,,"Num(14,3) ",Flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_010001,Q0001E,,1,"Num(14,3) ",Flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_010001,Q0001F,,,"Num(14,3) ",Flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_010001,QG0001Adj,,,"Num(14,3) ",Gage adjustment flow (cfs)
+reach,EROMExtension,EROM_010001,QG0001Nav,,,"Num(14,3) ",Gage adjustment flow not available ( cfs)
+reach,EROMExtension,EROM_010001,QIncr0001A,,,"Num(13,5) ",Incremental Flow from runoff (cfs)
+reach,EROMExtension,EROM_010001,QIncr0001B,,,"Num(13,5) ",Incremental Flow With Excess ET (cfs)
+reach,EROMExtension,EROM_010001,QIncr0001C,,,"Num(13,5) ",Incremental Flow by subtracting the sum of upstream flows from the sum of the upstream Q0001C (cfs)
+reach,EROMExtension,EROM_010001,QIncr0001D,,,"Num(13,5) ",Incremental flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_010001,QIncr0001E,,,"Num(13,5) ",Incremental flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_010001,QIncr0001F,,,"Num(13,5) ",Incremental flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_010001,QLoss0001,,,"Num(14,3) ",Catchment flow loss from Excess ET (cfs)
+reach,EROMExtension,EROM_010001,r2,,,"Num(11,4) ",Reference gage regression Log-Log r2
+reach,EROMExtension,EROM_010001,SER,,,"Num(11,5) ",Reference gage regression log-log Standard Error of the Regression
+reach,EROMExtension,EROM_010001,SMGageID,,,Text(16),The ID of the gage located on NHDFlowline feature
+reach,EROMExtension,EROM_010001,SMGageq,,,"Num(14,3) ",Gaged flow measured by the gage on NHDFlowline feature (cfs)
+reach,EROMExtension,EROM_010001,Temp0001,,,"Num(14,5) ",Catchment temperature  (Deg. C)
+reach,EROMExtension,EROM_010001,V0001A,,,"Num(14,5) ",Velocity for Q0001A (fps)
+reach,EROMExtension,EROM_010001,V0001B,,,"Num(13,5) ",Velocity for Q0001B (fps)
+reach,EROMExtension,EROM_010001,V0001C,,,"Num(13,5) ",Velocity for Q0001C (fps)
+reach,EROMExtension,EROM_010001,V0001D,,,"Num(13,5) ",Velocity for Q0001D (fps)
+reach,EROMExtension,EROM_010001,V0001E,,1,"Num(13,5) ",Velocity from gage adjustment (fps)
+reach,EROMExtension,EROM_020001,A,,,"Num(11,5) ",Reference gage regression coefficient a
+reach,EROMExtension,EROM_020001,AreaSqKm,,,"Num(14,6) ",See Catchment
+reach,EROMExtension,EROM_020001,ARQ0001Nav,,,"Num(14,3) ",PlusflowAR flow not available on flowline (cfs)
+reach,EROMExtension,EROM_020001,AvgQAdj,,,"Num(14,3) ",Gage Q adjusted for bottom of an NHDflowline feature (cfs)
+reach,EROMExtension,EROM_020001,B,,,"Num(11,5) ",Reference gage regression coefficient b
+reach,EROMExtension,EROM_020001,BCF,,,"Num(11,5) ",Reference gage regression Bias Correction Factor
+reach,EROMExtension,EROM_020001,ComID,,1,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROM_020001,DivDASqKm,,,"Num(14,6) ",Divergence-routed cumulative area
+reach,EROMExtension,EROM_020001,ETFract1,,,"Num(5,3) ",Excess ET Fraction 1
+reach,EROMExtension,EROM_020001,ETFract2,,,"Num(5,3) ",Excess ET Fraction 2
+reach,EROMExtension,EROM_020001,GageAdj,,,Text(1),"Flag indicating that Q<eeee>E and Qincr0001E have been adjusted by gage flow. 0 = not adjusted, 2 = adjusted, including the NHDFlowline feature at the gage and the NHDFlowline features upstream. "
+reach,EROMExtension,EROM_020001,GageSeq,,,"Num(5,3) ","0 = gage not sequestered, 1= gage sequestered "
+reach,EROMExtension,EROM_020001,GageSeqP,,,"Num(5,3) ",Proportion of gages to sequester in the gage sequestration step. Values 0 to 1.
+reach,EROMExtension,EROM_020001,Lat,,,"Num(9,5) ",Average Latitude of catchment in decimal degrees
+reach,EROMExtension,EROM_020001,NRef,,,"Num(5,4) ",Number of Reference gages used in the regression
+reach,EROMExtension,EROM_020001,PET0001,,,"Num(14,5) ",Catchment PET (mm)
+reach,EROMExtension,EROM_020001,PPT0001,,,"Num(14,5) ",Catchment precipitation (mm)
+reach,EROMExtension,EROM_020001,Q0001A,,,"Num(14,3) ",Flow from runoff (cfs)
+reach,EROMExtension,EROM_020001,Q0001B,,,"Num(14,3) ",Flow with Excess ET (cfs)
+reach,EROMExtension,EROM_020001,Q0001C,,,"Num(14,3) ",Flow with Reference Gage Regression applied to Q0001B
+reach,EROMExtension,EROM_020001,Q0001D,,,"Num(14,3) ",Flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_020001,Q0001E,,1,"Num(14,3) ",Flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_020001,Q0001F,,,"Num(14,3) ",Flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_020001,QG0001Adj,,,"Num(14,3) ",Gage adjustment flow (cfs)
+reach,EROMExtension,EROM_020001,QG0001Nav,,,"Num(14,3) ",Gage adjustment flow not available ( cfs)
+reach,EROMExtension,EROM_020001,QIncr0001A,,,"Num(13,5) ",Incremental Flow from runoff (cfs)
+reach,EROMExtension,EROM_020001,QIncr0001B,,,"Num(13,5) ",Incremental Flow With Excess ET (cfs)
+reach,EROMExtension,EROM_020001,QIncr0001C,,,"Num(13,5) ",Incremental Flow by subtracting the sum of upstream flows from the sum of the upstream Q0001C (cfs)
+reach,EROMExtension,EROM_020001,QIncr0001D,,,"Num(13,5) ",Incremental flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_020001,QIncr0001E,,,"Num(13,5) ",Incremental flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_020001,QIncr0001F,,,"Num(13,5) ",Incremental flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_020001,QLoss0001,,,"Num(14,3) ",Catchment flow loss from Excess ET (cfs)
+reach,EROMExtension,EROM_020001,r2,,,"Num(11,4) ",Reference gage regression Log-Log r2
+reach,EROMExtension,EROM_020001,SER,,,"Num(11,5) ",Reference gage regression log-log Standard Error of the Regression
+reach,EROMExtension,EROM_020001,SMGageID,,,Text(16),The ID of the gage located on NHDFlowline feature
+reach,EROMExtension,EROM_020001,SMGageq,,,"Num(14,3) ",Gaged flow measured by the gage on NHDFlowline feature (cfs)
+reach,EROMExtension,EROM_020001,Temp0001,,,"Num(14,5) ",Catchment temperature  (Deg. C)
+reach,EROMExtension,EROM_020001,V0001A,,,"Num(14,5) ",Velocity for Q0001A (fps)
+reach,EROMExtension,EROM_020001,V0001B,,,"Num(13,5) ",Velocity for Q0001B (fps)
+reach,EROMExtension,EROM_020001,V0001C,,,"Num(13,5) ",Velocity for Q0001C (fps)
+reach,EROMExtension,EROM_020001,V0001D,,,"Num(13,5) ",Velocity for Q0001D (fps)
+reach,EROMExtension,EROM_020001,V0001E,,1,"Num(13,5) ",Velocity from gage adjustment (fps)
+reach,EROMExtension,EROM_030001,A,,,"Num(11,5) ",Reference gage regression coefficient a
+reach,EROMExtension,EROM_030001,AreaSqKm,,,"Num(14,6) ",See Catchment
+reach,EROMExtension,EROM_030001,ARQ0001Nav,,,"Num(14,3) ",PlusflowAR flow not available on flowline (cfs)
+reach,EROMExtension,EROM_030001,AvgQAdj,,,"Num(14,3) ",Gage Q adjusted for bottom of an NHDflowline feature (cfs)
+reach,EROMExtension,EROM_030001,B,,,"Num(11,5) ",Reference gage regression coefficient
+reach,EROMExtension,EROM_030001,BCF,,,"Num(11,5) ",Reference gage regression Bias Correction Factor
+reach,EROMExtension,EROM_030001,ComID,,1,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROM_030001,DivDASqKm,,,"Num(14,6) ",Divergence-routed cumulative area
+reach,EROMExtension,EROM_030001,ETFract1,,,"Num(5,3) ",Excess ET Fraction 1
+reach,EROMExtension,EROM_030001,ETFract2,,,"Num(5,3) ",Excess ET Fraction 2
+reach,EROMExtension,EROM_030001,GageAdj,,,Text(1),"Flag indicating that Q<eeee>E and Qincr0001E have been adjusted by gage flow. 0 = not adjusted, 2 = adjusted, including the NHDFlowline feature at the gage and the NHDFlowline features upstream. "
+reach,EROMExtension,EROM_030001,GageSeq,,,"Num(5,3) ","0 = gage not sequestered, 1= gage sequestered "
+reach,EROMExtension,EROM_030001,GageSeqP,,,"Num(5,3) ",Proportion of gages to sequester in the gage sequestration step. Values 0 to 1.
+reach,EROMExtension,EROM_030001,Lat,,,"Num(9,5) ",Average Latitude of catchment in decimal degrees
+reach,EROMExtension,EROM_030001,NRef,,,"Num(5,4) ",Number of Reference gages used in the regression
+reach,EROMExtension,EROM_030001,PET0001,,,"Num(14,5) ",Catchment PET (mm)
+reach,EROMExtension,EROM_030001,PPT0001,,,"Num(14,5) ",Catchment precipitation (mm)
+reach,EROMExtension,EROM_030001,Q0001A,,,"Num(14,3) ",Flow from runoff (cfs)
+reach,EROMExtension,EROM_030001,Q0001B,,,"Num(14,3) ",Flow with Excess ET (cfs)
+reach,EROMExtension,EROM_030001,Q0001C,,,"Num(14,3) ",Flow with Reference Gage Regression applied to Q0001B
+reach,EROMExtension,EROM_030001,Q0001D,,,"Num(14,3) ",Flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_030001,Q0001E,,1,"Num(14,3) ",Flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_030001,Q0001F,,,"Num(14,3) ",Flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_030001,QG0001Adj,,,"Num(14,3) ",Gage adjustment flow (cfs)
+reach,EROMExtension,EROM_030001,QG0001Nav,,,"Num(14,3) ",Gage adjustment flow not available ( cfs)
+reach,EROMExtension,EROM_030001,QIncr0001A,,,"Num(13,5) ",Incremental Flow from runoff (cfs)
+reach,EROMExtension,EROM_030001,QIncr0001B,,,"Num(13,5) ",Incremental Flow With Excess ET (cfs)
+reach,EROMExtension,EROM_030001,QIncr0001C,,,"Num(13,5) ",Incremental Flow by subtracting the sum of upstream flows from the sum of the upstream Q0001C (cfs)
+reach,EROMExtension,EROM_030001,QIncr0001D,,,"Num(13,5) ",Incremental flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_030001,QIncr0001E,,,"Num(13,5) ",Incremental flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_030001,QIncr0001F,,,"Num(13,5) ",Incremental flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_030001,QLoss0001,,,"Num(14,3) ",Catchment flow loss from Excess ET (cfs)
+reach,EROMExtension,EROM_030001,r2,,,"Num(11,4) ",Reference gage regression Log-Log r2
+reach,EROMExtension,EROM_030001,SER,,,"Num(11,5) ",Reference gage regression log-log Standard Error of the Regression
+reach,EROMExtension,EROM_030001,SMGageID,,,Text(16),The ID of the gage located on NHDFlowline feature
+reach,EROMExtension,EROM_030001,SMGageq,,,"Num(14,3) ",Gaged flow measured by the gage on NHDFlowline feature (cfs)
+reach,EROMExtension,EROM_030001,Temp0001,,,"Num(14,5) ",Catchment temperature  (Deg. C)
+reach,EROMExtension,EROM_030001,V0001A,,,"Num(14,5) ",Velocity for Q0001A (fps)
+reach,EROMExtension,EROM_030001,V0001B,,,"Num(13,5) ",Velocity for Q0001B (fps)
+reach,EROMExtension,EROM_030001,V0001C,,,"Num(13,5) ",Velocity for Q0001C (fps)
+reach,EROMExtension,EROM_030001,V0001D,,,"Num(13,5) ",Velocity for Q0001D (fps)
+reach,EROMExtension,EROM_030001,V0001E,,1,"Num(13,5) ",Velocity from gage adjustment (fps)
+reach,EROMExtension,EROM_040001,A,,,"Num(11,5) ",Reference gage regression coefficient a
+reach,EROMExtension,EROM_040001,AreaSqKm,,,"Num(14,6) ",See Catchment
+reach,EROMExtension,EROM_040001,ARQ0001Nav,,,"Num(14,3) ",PlusflowAR flow not available on flowline (cfs)
+reach,EROMExtension,EROM_040001,AvgQAdj,,,"Num(14,3) ",Gage Q adjusted for bottom of an NHDflowline feature (cfs)
+reach,EROMExtension,EROM_040001,B,,,"Num(11,5) ",Reference gage regression coefficient b
+reach,EROMExtension,EROM_040001,BCF,,,"Num(11,5) ",Reference gage regression Bias Correction Factor
+reach,EROMExtension,EROM_040001,ComID,,1,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROM_040001,DivDASqKm,,,"Num(14,6) ",Divergence-routed cumulative area
+reach,EROMExtension,EROM_040001,ETFract1,,,"Num(5,3) ",Excess ET Fraction 1
+reach,EROMExtension,EROM_040001,ETFract2,,,"Num(5,3) ",Excess ET Fraction 2
+reach,EROMExtension,EROM_040001,GageAdj,,,Text(1),"Flag indicating that Q<eeee>E and Qincr0001E have been adjusted by gage flow. 0 = not adjusted, 2 = adjusted, including the NHDFlowline feature at the gage and the NHDFlowline features upstream. "
+reach,EROMExtension,EROM_040001,GageSeq,,,"Num(5,3) ","0 = gage not sequestered, 1= gage sequestered "
+reach,EROMExtension,EROM_040001,GageSeqP,,,"Num(5,3) ",Proportion of gages to sequester in the gage sequestration step. Values 0 to 1.
+reach,EROMExtension,EROM_040001,Lat,,,"Num(9,5) ",Average Latitude of catchment in decimal degrees
+reach,EROMExtension,EROM_040001,NRef,,,"Num(5,4) ",Number of Reference gages used in the regression
+reach,EROMExtension,EROM_040001,PET0001,,,"Num(14,5) ",Catchment PET (mm)
+reach,EROMExtension,EROM_040001,PPT0001,,,"Num(14,5) ",Catchment precipitation (mm)
+reach,EROMExtension,EROM_040001,Q0001A,,,"Num(14,3) ",Flow from runoff (cfs)
+reach,EROMExtension,EROM_040001,Q0001B,,,"Num(14,3) ",Flow with Excess ET (cfs)
+reach,EROMExtension,EROM_040001,Q0001C,,,"Num(14,3) ",Flow with Reference Gage Regression applied to Q0001B
+reach,EROMExtension,EROM_040001,Q0001D,,,"Num(14,3) ",Flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_040001,Q0001E,,1,"Num(14,3) ",Flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_040001,Q0001F,,,"Num(14,3) ",Flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_040001,QG0001Adj,,,"Num(14,3) ",Gage adjustment flow (cfs)
+reach,EROMExtension,EROM_040001,QG0001Nav,,,"Num(14,3) ",Gage adjustment flow not available ( cfs)
+reach,EROMExtension,EROM_040001,QIncr0001A,,,"Num(13,5) ",Incremental Flow from runoff (cfs)
+reach,EROMExtension,EROM_040001,QIncr0001B,,,"Num(13,5) ",Incremental Flow With Excess ET (cfs)
+reach,EROMExtension,EROM_040001,QIncr0001C,,,"Num(13,5) ",Incremental Flow by subtracting the sum of upstream flows from the sum of the upstream Q0001C (cfs)
+reach,EROMExtension,EROM_040001,QIncr0001D,,,"Num(13,5) ",Incremental flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_040001,QIncr0001E,,,"Num(13,5) ",Incremental flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_040001,QIncr0001F,,,"Num(13,5) ",Incremental flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_040001,QLoss0001,,,"Num(14,3) ",Catchment flow loss from Excess ET (cfs)
+reach,EROMExtension,EROM_040001,r2,,,"Num(11,4) ",Reference gage regression Log-Log r2
+reach,EROMExtension,EROM_040001,SER,,,"Num(11,5) ",Reference gage regression log-log Standard Error of the Regression
+reach,EROMExtension,EROM_040001,SMGageID,,,Text(16),The ID of the gage located on NHDFlowline feature
+reach,EROMExtension,EROM_040001,SMGageq,,,"Num(14,3) ",Gaged flow measured by the gage on NHDFlowline feature (cfs)
+reach,EROMExtension,EROM_040001,Temp0001,,,"Num(14,5) ",Catchment temperature  (Deg. C)
+reach,EROMExtension,EROM_040001,V0001A,,,"Num(14,5) ",Velocity for Q0001A (fps)
+reach,EROMExtension,EROM_040001,V0001B,,,"Num(13,5) ",Velocity for Q0001B (fps)
+reach,EROMExtension,EROM_040001,V0001C,,,"Num(13,5) ",Velocity for Q0001C (fps)
+reach,EROMExtension,EROM_040001,V0001D,,,"Num(13,5) ",Velocity for Q0001D (fps)
+reach,EROMExtension,EROM_040001,V0001E,,1,"Num(13,5) ",Velocity from gage adjustment (fps)
+reach,EROMExtension,EROM_050001,A,,,"Num(11,5) ",Reference gage regression coefficient a
+reach,EROMExtension,EROM_050001,AreaSqKm,,,"Num(14,6) ",See Catchment
+reach,EROMExtension,EROM_050001,ARQ0001Nav,,,"Num(14,3) ",PlusflowAR flow not available on flowline (cfs)
+reach,EROMExtension,EROM_050001,AvgQAdj,,,"Num(14,3) ",Gage Q adjusted for bottom of an NHDflowline feature (cfs)
+reach,EROMExtension,EROM_050001,B,,,"Num(11,5) ",Reference gage regression coefficient b
+reach,EROMExtension,EROM_050001,BCF,,,"Num(11,5) ",Reference gage regression Bias Correction Factor
+reach,EROMExtension,EROM_050001,ComID,,1,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROM_050001,DivDASqKm,,,"Num(14,6) ",Divergence-routed cumulative area
+reach,EROMExtension,EROM_050001,ETFract1,,,"Num(5,3) ",Excess ET Fraction 1
+reach,EROMExtension,EROM_050001,ETFract2,,,"Num(5,3) ",Excess ET Fraction 2
+reach,EROMExtension,EROM_050001,GageAdj,,,Text(1),"Flag indicating that Q<eeee>E and Qincr0001E have been adjusted by gage flow. 0 = not adjusted, 2 = adjusted, including the NHDFlowline feature at the gage and the NHDFlowline features upstream. "
+reach,EROMExtension,EROM_050001,GageSeq,,,"Num(5,3) ","0 = gage not sequestered, 1= gage sequestered "
+reach,EROMExtension,EROM_050001,GageSeqP,,,"Num(5,3) ",Proportion of gages to sequester in the gage sequestration step. Values 0 to 1.
+reach,EROMExtension,EROM_050001,Lat,,,"Num(9,5) ",Average Latitude of catchment in decimal degrees
+reach,EROMExtension,EROM_050001,NRef,,,"Num(5,4) ",Number of Reference gages used in the regression
+reach,EROMExtension,EROM_050001,PET0001,,,"Num(14,5) ",Catchment PET (mm)
+reach,EROMExtension,EROM_050001,PPT0001,,,"Num(14,5) ",Catchment precipitation (mm)
+reach,EROMExtension,EROM_050001,Q0001A,,,"Num(14,3) ",Flow from runoff (cfs)
+reach,EROMExtension,EROM_050001,Q0001B,,,"Num(14,3) ",Flow with Excess ET (cfs)
+reach,EROMExtension,EROM_050001,Q0001C,,,"Num(14,3) ",Flow with Reference Gage Regression applied to Q0001B
+reach,EROMExtension,EROM_050001,Q0001D,,,"Num(14,3) ",Flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_050001,Q0001E,,1,"Num(14,3) ",Flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_050001,Q0001F,,,"Num(14,3) ",Flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_050001,QG0001Adj,,,"Num(14,3) ",Gage adjustment flow (cfs)
+reach,EROMExtension,EROM_050001,QG0001Nav,,,"Num(14,3) ",Gage adjustment flow not available ( cfs)
+reach,EROMExtension,EROM_050001,QIncr0001A,,,"Num(13,5) ",Incremental Flow from runoff (cfs)
+reach,EROMExtension,EROM_050001,QIncr0001B,,,"Num(13,5) ",Incremental Flow With Excess ET (cfs)
+reach,EROMExtension,EROM_050001,QIncr0001C,,,"Num(13,5) ",Incremental Flow by subtracting the sum of upstream flows from the sum of the upstream Q0001C (cfs)
+reach,EROMExtension,EROM_050001,QIncr0001D,,,"Num(13,5) ",Incremental flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_050001,QIncr0001E,,,"Num(13,5) ",Incremental flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_050001,QIncr0001F,,,"Num(13,5) ",Incremental flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_050001,QLoss0001,,,"Num(14,3) ",Catchment flow loss from Excess ET (cfs)
+reach,EROMExtension,EROM_050001,r2,,,"Num(11,4) ",Reference gage regression Log-Log r2
+reach,EROMExtension,EROM_050001,SER,,,"Num(11,5) ",Reference gage regression log-log Standard Error of the Regression
+reach,EROMExtension,EROM_050001,SMGageID,,,Text(16),The ID of the gage located on NHDFlowline feature
+reach,EROMExtension,EROM_050001,SMGageq,,,"Num(14,3) ",Gaged flow measured by the gage on NHDFlowline feature (cfs)
+reach,EROMExtension,EROM_050001,Temp0001,,,"Num(14,5) ",Catchment temperature  (Deg. C)
+reach,EROMExtension,EROM_050001,V0001A,,,"Num(14,5) ",Velocity for Q0001A (fps)
+reach,EROMExtension,EROM_050001,V0001B,,,"Num(13,5) ",Velocity for Q0001B (fps)
+reach,EROMExtension,EROM_050001,V0001C,,,"Num(13,5) ",Velocity for Q0001C (fps)
+reach,EROMExtension,EROM_050001,V0001D,,,"Num(13,5) ",Velocity for Q0001D (fps)
+reach,EROMExtension,EROM_050001,V0001E,,1,"Num(13,5) ",Velocity from gage adjustment (fps)
+reach,EROMExtension,EROM_060001,A,,,"Num(11,5) ",Reference gage regression coefficient a
+reach,EROMExtension,EROM_060001,AreaSqKm,,,"Num(14,6) ",See Catchment
+reach,EROMExtension,EROM_060001,ARQ0001Nav,,,"Num(14,3) ",PlusflowAR flow not available on flowline (cfs)
+reach,EROMExtension,EROM_060001,AvgQAdj,,,"Num(14,3) ",Gage Q adjusted for bottom of an NHDflowline feature (cfs)
+reach,EROMExtension,EROM_060001,B,,,"Num(11,5) ",Reference gage regression coefficient b
+reach,EROMExtension,EROM_060001,BCF,,,"Num(11,5) ",Reference gage regression Bias Correction Factor
+reach,EROMExtension,EROM_060001,ComID,,1,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROM_060001,DivDASqKm,,,"Num(14,6) ",Divergence-routed cumulative area
+reach,EROMExtension,EROM_060001,ETFract1,,,"Num(5,3) ",Excess ET Fraction 1
+reach,EROMExtension,EROM_060001,ETFract2,,,"Num(5,3) ",Excess ET Fraction 2
+reach,EROMExtension,EROM_060001,GageAdj,,,Text(1),"Flag indicating that Q<eeee>E and Qincr0001E have been adjusted by gage flow. 0 = not adjusted, 2 = adjusted, including the NHDFlowline feature at the gage and the NHDFlowline features upstream. "
+reach,EROMExtension,EROM_060001,GageSeq,,,"Num(5,3) ","0 = gage not sequestered, 1= gage sequestered "
+reach,EROMExtension,EROM_060001,GageSeqP,,,"Num(5,3) ",Proportion of gages to sequester in the gage sequestration step. Values 0 to 1.
+reach,EROMExtension,EROM_060001,Lat,,,"Num(9,5) ",Average Latitude of catchment in decimal degrees
+reach,EROMExtension,EROM_060001,NRef,,,"Num(5,4) ",Number of Reference gages used in the regression
+reach,EROMExtension,EROM_060001,PET0001,,,"Num(14,5) ",Catchment PET (mm)
+reach,EROMExtension,EROM_060001,PPT0001,,,"Num(14,5) ",Catchment precipitation (mm)
+reach,EROMExtension,EROM_060001,Q0001A,,,"Num(14,3) ",Flow from runoff (cfs)
+reach,EROMExtension,EROM_060001,Q0001B,,,"Num(14,3) ",Flow with Excess ET (cfs)
+reach,EROMExtension,EROM_060001,Q0001C,,,"Num(14,3) ",Flow with Reference Gage Regression applied to Q0001B
+reach,EROMExtension,EROM_060001,Q0001D,,,"Num(14,3) ",Flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_060001,Q0001E,,1,"Num(14,3) ",Flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_060001,Q0001F,,,"Num(14,3) ",Flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_060001,QG0001Adj,,,"Num(14,3) ",Gage adjustment flow (cfs)
+reach,EROMExtension,EROM_060001,QG0001Nav,,,"Num(14,3) ",Gage adjustment flow not available ( cfs)
+reach,EROMExtension,EROM_060001,QIncr0001A,,,"Num(13,5) ",Incremental Flow from runoff (cfs)
+reach,EROMExtension,EROM_060001,QIncr0001B,,,"Num(13,5) ",Incremental Flow With Excess ET (cfs)
+reach,EROMExtension,EROM_060001,QIncr0001C,,,"Num(13,5) ",Incremental Flow by subtracting the sum of upstream flows from the sum of the upstream Q0001C (cfs)
+reach,EROMExtension,EROM_060001,QIncr0001D,,,"Num(13,5) ",Incremental flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_060001,QIncr0001E,,,"Num(13,5) ",Incremental flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_060001,QIncr0001F,,,"Num(13,5) ",Incremental flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_060001,QLoss0001,,,"Num(14,3) ",Catchment flow loss from Excess ET (cfs)
+reach,EROMExtension,EROM_060001,r2,,,"Num(11,4) ",Reference gage regression Log-Log r2
+reach,EROMExtension,EROM_060001,SER,,,"Num(11,5) ",Reference gage regression log-log Standard Error of the Regression
+reach,EROMExtension,EROM_060001,SMGageID,,,Text(16),The ID of the gage located on NHDFlowline feature
+reach,EROMExtension,EROM_060001,SMGageq,,,"Num(14,3) ",Gaged flow measured by the gage on NHDFlowline feature (cfs)
+reach,EROMExtension,EROM_060001,Temp0001,,,"Num(14,5) ",Catchment temperature  (Deg. C)
+reach,EROMExtension,EROM_060001,V0001A,,,"Num(14,5) ",Velocity for Q0001A (fps)
+reach,EROMExtension,EROM_060001,V0001B,,,"Num(13,5) ",Velocity for Q0001B (fps)
+reach,EROMExtension,EROM_060001,V0001C,,,"Num(13,5) ",Velocity for Q0001C (fps)
+reach,EROMExtension,EROM_060001,V0001D,,,"Num(13,5) ",Velocity for Q0001D (fps)
+reach,EROMExtension,EROM_060001,V0001E,,1,"Num(13,5) ",Velocity from gage adjustment (fps)
+reach,EROMExtension,EROM_070001,A,,,"Num(11,5) ",Reference gage regression coefficient a
+reach,EROMExtension,EROM_070001,AreaSqKm,,,"Num(14,6) ",See Catchment
+reach,EROMExtension,EROM_070001,ARQ0001Nav,,,"Num(14,3) ",PlusflowAR flow not available on flowline (cfs)
+reach,EROMExtension,EROM_070001,AvgQAdj,,,"Num(14,3) ",Gage Q adjusted for bottom of an NHDflowline feature (cfs)
+reach,EROMExtension,EROM_070001,B,,,"Num(11,5) ",Reference gage regression coefficient b
+reach,EROMExtension,EROM_070001,BCF,,,"Num(11,5) ",Reference gage regression Bias Correction Factor
+reach,EROMExtension,EROM_070001,ComID,,1,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROM_070001,DivDASqKm,,,"Num(14,6) ",Divergence-routed cumulative area
+reach,EROMExtension,EROM_070001,ETFract1,,,"Num(5,3) ",Excess ET Fraction 1
+reach,EROMExtension,EROM_070001,ETFract2,,,"Num(5,3) ",Excess ET Fraction 2
+reach,EROMExtension,EROM_070001,GageAdj,,,Text(1),"Flag indicating that Q<eeee>E and Qincr0001E have been adjusted by gage flow. 0 = not adjusted, 2 = adjusted, including the NHDFlowline feature at the gage and the NHDFlowline features upstream. "
+reach,EROMExtension,EROM_070001,GageSeq,,,"Num(5,3) ","0 = gage not sequestered, 1= gage sequestered "
+reach,EROMExtension,EROM_070001,GageSeqP,,,"Num(5,3) ",Proportion of gages to sequester in the gage sequestration step. Values 0 to 1.
+reach,EROMExtension,EROM_070001,Lat,,,"Num(9,5) ",Average Latitude of catchment in decimal degrees
+reach,EROMExtension,EROM_070001,NRef,,,"Num(5,4) ",Number of Reference gages used in the regression
+reach,EROMExtension,EROM_070001,PET0001,,,"Num(14,5) ",Catchment PET (mm)
+reach,EROMExtension,EROM_070001,PPT0001,,,"Num(14,5) ",Catchment precipitation (mm)
+reach,EROMExtension,EROM_070001,Q0001A,,,"Num(14,3) ",Flow from runoff (cfs)
+reach,EROMExtension,EROM_070001,Q0001B,,,"Num(14,3) ",Flow with Excess ET (cfs)
+reach,EROMExtension,EROM_070001,Q0001C,,,"Num(14,3) ",Flow with Reference Gage Regression applied to Q0001B
+reach,EROMExtension,EROM_070001,Q0001D,,,"Num(14,3) ",Flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_070001,Q0001E,,1,"Num(14,3) ",Flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_070001,Q0001F,,,"Num(14,3) ",Flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_070001,QG0001Adj,,,"Num(14,3) ",Gage adjustment flow (cfs)
+reach,EROMExtension,EROM_070001,QG0001Nav,,,"Num(14,3) ",Gage adjustment flow not available ( cfs)
+reach,EROMExtension,EROM_070001,QIncr0001A,,,"Num(13,5) ",Incremental Flow from runoff (cfs)
+reach,EROMExtension,EROM_070001,QIncr0001B,,,"Num(13,5) ",Incremental Flow With Excess ET (cfs)
+reach,EROMExtension,EROM_070001,QIncr0001C,,,"Num(13,5) ",Incremental Flow by subtracting the sum of upstream flows from the sum of the upstream Q0001C (cfs)
+reach,EROMExtension,EROM_070001,QIncr0001D,,,"Num(13,5) ",Incremental flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_070001,QIncr0001E,,,"Num(13,5) ",Incremental flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_070001,QIncr0001F,,,"Num(13,5) ",Incremental flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_070001,QLoss0001,,,"Num(14,3) ",Catchment flow loss from Excess ET (cfs)
+reach,EROMExtension,EROM_070001,r2,,,"Num(11,4) ",Reference gage regression Log-Log r2
+reach,EROMExtension,EROM_070001,SER,,,"Num(11,5) ",Reference gage regression log-log Standard Error of the Regression
+reach,EROMExtension,EROM_070001,SMGageID,,,Text(16),The ID of the gage located on NHDFlowline feature
+reach,EROMExtension,EROM_070001,SMGageq,,,"Num(14,3) ",Gaged flow measured by the gage on NHDFlowline feature (cfs)
+reach,EROMExtension,EROM_070001,Temp0001,,,"Num(14,5) ",Catchment temperature  (Deg. C)
+reach,EROMExtension,EROM_070001,V0001A,,,"Num(14,5) ",Velocity for Q0001A (fps)
+reach,EROMExtension,EROM_070001,V0001B,,,"Num(13,5) ",Velocity for Q0001B (fps)
+reach,EROMExtension,EROM_070001,V0001C,,,"Num(13,5) ",Velocity for Q0001C (fps)
+reach,EROMExtension,EROM_070001,V0001D,,,"Num(13,5) ",Velocity for Q0001D (fps)
+reach,EROMExtension,EROM_070001,V0001E,,1,"Num(13,5) ",Velocity from gage adjustment (fps)
+reach,EROMExtension,EROM_080001,A,,,"Num(11,5) ",Reference gage regression coefficient a
+reach,EROMExtension,EROM_080001,AreaSqKm,,,"Num(14,6) ",See Catchment
+reach,EROMExtension,EROM_080001,ARQ0001Nav,,,"Num(14,3) ",PlusflowAR flow not available on flowline (cfs)
+reach,EROMExtension,EROM_080001,AvgQAdj,,,"Num(14,3) ",Gage Q adjusted for bottom of an NHDflowline feature (cfs)
+reach,EROMExtension,EROM_080001,B,,,"Num(11,5) ",Reference gage regression coefficient b
+reach,EROMExtension,EROM_080001,BCF,,,"Num(11,5) ",Reference gage regression Bias Correction Factor
+reach,EROMExtension,EROM_080001,ComID,,1,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROM_080001,DivDASqKm,,,"Num(14,6) ",Divergence-routed cumulative area
+reach,EROMExtension,EROM_080001,ETFract1,,,"Num(5,3) ",Excess ET Fraction 1
+reach,EROMExtension,EROM_080001,ETFract2,,,"Num(5,3) ",Excess ET Fraction 2
+reach,EROMExtension,EROM_080001,GageAdj,,,Text(1),"Flag indicating that Q<eeee>E and Qincr0001E have been adjusted by gage flow. 0 = not adjusted, 2 = adjusted, including the NHDFlowline feature at the gage and the NHDFlowline features upstream. "
+reach,EROMExtension,EROM_080001,GageSeq,,,"Num(5,3) ","0 = gage not sequestered, 1= gage sequestered "
+reach,EROMExtension,EROM_080001,GageSeqP,,,"Num(5,3) ",Proportion of gages to sequester in the gage sequestration step. Values 0 to 1.
+reach,EROMExtension,EROM_080001,Lat,,,"Num(9,5) ",Average Latitude of catchment in decimal degrees
+reach,EROMExtension,EROM_080001,NRef,,,"Num(5,4) ",Number of Reference gages used in the regression
+reach,EROMExtension,EROM_080001,PET0001,,,"Num(14,5) ",Catchment PET (mm)
+reach,EROMExtension,EROM_080001,PPT0001,,,"Num(14,5) ",Catchment precipitation (mm)
+reach,EROMExtension,EROM_080001,Q0001A,,,"Num(14,3) ",Flow from runoff (cfs)
+reach,EROMExtension,EROM_080001,Q0001B,,,"Num(14,3) ",Flow with Excess ET (cfs)
+reach,EROMExtension,EROM_080001,Q0001C,,,"Num(14,3) ",Flow with Reference Gage Regression applied to Q0001B
+reach,EROMExtension,EROM_080001,Q0001D,,,"Num(14,3) ",Flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_080001,Q0001E,,1,"Num(14,3) ",Flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_080001,Q0001F,,,"Num(14,3) ",Flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_080001,QG0001Adj,,,"Num(14,3) ",Gage adjustment flow (cfs)
+reach,EROMExtension,EROM_080001,QG0001Nav,,,"Num(14,3) ",Gage adjustment flow not available ( cfs)
+reach,EROMExtension,EROM_080001,QIncr0001A,,,"Num(13,5) ",Incremental Flow from runoff (cfs)
+reach,EROMExtension,EROM_080001,QIncr0001B,,,"Num(13,5) ",Incremental Flow With Excess ET (cfs)
+reach,EROMExtension,EROM_080001,QIncr0001C,,,"Num(13,5) ",Incremental Flow by subtracting the sum of upstream flows from the sum of the upstream Q0001C (cfs)
+reach,EROMExtension,EROM_080001,QIncr0001D,,,"Num(13,5) ",Incremental flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_080001,QIncr0001E,,,"Num(13,5) ",Incremental flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_080001,QIncr0001F,,,"Num(13,5) ",Incremental flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_080001,QLoss0001,,,"Num(14,3) ",Catchment flow loss from Excess ET (cfs)
+reach,EROMExtension,EROM_080001,r2,,,"Num(11,4) ",Reference gage regression Log-Log r2
+reach,EROMExtension,EROM_080001,SER,,,"Num(11,5) ",Reference gage regression log-log Standard Error of the Regression
+reach,EROMExtension,EROM_080001,SMGageID,,,Text(16),The ID of the gage located on NHDFlowline feature
+reach,EROMExtension,EROM_080001,SMGageq,,,"Num(14,3) ",Gaged flow measured by the gage on NHDFlowline feature (cfs)
+reach,EROMExtension,EROM_080001,Temp0001,,,"Num(14,5) ",Catchment temperature  (Deg. C)
+reach,EROMExtension,EROM_080001,V0001A,,,"Num(14,5) ",Velocity for Q0001A (fps)
+reach,EROMExtension,EROM_080001,V0001B,,,"Num(13,5) ",Velocity for Q0001B (fps)
+reach,EROMExtension,EROM_080001,V0001C,,,"Num(13,5) ",Velocity for Q0001C (fps)
+reach,EROMExtension,EROM_080001,V0001D,,,"Num(13,5) ",Velocity for Q0001D (fps)
+reach,EROMExtension,EROM_080001,V0001E,,1,"Num(13,5) ",Velocity from gage adjustment (fps)
+reach,EROMExtension,EROM_090001,A,,,"Num(11,5) ",Reference gage regression coefficient a
+reach,EROMExtension,EROM_090001,AreaSqKm,,,"Num(14,6) ",See Catchment
+reach,EROMExtension,EROM_090001,ARQ0001Nav,,,"Num(14,3) ",PlusflowAR flow not available on flowline (cfs)
+reach,EROMExtension,EROM_090001,AvgQAdj,,,"Num(14,3) ",Gage Q adjusted for bottom of an NHDflowline feature (cfs)
+reach,EROMExtension,EROM_090001,B,,,"Num(11,5) ",Reference gage regression coefficient b
+reach,EROMExtension,EROM_090001,BCF,,,"Num(11,5) ",Reference gage regression Bias Correction Factor
+reach,EROMExtension,EROM_090001,ComID,,1,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROM_090001,DivDASqKm,,,"Num(14,6) ",Divergence-routed cumulative area
+reach,EROMExtension,EROM_090001,ETFract1,,,"Num(5,3) ",Excess ET Fraction 1
+reach,EROMExtension,EROM_090001,ETFract2,,,"Num(5,3) ",Excess ET Fraction 2
+reach,EROMExtension,EROM_090001,GageAdj,,,Text(1),"Flag indicating that Q<eeee>E and Qincr0001E have been adjusted by gage flow. 0 = not adjusted, 2 = adjusted, including the NHDFlowline feature at the gage and the NHDFlowline features upstream. "
+reach,EROMExtension,EROM_090001,GageSeqP,,,"Num(5,3) ",Proportion of gages to sequester in the gage sequestration step. Values 0 to 1.
+reach,EROMExtension,EROM_090001,Lat,,,"Num(9,5) ",Average Latitude of catchment in decimal degrees
+reach,EROMExtension,EROM_090001,NRef,,,"Num(5,4) ",Number of Reference gages used in the regression
+reach,EROMExtension,EROM_090001,PET0001,,,"Num(14,5) ",Catchment PET (mm)
+reach,EROMExtension,EROM_090001,PPT0001,,,"Num(14,5) ",Catchment precipitation (mm)
+reach,EROMExtension,EROM_090001,Q0001A,,,"Num(14,3) ",Flow from runoff (cfs)
+reach,EROMExtension,EROM_090001,Q0001B,,,"Num(14,3) ",Flow with Excess ET (cfs)
+reach,EROMExtension,EROM_090001,Q0001C,,,"Num(14,3) ",Flow with Reference Gage Regression applied to Q0001B
+reach,EROMExtension,EROM_090001,Q0001D,,,"Num(14,3) ",Flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_090001,Q0001E,,1,"Num(14,3) ",Flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_090001,Q0001F,,,"Num(14,3) ",Flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_090001,QG0001Adj,,,"Num(14,3) ",Gage adjustment flow (cfs)
+reach,EROMExtension,EROM_090001,QG0001Nav,,,"Num(14,3) ",Gage adjustment flow not available ( cfs)
+reach,EROMExtension,EROM_090001,QIncr0001A,,,"Num(13,5) ",Incremental Flow from runoff (cfs)
+reach,EROMExtension,EROM_090001,QIncr0001B,,,"Num(13,5) ",Incremental Flow With Excess ET (cfs)
+reach,EROMExtension,EROM_090001,QIncr0001C,,,"Num(13,5) ",Incremental Flow by subtracting the sum of upstream flows from the sum of the upstream Q0001C (cfs)
+reach,EROMExtension,EROM_090001,QIncr0001D,,,"Num(13,5) ",Incremental flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_090001,QIncr0001E,,,"Num(13,5) ",Incremental flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_090001,QIncr0001F,,,"Num(13,5) ",Incremental flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_090001,QLoss0001,,,"Num(14,3) ",Catchment flow loss from Excess ET (cfs)
+reach,EROMExtension,EROM_090001,r2,,,"Num(11,4) ",Reference gage regression Log-Log r2
+reach,EROMExtension,EROM_090001,SER,,,"Num(11,5) ",Reference gage regression log-log Standard Error of the Regression
+reach,EROMExtension,EROM_090001,SMGageID,,,Text(16),The ID of the gage located on NHDFlowline feature
+reach,EROMExtension,EROM_090001,SMGageq,,,"Num(14,3) ",Gaged flow measured by the gage on NHDFlowline feature (cfs)
+reach,EROMExtension,EROM_090001,Temp0001,,,"Num(14,5) ",Catchment temperature  (Deg. C)
+reach,EROMExtension,EROM_090001,V0001A,,,"Num(14,5) ",Velocity for Q0001A (fps)
+reach,EROMExtension,EROM_090001,V0001B,,,"Num(13,5) ",Velocity for Q0001B (fps)
+reach,EROMExtension,EROM_090001,V0001C,,,"Num(13,5) ",Velocity for Q0001C (fps)
+reach,EROMExtension,EROM_090001,V0001D,,,"Num(13,5) ",Velocity for Q0001D (fps)
+reach,EROMExtension,EROM_090001,V0001E,,1,"Num(13,5) ",Velocity from gage adjustment (fps)
+reach,EROMExtension,EROM_100001,A,,,"Num(11,5) ",Reference gage regression coefficient a
+reach,EROMExtension,EROM_100001,AreaSqKm,,,"Num(14,6) ",See Catchment
+reach,EROMExtension,EROM_100001,ARQ0001Nav,,,"Num(14,3) ",PlusflowAR flow not available on flowline (cfs)
+reach,EROMExtension,EROM_100001,AvgQAdj,,,"Num(14,3) ",Gage Q adjusted for bottom of an NHDflowline feature (cfs)
+reach,EROMExtension,EROM_100001,B,,,"Num(11,5) ",Reference gage regression coefficient b
+reach,EROMExtension,EROM_100001,BCF,,,"Num(11,5) ",Reference gage regression Bias Correction Factor
+reach,EROMExtension,EROM_100001,ComID,,1,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROM_100001,DivDASqKm,,,"Num(14,6) ",Divergence-routed cumulative area
+reach,EROMExtension,EROM_100001,ETFract1,,,"Num(5,3) ",Excess ET Fraction 1
+reach,EROMExtension,EROM_100001,ETFract2,,,"Num(5,3) ",Excess ET Fraction 2
+reach,EROMExtension,EROM_100001,GageAdj,,,Text(1),"Flag indicating that Q<eeee>E and Qincr0001E have been adjusted by gage flow. 0 = not adjusted, 2 = adjusted, including the NHDFlowline feature at the gage and the NHDFlowline features upstream. "
+reach,EROMExtension,EROM_100001,GageSeq,,,"Num(5,3) ","0 = gage not sequestered, 1= gage sequestered "
+reach,EROMExtension,EROM_100001,GageSeqP,,,"Num(5,3) ",Proportion of gages to sequester in the gage sequestration step. Values 0 to 1.
+reach,EROMExtension,EROM_100001,Lat,,,"Num(9,5) ",Average Latitude of catchment in decimal degrees
+reach,EROMExtension,EROM_100001,NRef,,,"Num(5,4) ",Number of Reference gages used in the regression
+reach,EROMExtension,EROM_100001,PET0001,,,"Num(14,5) ",Catchment PET (mm)
+reach,EROMExtension,EROM_100001,PPT0001,,,"Num(14,5) ",Catchment precipitation (mm)
+reach,EROMExtension,EROM_100001,Q0001A,,,"Num(14,3) ",Flow from runoff (cfs)
+reach,EROMExtension,EROM_100001,Q0001B,,,"Num(14,3) ",Flow with Excess ET (cfs)
+reach,EROMExtension,EROM_100001,Q0001C,,,"Num(14,3) ",Flow with Reference Gage Regression applied to Q0001B
+reach,EROMExtension,EROM_100001,Q0001D,,,"Num(14,3) ",Flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_100001,Q0001E,,1,"Num(14,3) ",Flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_100001,Q0001F,,,"Num(14,3) ",Flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_100001,QG0001Adj,,,"Num(14,3) ",Gage adjustment flow (cfs)
+reach,EROMExtension,EROM_100001,QG0001Nav,,,"Num(14,3) ",Gage adjustment flow not available ( cfs)
+reach,EROMExtension,EROM_100001,QIncr0001A,,,"Num(13,5) ",Incremental Flow from runoff (cfs)
+reach,EROMExtension,EROM_100001,QIncr0001B,,,"Num(13,5) ",Incremental Flow With Excess ET (cfs)
+reach,EROMExtension,EROM_100001,QIncr0001C,,,"Num(13,5) ",Incremental Flow by subtracting the sum of upstream flows from the sum of the upstream Q0001C (cfs)
+reach,EROMExtension,EROM_100001,QIncr0001D,,,"Num(13,5) ",Incremental flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_100001,QIncr0001E,,,"Num(13,5) ",Incremental flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_100001,QIncr0001F,,,"Num(13,5) ",Incremental flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_100001,QLoss0001,,,"Num(14,3) ",Catchment flow loss from Excess ET (cfs)
+reach,EROMExtension,EROM_100001,r2,,,"Num(11,4) ",Reference gage regression Log-Log r2
+reach,EROMExtension,EROM_100001,SER,,,"Num(11,5) ",Reference gage regression log-log Standard Error of the Regression
+reach,EROMExtension,EROM_100001,SMGageID,,,Text(16),The ID of the gage located on NHDFlowline feature
+reach,EROMExtension,EROM_100001,SMGageq,,,"Num(14,3) ",Gaged flow measured by the gage on NHDFlowline feature (cfs)
+reach,EROMExtension,EROM_100001,Temp0001,,,"Num(14,5) ",Catchment temperature  (Deg. C)
+reach,EROMExtension,EROM_100001,V0001A,,,"Num(14,5) ",Velocity for Q0001A (fps)
+reach,EROMExtension,EROM_100001,V0001B,,,"Num(13,5) ",Velocity for Q0001B (fps)
+reach,EROMExtension,EROM_100001,V0001C,,,"Num(13,5) ",Velocity for Q0001C (fps)
+reach,EROMExtension,EROM_100001,V0001D,,,"Num(13,5) ",Velocity for Q0001D (fps)
+reach,EROMExtension,EROM_100001,V0001E,,1,"Num(13,5) ",Velocity from gage adjustment (fps)
+reach,EROMExtension,EROM_110001,A,,,"Num(11,5) ",Reference gage regression coefficient a
+reach,EROMExtension,EROM_110001,AreaSqKm,,,"Num(14,6) ",See Catchment
+reach,EROMExtension,EROM_110001,ARQ0001Nav,,,"Num(14,3) ",PlusflowAR flow not available on flowline (cfs)
+reach,EROMExtension,EROM_110001,AvgQAdj,,,"Num(14,3) ",Gage Q adjusted for bottom of an NHDflowline feature (cfs)
+reach,EROMExtension,EROM_110001,B,,,"Num(11,5) ",Reference gage regression coefficient b
+reach,EROMExtension,EROM_110001,BCF,,,"Num(11,5) ",Reference gage regression Bias Correction Factor
+reach,EROMExtension,EROM_110001,ComID,,1,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROM_110001,DivDASqKm,,,"Num(14,6) ",Divergence-routed cumulative area
+reach,EROMExtension,EROM_110001,ETFract1,,,"Num(5,3) ",Excess ET Fraction 1
+reach,EROMExtension,EROM_110001,ETFract2,,,"Num(5,3) ",Excess ET Fraction 2
+reach,EROMExtension,EROM_110001,GageAdj,,,Text(1),"Flag indicating that Q<eeee>E and Qincr0001E have been adjusted by gage flow. 0 = not adjusted, 2 = adjusted, including the NHDFlowline feature at the gage and the NHDFlowline features upstream. "
+reach,EROMExtension,EROM_110001,GageSeq,,,"Num(5,3) ","0 = gage not sequestered, 1= gage sequestered "
+reach,EROMExtension,EROM_110001,GageSeqP,,,"Num(5,3) ",Proportion of gages to sequester in the gage sequestration step. Values 0 to 1.
+reach,EROMExtension,EROM_110001,Lat,,,"Num(9,5) ",Average Latitude of catchment in decimal degrees
+reach,EROMExtension,EROM_110001,NRef,,,"Num(5,4) ",Number of Reference gages used in the regression
+reach,EROMExtension,EROM_110001,PET0001,,,"Num(14,5) ",Catchment PET (mm)
+reach,EROMExtension,EROM_110001,PPT0001,,,"Num(14,5) ",Catchment precipitation (mm)
+reach,EROMExtension,EROM_110001,Q0001A,,,"Num(14,3) ",Flow from runoff (cfs)
+reach,EROMExtension,EROM_110001,Q0001B,,,"Num(14,3) ",Flow with Excess ET (cfs)
+reach,EROMExtension,EROM_110001,Q0001C,,,"Num(14,3) ",Flow with Reference Gage Regression applied to Q0001B
+reach,EROMExtension,EROM_110001,Q0001D,,,"Num(14,3) ",Flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_110001,Q0001E,,1,"Num(14,3) ",Flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_110001,Q0001F,,,"Num(14,3) ",Flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_110001,QG0001Adj,,,"Num(14,3) ",Gage adjustment flow (cfs)
+reach,EROMExtension,EROM_110001,QG0001Nav,,,"Num(14,3) ",Gage adjustment flow not available ( cfs)
+reach,EROMExtension,EROM_110001,QIncr0001A,,,"Num(13,5) ",Incremental Flow from runoff (cfs)
+reach,EROMExtension,EROM_110001,QIncr0001B,,,"Num(13,5) ",Incremental Flow With Excess ET (cfs)
+reach,EROMExtension,EROM_110001,QIncr0001C,,,"Num(13,5) ",Incremental Flow by subtracting the sum of upstream flows from the sum of the upstream Q0001C (cfs)
+reach,EROMExtension,EROM_110001,QIncr0001D,,,"Num(13,5) ",Incremental flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_110001,QIncr0001E,,,"Num(13,5) ",Incremental flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_110001,QIncr0001F,,,"Num(13,5) ",Incremental flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_110001,QLoss0001,,,"Num(14,3) ",Catchment flow loss from Excess ET (cfs)
+reach,EROMExtension,EROM_110001,r2,,,"Num(11,4) ",Reference gage regression Log-Log r2
+reach,EROMExtension,EROM_110001,SER,,,"Num(11,5) ",Reference gage regression log-log Standard Error of the Regression
+reach,EROMExtension,EROM_110001,SMGageID,,,Text(16),The ID of the gage located on NHDFlowline feature
+reach,EROMExtension,EROM_110001,SMGageq,,,"Num(14,3) ",Gaged flow measured by the gage on NHDFlowline feature (cfs)
+reach,EROMExtension,EROM_110001,Temp0001,,,"Num(14,5) ",Catchment temperature  (Deg. C)
+reach,EROMExtension,EROM_110001,V0001A,,,"Num(14,5) ",Velocity for Q0001A (fps)
+reach,EROMExtension,EROM_110001,V0001B,,,"Num(13,5) ",Velocity for Q0001B (fps)
+reach,EROMExtension,EROM_110001,V0001C,,,"Num(13,5) ",Velocity for Q0001C (fps)
+reach,EROMExtension,EROM_110001,V0001D,,,"Num(13,5) ",Velocity for Q0001D (fps)
+reach,EROMExtension,EROM_110001,V0001E,,1,"Num(13,5) ",Velocity from gage adjustment (fps)
+reach,EROMExtension,EROM_120001,A,,,"Num(11,5) ",Reference gage regression coefficient a
+reach,EROMExtension,EROM_120001,AreaSqKm,,,"Num(14,6) ",See Catchment
+reach,EROMExtension,EROM_120001,ARQ0001Nav,,,"Num(14,3) ",PlusflowAR flow not available on flowline (cfs)
+reach,EROMExtension,EROM_120001,AvgQAdj,,,"Num(14,3) ",Gage Q adjusted for bottom of an NHDflowline feature (cfs)
+reach,EROMExtension,EROM_120001,B,,,"Num(11,5) ",Reference gage regression coefficient b
+reach,EROMExtension,EROM_120001,BCF,,,"Num(11,5) ",Reference gage regression Bias Correction Factor
+reach,EROMExtension,EROM_120001,ComID,,1,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROM_120001,DivDASqKm,,,"Num(14,6) ",Divergence-routed cumulative area
+reach,EROMExtension,EROM_120001,ETFract1,,,"Num(5,3) ",Excess ET Fraction 1
+reach,EROMExtension,EROM_120001,ETFract2,,,"Num(5,3) ",Excess ET Fraction 2
+reach,EROMExtension,EROM_120001,GageAdj,,,Text(1),"Flag indicating that Q<eeee>E and Qincr0001E have been adjusted by gage flow. 0 = not adjusted, 2 = adjusted, including the NHDFlowline feature at the gage and the NHDFlowline features upstream. "
+reach,EROMExtension,EROM_120001,GageSeq,,,"Num(5,3) ","0 = gage not sequestered, 1= gage sequestered "
+reach,EROMExtension,EROM_120001,GageSeqP,,,"Num(5,3) ",Proportion of gages to sequester in the gage sequestration step. Values 0 to 1.
+reach,EROMExtension,EROM_120001,Lat,,,"Num(9,5) ",Average Latitude of catchment in decimal degrees
+reach,EROMExtension,EROM_120001,NRef,,,"Num(5,4) ",Number of Reference gages used in the regression
+reach,EROMExtension,EROM_120001,PET0001,,,"Num(14,5) ",Catchment PET (mm)
+reach,EROMExtension,EROM_120001,PPT0001,,,"Num(14,5) ",Catchment precipitation (mm)
+reach,EROMExtension,EROM_120001,Q0001A,,,"Num(14,3) ",Flow from runoff (cfs)
+reach,EROMExtension,EROM_120001,Q0001B,,,"Num(14,3) ",Flow with Excess ET (cfs)
+reach,EROMExtension,EROM_120001,Q0001C,,,"Num(14,3) ",Flow with Reference Gage Regression applied to Q0001B
+reach,EROMExtension,EROM_120001,Q0001D,,,"Num(14,3) ",Flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_120001,Q0001E,,1,"Num(14,3) ",Flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_120001,Q0001F,,,"Num(14,3) ",Flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_120001,QG0001Adj,,,"Num(14,3) ",Gage adjustment flow (cfs)
+reach,EROMExtension,EROM_120001,QG0001Nav,,,"Num(14,3) ",Gage adjustment flow not available ( cfs)
+reach,EROMExtension,EROM_120001,QIncr0001A,,,"Num(13,5) ",Incremental Flow from runoff (cfs)
+reach,EROMExtension,EROM_120001,QIncr0001B,,,"Num(13,5) ",Incremental Flow With Excess ET (cfs)
+reach,EROMExtension,EROM_120001,QIncr0001C,,,"Num(13,5) ",Incremental Flow by subtracting the sum of upstream flows from the sum of the upstream Q0001C (cfs)
+reach,EROMExtension,EROM_120001,QIncr0001D,,,"Num(13,5) ",Incremental flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_120001,QIncr0001E,,,"Num(13,5) ",Incremental flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_120001,QIncr0001F,,,"Num(13,5) ",Incremental flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_120001,QLoss0001,,,"Num(14,3) ",Catchment flow loss from Excess ET (cfs)
+reach,EROMExtension,EROM_120001,r2,,,"Num(11,4) ",Reference gage regression Log-Log r2
+reach,EROMExtension,EROM_120001,SER,,,"Num(11,5) ",Reference gage regression log-log Standard Error of the Regression
+reach,EROMExtension,EROM_120001,SMGageID,,,Text(16),The ID of the gage located on NHDFlowline feature
+reach,EROMExtension,EROM_120001,SMGageq,,,"Num(14,3) ",Gaged flow measured by the gage on NHDFlowline feature (cfs)
+reach,EROMExtension,EROM_120001,Temp0001,,,"Num(14,5) ",Catchment temperature  (Deg. C)
+reach,EROMExtension,EROM_120001,V0001A,,,"Num(14,5) ",Velocity for Q0001A (fps)
+reach,EROMExtension,EROM_120001,V0001B,,,"Num(13,5) ",Velocity for Q0001B (fps)
+reach,EROMExtension,EROM_120001,V0001C,,,"Num(13,5) ",Velocity for Q0001C (fps)
+reach,EROMExtension,EROM_120001,V0001D,,,"Num(13,5) ",Velocity for Q0001D (fps)
+reach,EROMExtension,EROM_120001,V0001E,,1,"Num(13,5) ",Velocity from gage adjustment (fps)
+reach,EROMExtension,EROM_MA0001,A,,,"Num(11,5) ",Reference gage regression coefficient a
+reach,EROMExtension,EROM_MA0001,AreaSqKm,,,"Num(14,6) ",See Catchment
+reach,EROMExtension,EROM_MA0001,ARQ0001Nav,,,"Num(14,3) ",PlusflowAR flow not available on flowline (cfs)
+reach,EROMExtension,EROM_MA0001,AvgQAdj,,,"Num(14,3) ",Gage Q adjusted for bottom of an NHDflowline feature (cfs)
+reach,EROMExtension,EROM_MA0001,B,,,"Num(11,5) ",Reference gage regression coefficient b
+reach,EROMExtension,EROM_MA0001,BCF,,,"Num(11,5) ",Reference gage regression Bias Correction Factor
+reach,EROMExtension,EROM_MA0001,ComID,,1,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROM_MA0001,DivDASqKm,,,"Num(14,6) ",Divergence-routed cumulative area
+reach,EROMExtension,EROM_MA0001,ETFract1,,,"Num(5,3) ",Excess ET Fraction 1
+reach,EROMExtension,EROM_MA0001,ETFract2,,,"Num(5,3) ",Excess ET Fraction 2
+reach,EROMExtension,EROM_MA0001,GageAdj,,,Text(1),"Flag indicating that Q<eeee>E and Qincr0001E have been adjusted by gage flow. 0 = not adjusted, 2 = adjusted, including the NHDFlowline feature at the gage and the NHDFlowline features upstream. "
+reach,EROMExtension,EROM_MA0001,GageSeqP,,,"Num(5,3) ",Proportion of gages to sequester in the gage sequestration step. Values 0 to 1.
+reach,EROMExtension,EROM_MA0001,Lat,,,"Num(9,5) ",Average Latitude of catchment in decimal degrees
+reach,EROMExtension,EROM_MA0001,NRef,,,"Num(5,4) ",Number of Reference gages used in the regression
+reach,EROMExtension,EROM_MA0001,PET0001,,,"Num(14,5) ",Catchment PET (mm)
+reach,EROMExtension,EROM_MA0001,PPT0001,,,"Num(14,5) ",Catchment precipitation (mm)
+reach,EROMExtension,EROM_MA0001,Q0001A,,,"Num(14,3) ",Flow from runoff (cfs)
+reach,EROMExtension,EROM_MA0001,Q0001B,,,"Num(14,3) ",Flow with Excess ET (cfs)
+reach,EROMExtension,EROM_MA0001,Q0001C,,,"Num(14,3) ",Flow with Reference Gage Regression applied to Q0001B
+reach,EROMExtension,EROM_MA0001,Q0001D,,,"Num(14,3) ",Flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_MA0001,Q0001E,,1,"Num(14,3) ",Flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_MA0001,Q0001F,,,"Num(14,3) ",Flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_MA0001,QG0001Adj,,,"Num(14,3) ",Gage adjustment flow (cfs)
+reach,EROMExtension,EROM_MA0001,QG0001Nav,,,"Num(14,3) ",Gage adjustment flow not available ( cfs)
+reach,EROMExtension,EROM_MA0001,QIncr0001A,,,"Num(13,5) ",Incremental Flow from runoff (cfs)
+reach,EROMExtension,EROM_MA0001,QIncr0001B,,,"Num(13,5) ",Incremental Flow With Excess ET (cfs)
+reach,EROMExtension,EROM_MA0001,QIncr0001C,,,"Num(13,5) ",Incremental Flow by subtracting the sum of upstream flows from the sum of the upstream Q0001C (cfs)
+reach,EROMExtension,EROM_MA0001,QIncr0001D,,,"Num(13,5) ",Incremental flow with PlusFlowAR (cfs)
+reach,EROMExtension,EROM_MA0001,QIncr0001E,,,"Num(13,5) ",Incremental flow from gage adjustment (cfs)
+reach,EROMExtension,EROM_MA0001,QIncr0001F,,,"Num(13,5) ",Incremental flow from gage sequestration step (cfs)
+reach,EROMExtension,EROM_MA0001,QLoss0001,,,"Num(14,3) ",Catchment flow loss from Excess ET (cfs)
+reach,EROMExtension,EROM_MA0001,r2,,,"Num(11,4) ",Reference gage regression Log-Log r2
+reach,EROMExtension,EROM_MA0001,SER,,,"Num(11,5) ",Reference gage regression log-log Standard Error of the Regression
+reach,EROMExtension,EROM_MA0001,SMGageID,,,Text(16),The ID of the gage located on NHDFlowline feature
+reach,EROMExtension,EROM_MA0001,SMGageq,,,"Num(14,3) ",Gaged flow measured by the gage on NHDFlowline feature (cfs)
+reach,EROMExtension,EROM_MA0001,Temp0001,,,"Num(14,5) ",Catchment temperature  (Deg. C)
+reach,EROMExtension,EROM_MA0001,V0001A,,,"Num(14,5) ",Velocity for Q0001A (fps)
+reach,EROMExtension,EROM_MA0001,V0001B,,,"Num(13,5) ",Velocity for Q0001B (fps)
+reach,EROMExtension,EROM_MA0001,V0001C,,,"Num(13,5) ",Velocity for Q0001C (fps)
+reach,EROMExtension,EROM_MA0001,V0001D,,,"Num(13,5) ",Velocity for Q0001D (fps)
+reach,EROMExtension,EROM_MA0001,V0001E,,1,"Num(13,5) ",Velocity from gage adjustment (fps)
+reach,EROMExtension,EROMQA_010001,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROMQA_010001,DivDASqKm,,,"Num(14,3) ",The NHDPlusV2 divergence-routed drainage area at the bottom of the flowline. (sqkm)
+reach,EROMExtension,EROMQA_010001,GageID,,,Text(16),The NWIS gageid
+reach,EROMExtension,EROMQA_010001,GageRef,,,Char(3),Text field: “Ref” = Falcone Reference Gage. Blank = not Reference gage.
+reach,EROMExtension,EROMQA_010001,Q_A,,,"Num(14,3) ",Cumulative runoff (cfs)
+reach,EROMExtension,EROMQA_010001,Q_ADelta,,,"Num(14,3) ",Q_E – Q_A (cfs)
+reach,EROMExtension,EROMQA_010001,Q_AUnitRo,,,"Num(14,3) ",Q_A / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_010001,Q_AURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Aunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_010001,Q_B,,,"Num(14,3) ",Q_A – Excess ET (EET) (cfs)
+reach,EROMExtension,EROMQA_010001,Q_BDelta,,,"Num(14,3) ",Q_E – Q_B (cfs)
+reach,EROMExtension,EROMQA_010001,Q_BUnitRo,,,"Num(14,3) ",Q_B / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_010001,Q_BURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Bunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_010001,Q_C,,,"Num(14,3) ",Q_A - EET +/- Refgage Regression Adjustment (cfs)
+reach,EROMExtension,EROMQA_010001,Q_CDelta,,,"Num(14,3) ",Q_E – Q_C (cfs)
+reach,EROMExtension,EROMQA_010001,Q_CUnitRo,,,"Num(14,3) ",Q_C / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_010001,Q_CURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Cunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_010001,Q_D,,,"Num(14,3) ",Q_A – EET +/ Refgage Regression Adjustment +/- PlusFlowAR (cfs)
+reach,EROMExtension,EROMQA_010001,Q_DDelta,,,"Num(14,3) ",Q_E – Q_D (cfs)
+reach,EROMExtension,EROMQA_010001,Q_DUnitRo,,,"Num(14,3) ",Q_D / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_010001,Q_DURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Dunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_010001,Q_E,,,"Num(14,3) ",The Gage Flow (cfs)
+reach,EROMExtension,EROMQA_010001,Q_EUnitRo,,,"Num(14,3) ",Q_E / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_020001,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROMQA_020001,DivDASqKm,,,"Num(14,3) ",The NHDPlusV2 divergence-routed drainage area at the bottom of the flowline. (sqkm)
+reach,EROMExtension,EROMQA_020001,GageID,,,Text(16),The NWIS gageid
+reach,EROMExtension,EROMQA_020001,GageRef,,,Char(3),Text field: “Ref” = Falcone Reference Gage. Blank = not Reference gage.
+reach,EROMExtension,EROMQA_020001,Q_A,,,"Num(14,3) ",Cumulative runoff (cfs)
+reach,EROMExtension,EROMQA_020001,Q_ADelta,,,"Num(14,3) ",Q_E – Q_A (cfs)
+reach,EROMExtension,EROMQA_020001,Q_AUnitRo,,,"Num(14,3) ",Q_A / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_020001,Q_AURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Aunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_020001,Q_B,,,"Num(14,3) ",Q_A – Excess ET (EET) (cfs)
+reach,EROMExtension,EROMQA_020001,Q_BDelta,,,"Num(14,3) ",Q_E – Q_B (cfs)
+reach,EROMExtension,EROMQA_020001,Q_BUnitRo,,,"Num(14,3) ",Q_B / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_020001,Q_BURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Bunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_020001,Q_C,,,"Num(14,3) ",Q_A - EET +/- Refgage Regression Adjustment (cfs)
+reach,EROMExtension,EROMQA_020001,Q_CDelta,,,"Num(14,3) ",Q_E – Q_C (cfs)
+reach,EROMExtension,EROMQA_020001,Q_CUnitRo,,,"Num(14,3) ",Q_C / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_020001,Q_CURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Cunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_020001,Q_D,,,"Num(14,3) ",Q_A – EET +/ Refgage Regression Adjustment +/- PlusFlowAR (cfs)
+reach,EROMExtension,EROMQA_020001,Q_DDelta,,,"Num(14,3) ",Q_E – Q_D (cfs)
+reach,EROMExtension,EROMQA_020001,Q_DUnitRo,,,"Num(14,3) ",Q_D / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_020001,Q_DURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Dunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_020001,Q_E,,,"Num(14,3) ",The Gage Flow (cfs)
+reach,EROMExtension,EROMQA_020001,Q_EUnitRo,,,"Num(14,3) ",Q_E / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_030001,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROMQA_030001,DivDASqKm,,,"Num(14,3) ",The NHDPlusV2 divergence-routed drainage area at the bottom of the flowline. (sqkm)
+reach,EROMExtension,EROMQA_030001,GageID,,,Text(16),The NWIS gageid
+reach,EROMExtension,EROMQA_030001,GageRef,,,Char(3),Text field: “Ref” = Falcone Reference Gage. Blank = not Reference gage.
+reach,EROMExtension,EROMQA_030001,Q_A,,,"Num(14,3) ",Cumulative runoff (cfs)
+reach,EROMExtension,EROMQA_030001,Q_ADelta,,,"Num(14,3) ",Q_E – Q_A (cfs)
+reach,EROMExtension,EROMQA_030001,Q_AUnitRo,,,"Num(14,3) ",Q_A / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_030001,Q_AURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Aunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_030001,Q_B,,,"Num(14,3) ",Q_A – Excess ET (EET) (cfs)
+reach,EROMExtension,EROMQA_030001,Q_BDelta,,,"Num(14,3) ",Q_E – Q_B (cfs)
+reach,EROMExtension,EROMQA_030001,Q_BUnitRo,,,"Num(14,3) ",Q_B / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_030001,Q_BURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Bunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_030001,Q_C,,,"Num(14,3) ",Q_A - EET +/- Refgage Regression Adjustment (cfs)
+reach,EROMExtension,EROMQA_030001,Q_CDelta,,,"Num(14,3) ",Q_E – Q_C (cfs)
+reach,EROMExtension,EROMQA_030001,Q_CUnitRo,,,"Num(14,3) ",Q_C / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_030001,Q_CURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Cunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_030001,Q_D,,,"Num(14,3) ",Q_A – EET +/ Refgage Regression Adjustment +/- PlusFlowAR (cfs)
+reach,EROMExtension,EROMQA_030001,Q_DDelta,,,"Num(14,3) ",Q_E – Q_D (cfs)
+reach,EROMExtension,EROMQA_030001,Q_DUnitRo,,,"Num(14,3) ",Q_D / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_030001,Q_DURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Dunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_030001,Q_E,,,"Num(14,3) ",The Gage Flow (cfs)
+reach,EROMExtension,EROMQA_030001,Q_EUnitRo,,,"Num(14,3) ",Q_E / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_040001,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROMQA_040001,DivDASqKm,,,"Num(14,3) ",The NHDPlusV2 divergence-routed drainage area at the bottom of the flowline. (sqkm)
+reach,EROMExtension,EROMQA_040001,GageID,,,Text(16),The NWIS gageid
+reach,EROMExtension,EROMQA_040001,GageRef,,,Char(3),Text field: “Ref” = Falcone Reference Gage. Blank = not Reference gage.
+reach,EROMExtension,EROMQA_040001,Q_A,,,"Num(14,3) ",Cumulative runoff (cfs)
+reach,EROMExtension,EROMQA_040001,Q_ADelta,,,"Num(14,3) ",Q_E – Q_A (cfs)
+reach,EROMExtension,EROMQA_040001,Q_AUnitRo,,,"Num(14,3) ",Q_A / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_040001,Q_AURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Aunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_040001,Q_B,,,"Num(14,3) ",Q_A – Excess ET (EET) (cfs)
+reach,EROMExtension,EROMQA_040001,Q_BDelta,,,"Num(14,3) ",Q_E – Q_B (cfs)
+reach,EROMExtension,EROMQA_040001,Q_BUnitRo,,,"Num(14,3) ",Q_B / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_040001,Q_BURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Bunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_040001,Q_C,,,"Num(14,3) ",Q_A - EET +/- Refgage Regression Adjustment (cfs)
+reach,EROMExtension,EROMQA_040001,Q_CDelta,,,"Num(14,3) ",Q_E – Q_C (cfs)
+reach,EROMExtension,EROMQA_040001,Q_CUnitRo,,,"Num(14,3) ",Q_C / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_040001,Q_CURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Cunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_040001,Q_D,,,"Num(14,3) ",Q_A – EET +/ Refgage Regression Adjustment +/- PlusFlowAR (cfs)
+reach,EROMExtension,EROMQA_040001,Q_DDelta,,,"Num(14,3) ",Q_E – Q_D (cfs)
+reach,EROMExtension,EROMQA_040001,Q_DUnitRo,,,"Num(14,3) ",Q_D / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_040001,Q_DURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Dunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_040001,Q_E,,,"Num(14,3) ",The Gage Flow (cfs)
+reach,EROMExtension,EROMQA_040001,Q_EUnitRo,,,"Num(14,3) ",Q_E / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_050001,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROMQA_050001,DivDASqKm,,,"Num(14,3) ",The NHDPlusV2 divergence-routed drainage area at the bottom of the flowline. (sqkm)
+reach,EROMExtension,EROMQA_050001,GageID,,,Text(16),The NWIS gageid
+reach,EROMExtension,EROMQA_050001,GageRef,,,Char(3),Text field: “Ref” = Falcone Reference Gage. Blank = not Reference gage.
+reach,EROMExtension,EROMQA_050001,Q_A,,,"Num(14,3) ",Cumulative runoff (cfs)
+reach,EROMExtension,EROMQA_050001,Q_ADelta,,,"Num(14,3) ",Q_E – Q_A (cfs)
+reach,EROMExtension,EROMQA_050001,Q_AUnitRo,,,"Num(14,3) ",Q_A / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_050001,Q_AURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Aunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_050001,Q_B,,,"Num(14,3) ",Q_A – Excess ET (EET) (cfs)
+reach,EROMExtension,EROMQA_050001,Q_BDelta,,,"Num(14,3) ",Q_E – Q_B (cfs)
+reach,EROMExtension,EROMQA_050001,Q_BUnitRo,,,"Num(14,3) ",Q_B / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_050001,Q_BURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Bunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_050001,Q_C,,,"Num(14,3) ",Q_A - EET +/- Refgage Regression Adjustment (cfs)
+reach,EROMExtension,EROMQA_050001,Q_CDelta,,,"Num(14,3) ",Q_E – Q_C (cfs)
+reach,EROMExtension,EROMQA_050001,Q_CUnitRo,,,"Num(14,3) ",Q_C / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_050001,Q_CURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Cunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_050001,Q_D,,,"Num(14,3) ",Q_A – EET +/ Refgage Regression Adjustment +/- PlusFlowAR (cfs)
+reach,EROMExtension,EROMQA_050001,Q_DDelta,,,"Num(14,3) ",Q_E – Q_D (cfs)
+reach,EROMExtension,EROMQA_050001,Q_DUnitRo,,,"Num(14,3) ",Q_D / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_050001,Q_DURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Dunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_050001,Q_E,,,"Num(14,3) ",The Gage Flow (cfs)
+reach,EROMExtension,EROMQA_050001,Q_EUnitRo,,,"Num(14,3) ",Q_E / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_060001,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROMQA_060001,DivDASqKm,,,"Num(14,3) ",The NHDPlusV2 divergence-routed drainage area at the bottom of the flowline. (sqkm)
+reach,EROMExtension,EROMQA_060001,GageID,,,Text(16),The NWIS gageid
+reach,EROMExtension,EROMQA_060001,GageRef,,,Char(3),Text field: “Ref” = Falcone Reference Gage. Blank = not Reference gage.
+reach,EROMExtension,EROMQA_060001,Q_A,,,"Num(14,3) ",Cumulative runoff (cfs)
+reach,EROMExtension,EROMQA_060001,Q_ADelta,,,"Num(14,3) ",Q_E – Q_A (cfs)
+reach,EROMExtension,EROMQA_060001,Q_AUnitRo,,,"Num(14,3) ",Q_A / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_060001,Q_AURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Aunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_060001,Q_B,,,"Num(14,3) ",Q_A – Excess ET (EET) (cfs)
+reach,EROMExtension,EROMQA_060001,Q_BDelta,,,"Num(14,3) ",Q_E – Q_B (cfs)
+reach,EROMExtension,EROMQA_060001,Q_BUnitRo,,,"Num(14,3) ",Q_B / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_060001,Q_BURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Bunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_060001,Q_C,,,"Num(14,3) ",Q_A - EET +/- Refgage Regression Adjustment (cfs)
+reach,EROMExtension,EROMQA_060001,Q_CDelta,,,"Num(14,3) ",Q_E – Q_C (cfs)
+reach,EROMExtension,EROMQA_060001,Q_CUnitRo,,,"Num(14,3) ",Q_C / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_060001,Q_CURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Cunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_060001,Q_D,,,"Num(14,3) ",Q_A – EET +/ Refgage Regression Adjustment +/- PlusFlowAR (cfs)
+reach,EROMExtension,EROMQA_060001,Q_DDelta,,,"Num(14,3) ",Q_E – Q_D (cfs)
+reach,EROMExtension,EROMQA_060001,Q_DUnitRo,,,"Num(14,3) ",Q_D / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_060001,Q_DURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Dunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_060001,Q_E,,,"Num(14,3) ",The Gage Flow (cfs)
+reach,EROMExtension,EROMQA_060001,Q_EUnitRo,,,"Num(14,3) ",Q_E / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_070001,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROMQA_070001,DivDASqKm,,,"Num(14,3) ",The NHDPlusV2 divergence-routed drainage area at the bottom of the flowline. (sqkm)
+reach,EROMExtension,EROMQA_070001,GageID,,,Text(16),The NWIS gageid
+reach,EROMExtension,EROMQA_070001,GageRef,,,Char(3),Text field: “Ref” = Falcone Reference Gage. Blank = not Reference gage.
+reach,EROMExtension,EROMQA_070001,Q_A,,,"Num(14,3) ",Cumulative runoff (cfs)
+reach,EROMExtension,EROMQA_070001,Q_ADelta,,,"Num(14,3) ",Q_E – Q_A (cfs)
+reach,EROMExtension,EROMQA_070001,Q_AUnitRo,,,"Num(14,3) ",Q_A / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_070001,Q_AURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Aunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_070001,Q_B,,,"Num(14,3) ",Q_A – Excess ET (EET) (cfs)
+reach,EROMExtension,EROMQA_070001,Q_BDelta,,,"Num(14,3) ",Q_E – Q_B (cfs)
+reach,EROMExtension,EROMQA_070001,Q_BUnitRo,,,"Num(14,3) ",Q_B / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_070001,Q_BURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Bunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_070001,Q_C,,,"Num(14,3) ",Q_A - EET +/- Refgage Regression Adjustment (cfs)
+reach,EROMExtension,EROMQA_070001,Q_CDelta,,,"Num(14,3) ",Q_E – Q_C (cfs)
+reach,EROMExtension,EROMQA_070001,Q_CUnitRo,,,"Num(14,3) ",Q_C / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_070001,Q_CURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Cunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_070001,Q_D,,,"Num(14,3) ",Q_A – EET +/ Refgage Regression Adjustment +/- PlusFlowAR (cfs)
+reach,EROMExtension,EROMQA_070001,Q_DDelta,,,"Num(14,3) ",Q_E – Q_D (cfs)
+reach,EROMExtension,EROMQA_070001,Q_DUnitRo,,,"Num(14,3) ",Q_D / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_070001,Q_DURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Dunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_070001,Q_E,,,"Num(14,3) ",The Gage Flow (cfs)
+reach,EROMExtension,EROMQA_070001,Q_EUnitRo,,,"Num(14,3) ",Q_E / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_080001,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROMQA_080001,DivDASqKm,,,"Num(14,3) ",The NHDPlusV2 divergence-routed drainage area at the bottom of the flowline. (sqkm)
+reach,EROMExtension,EROMQA_080001,GageID,,,Text(16),The NWIS gageid
+reach,EROMExtension,EROMQA_080001,GageRef,,,Char(3),Text field: “Ref” = Falcone Reference Gage. Blank = not Reference gage.
+reach,EROMExtension,EROMQA_080001,Q_A,,,"Num(14,3) ",Cumulative runoff (cfs)
+reach,EROMExtension,EROMQA_080001,Q_ADelta,,,"Num(14,3) ",Q_E – Q_A (cfs)
+reach,EROMExtension,EROMQA_080001,Q_AUnitRo,,,"Num(14,3) ",Q_A / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_080001,Q_AURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Aunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_080001,Q_B,,,"Num(14,3) ",Q_A – Excess ET (EET) (cfs)
+reach,EROMExtension,EROMQA_080001,Q_BDelta,,,"Num(14,3) ",Q_E – Q_B (cfs)
+reach,EROMExtension,EROMQA_080001,Q_BUnitRo,,,"Num(14,3) ",Q_B / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_080001,Q_BURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Bunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_080001,Q_C,,,"Num(14,3) ",Q_A - EET +/- Refgage Regression Adjustment (cfs)
+reach,EROMExtension,EROMQA_080001,Q_CDelta,,,"Num(14,3) ",Q_E – Q_C (cfs)
+reach,EROMExtension,EROMQA_080001,Q_CUnitRo,,,"Num(14,3) ",Q_C / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_080001,Q_CURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Cunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_080001,Q_D,,,"Num(14,3) ",Q_A – EET +/ Refgage Regression Adjustment +/- PlusFlowAR (cfs)
+reach,EROMExtension,EROMQA_080001,Q_DDelta,,,"Num(14,3) ",Q_E – Q_D (cfs)
+reach,EROMExtension,EROMQA_080001,Q_DUnitRo,,,"Num(14,3) ",Q_D / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_080001,Q_DURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Dunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_080001,Q_E,,,"Num(14,3) ",The Gage Flow (cfs)
+reach,EROMExtension,EROMQA_080001,Q_EUnitRo,,,"Num(14,3) ",Q_E / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_090001,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROMQA_090001,DivDASqKm,,,"Num(14,3) ",The NHDPlusV2 divergence-routed drainage area at the bottom of the flowline. (sqkm)
+reach,EROMExtension,EROMQA_090001,GageID,,,Text(16),The NWIS gageid
+reach,EROMExtension,EROMQA_090001,GageRef,,,Char(3),Text field: “Ref” = Falcone Reference Gage. Blank = not Reference gage.
+reach,EROMExtension,EROMQA_090001,Q_A,,,"Num(14,3) ",Cumulative runoff (cfs)
+reach,EROMExtension,EROMQA_090001,Q_ADelta,,,"Num(14,3) ",Q_E – Q_A (cfs)
+reach,EROMExtension,EROMQA_090001,Q_AUnitRo,,,"Num(14,3) ",Q_A / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_090001,Q_AURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Aunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_090001,Q_B,,,"Num(14,3) ",Q_A – Excess ET (EET) (cfs)
+reach,EROMExtension,EROMQA_090001,Q_BDelta,,,"Num(14,3) ",Q_E – Q_B (cfs)
+reach,EROMExtension,EROMQA_090001,Q_BUnitRo,,,"Num(14,3) ",Q_B / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_090001,Q_BURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Bunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_090001,Q_C,,,"Num(14,3) ",Q_A - EET +/- Refgage Regression Adjustment (cfs)
+reach,EROMExtension,EROMQA_090001,Q_CDelta,,,"Num(14,3) ",Q_E – Q_C (cfs)
+reach,EROMExtension,EROMQA_090001,Q_CUnitRo,,,"Num(14,3) ",Q_C / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_090001,Q_CURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Cunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_090001,Q_D,,,"Num(14,3) ",Q_A – EET +/ Refgage Regression Adjustment +/- PlusFlowAR (cfs)
+reach,EROMExtension,EROMQA_090001,Q_DDelta,,,"Num(14,3) ",Q_E – Q_D (cfs)
+reach,EROMExtension,EROMQA_090001,Q_DUnitRo,,,"Num(14,3) ",Q_D / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_090001,Q_DURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Dunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_090001,Q_E,,,"Num(14,3) ",The Gage Flow (cfs)
+reach,EROMExtension,EROMQA_090001,Q_EUnitRo,,,"Num(14,3) ",Q_E / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_100001,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROMQA_100001,DivDASqKm,,,"Num(14,3) ",The NHDPlusV2 divergence-routed drainage area at the bottom of the flowline. (sqkm)
+reach,EROMExtension,EROMQA_100001,GageID,,,Text(16),The NWIS gageid
+reach,EROMExtension,EROMQA_100001,GageRef,,,Char(3),Text field: “Ref” = Falcone Reference Gage. Blank = not Reference gage.
+reach,EROMExtension,EROMQA_100001,Q_A,,,"Num(14,3) ",Cumulative runoff (cfs)
+reach,EROMExtension,EROMQA_100001,Q_ADelta,,,"Num(14,3) ",Q_E – Q_A (cfs)
+reach,EROMExtension,EROMQA_100001,Q_AUnitRo,,,"Num(14,3) ",Q_A / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_100001,Q_AURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Aunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_100001,Q_B,,,"Num(14,3) ",Q_A – Excess ET (EET) (cfs)
+reach,EROMExtension,EROMQA_100001,Q_BDelta,,,"Num(14,3) ",Q_E – Q_B (cfs)
+reach,EROMExtension,EROMQA_100001,Q_BUnitRo,,,"Num(14,3) ",Q_B / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_100001,Q_BURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Bunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_100001,Q_C,,,"Num(14,3) ",Q_A - EET +/- Refgage Regression Adjustment (cfs)
+reach,EROMExtension,EROMQA_100001,Q_CDelta,,,"Num(14,3) ",Q_E – Q_C (cfs)
+reach,EROMExtension,EROMQA_100001,Q_CUnitRo,,,"Num(14,3) ",Q_C / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_100001,Q_CURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Cunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_100001,Q_D,,,"Num(14,3) ",Q_A – EET +/ Refgage Regression Adjustment +/- PlusFlowAR (cfs)
+reach,EROMExtension,EROMQA_100001,Q_DDelta,,,"Num(14,3) ",Q_E – Q_D (cfs)
+reach,EROMExtension,EROMQA_100001,Q_DUnitRo,,,"Num(14,3) ",Q_D / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_100001,Q_DURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Dunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_100001,Q_E,,,"Num(14,3) ",The Gage Flow (cfs)
+reach,EROMExtension,EROMQA_100001,Q_EUnitRo,,,"Num(14,3) ",Q_E / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_110001,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROMQA_110001,DivDASqKm,,,"Num(14,3) ",The NHDPlusV2 divergence-routed drainage area at the bottom of the flowline. (sqkm)
+reach,EROMExtension,EROMQA_110001,GageID,,,Text(16),The NWIS gageid
+reach,EROMExtension,EROMQA_110001,GageRef,,,Char(3),Text field: “Ref” = Falcone Reference Gage. Blank = not Reference gage.
+reach,EROMExtension,EROMQA_110001,Q_A,,,"Num(14,3) ",Cumulative runoff (cfs)
+reach,EROMExtension,EROMQA_110001,Q_ADelta,,,"Num(14,3) ",Q_E – Q_A (cfs)
+reach,EROMExtension,EROMQA_110001,Q_AUnitRo,,,"Num(14,3) ",Q_A / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_110001,Q_AURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Aunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_110001,Q_B,,,"Num(14,3) ",Q_A – Excess ET (EET) (cfs)
+reach,EROMExtension,EROMQA_110001,Q_BDelta,,,"Num(14,3) ",Q_E – Q_B (cfs)
+reach,EROMExtension,EROMQA_110001,Q_BUnitRo,,,"Num(14,3) ",Q_B / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_110001,Q_BURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Bunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_110001,Q_C,,,"Num(14,3) ",Q_A - EET +/- Refgage Regression Adjustment (cfs)
+reach,EROMExtension,EROMQA_110001,Q_CDelta,,,"Num(14,3) ",Q_E – Q_C (cfs)
+reach,EROMExtension,EROMQA_110001,Q_CUnitRo,,,"Num(14,3) ",Q_C / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_110001,Q_CURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Cunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_110001,Q_D,,,"Num(14,3) ",Q_A – EET +/ Refgage Regression Adjustment +/- PlusFlowAR (cfs)
+reach,EROMExtension,EROMQA_110001,Q_DDelta,,,"Num(14,3) ",Q_E – Q_D (cfs)
+reach,EROMExtension,EROMQA_110001,Q_DUnitRo,,,"Num(14,3) ",Q_D / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_110001,Q_DURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Dunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_110001,Q_E,,,"Num(14,3) ",The Gage Flow (cfs)
+reach,EROMExtension,EROMQA_110001,Q_EUnitRo,,,"Num(14,3) ",Q_E / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_120001,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROMQA_120001,DivDASqKm,,,"Num(14,3) ",The NHDPlusV2 divergence-routed drainage area at the bottom of the flowline. (sqkm)
+reach,EROMExtension,EROMQA_120001,GageID,,,Text(16),The NWIS gageid
+reach,EROMExtension,EROMQA_120001,GageRef,,,Char(3),Text field: “Ref” = Falcone Reference Gage. Blank = not Reference gage.
+reach,EROMExtension,EROMQA_120001,Q_A,,,"Num(14,3) ",Cumulative runoff (cfs)
+reach,EROMExtension,EROMQA_120001,Q_ADelta,,,"Num(14,3) ",Q_E – Q_A (cfs)
+reach,EROMExtension,EROMQA_120001,Q_AUnitRo,,,"Num(14,3) ",Q_A / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_120001,Q_AURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Aunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_120001,Q_B,,,"Num(14,3) ",Q_A – Excess ET (EET) (cfs)
+reach,EROMExtension,EROMQA_120001,Q_BDelta,,,"Num(14,3) ",Q_E – Q_B (cfs)
+reach,EROMExtension,EROMQA_120001,Q_BUnitRo,,,"Num(14,3) ",Q_B / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_120001,Q_BURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Bunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_120001,Q_C,,,"Num(14,3) ",Q_A - EET +/- Refgage Regression Adjustment (cfs)
+reach,EROMExtension,EROMQA_120001,Q_CDelta,,,"Num(14,3) ",Q_E – Q_C (cfs)
+reach,EROMExtension,EROMQA_120001,Q_CUnitRo,,,"Num(14,3) ",Q_C / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_120001,Q_CURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Cunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_120001,Q_D,,,"Num(14,3) ",Q_A – EET +/ Refgage Regression Adjustment +/- PlusFlowAR (cfs)
+reach,EROMExtension,EROMQA_120001,Q_DDelta,,,"Num(14,3) ",Q_E – Q_D (cfs)
+reach,EROMExtension,EROMQA_120001,Q_DUnitRo,,,"Num(14,3) ",Q_D / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_120001,Q_DURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Dunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_120001,Q_E,,,"Num(14,3) ",The Gage Flow (cfs)
+reach,EROMExtension,EROMQA_120001,Q_EUnitRo,,,"Num(14,3) ",Q_E / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROMQA_MA0001,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,EROMExtension,EROMQA_MA0001,DivDASqKm,,,"Num(14,3) ",The NHDPlusV2 divergence-routed drainage area at the bottom of the flowline. (sqkm)
+reach,EROMExtension,EROMQA_MA0001,DivDASqKm,,,"Num(14,3) ",The NHDPlusV2 divergence-routed drainage area at the bottom of the flowline. (sqkm)
+reach,EROMExtension,EROMQA_MA0001,GageID,,,Text(16),The NWIS gageid
+reach,EROMExtension,EROMQA_MA0001,GageID,,,Text(16),The NWIS gageid
+reach,EROMExtension,EROMQA_MA0001,GageRef,,,Char(3),Text field: “Ref” = Falcone Reference Gage. Blank = not Reference gage.
+reach,EROMExtension,EROMQA_MA0001,GageRef,,,Char(3),Text field: “Ref” = Falcone Reference Gage. Blank = not Reference gage.
+reach,EROMExtension,EROMQA_MA0001,Q_A,,,"Num(14,3) ",Cumulative runoff (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_A,,,"Num(14,3) ",Cumulative runoff (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_ADelta,,,"Num(14,3) ",Q_E – Q_A (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_ADelta,,,"Num(14,3) ",Q_E – Q_A (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_AUnitRo,,,"Num(14,3) ",Q_A / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,Q_AUnitRo,,,"Num(14,3) ",Q_A / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,Q_AURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Aunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,Q_AURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Aunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,Q_B,,,"Num(14,3) ",Q_A – Excess ET (EET) (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_B,,,"Num(14,3) ",Q_A – Excess ET (EET) (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_BDelta,,,"Num(14,3) ",Q_E – Q_B (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_BDelta,,,"Num(14,3) ",Q_E – Q_B (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_BUnitRo,,,"Num(14,3) ",Q_B / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,Q_BUnitRo,,,"Num(14,3) ",Q_B / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,Q_BURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Bunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,Q_BURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Bunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,Q_C,,,"Num(14,3) ",Q_A - EET +/- Refgage Regression Adjustment (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_C,,,"Num(14,3) ",Q_A - EET +/- Refgage Regression Adjustment (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_CDelta,,,"Num(14,3) ",Q_E – Q_C (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_CDelta,,,"Num(14,3) ",Q_E – Q_C (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_CUnitRo,,,"Num(14,3) ",Q_C / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,Q_CUnitRo,,,"Num(14,3) ",Q_C / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,Q_CURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Cunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,Q_CURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Cunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,Q_D,,,"Num(14,3) ",Q_A – EET +/ Refgage Regression Adjustment +/- PlusFlowAR (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_D,,,"Num(14,3) ",Q_A – EET +/ Refgage Regression Adjustment +/- PlusFlowAR (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_DDelta,,,"Num(14,3) ",Q_E – Q_D (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_DDelta,,,"Num(14,3) ",Q_E – Q_D (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_DUnitRo,,,"Num(14,3) ",Q_D / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,Q_DUnitRo,,,"Num(14,3) ",Q_D / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,Q_DURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Dunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,Q_DURoDelt,,,"Num(14,3) ",Q_Eunitro – Q_Dunitro (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,Q_E,,,"Num(14,3) ",The Gage Flow (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_E,,,"Num(14,3) ",The Gage Flow (cfs)
+reach,EROMExtension,EROMQA_MA0001,Q_EUnitRo,,,"Num(14,3) ",Q_E / DivDASqKm (cfs/sqkm)
+reach,EROMExtension,EROMQA_MA0001,Q_EUnitRo,,,"Num(14,3) ",Q_E / DivDASqKm (cfs/sqkm)
+reach,NHDPlusAttributeExtension,CumDivPrecipMA,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivPrecipMA,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivPrecipMA,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivPrecipMA,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivPrecipMA,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumDivPrecipMM01,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM01,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivPrecipMM01,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivPrecipMM01,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM01,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumDivPrecipMM02,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM02,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivPrecipMM02,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivPrecipMM02,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM02,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumDivPrecipMM03,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM03,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivPrecipMM03,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivPrecipMM03,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM03,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumDivPrecipMM04,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM04,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivPrecipMM04,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivPrecipMM04,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM04,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumDivPrecipMM05,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM05,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivPrecipMM05,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivPrecipMM05,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM05,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumDivPrecipMM06,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM06,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivPrecipMM06,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivPrecipMM06,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM06,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumDivPrecipMM07,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM07,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivPrecipMM07,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivPrecipMM07,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM07,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumDivPrecipMM08,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM08,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivPrecipMM08,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivPrecipMM08,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM08,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumDivPrecipMM09,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM09,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivPrecipMM09,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivPrecipMM09,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM09,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumDivPrecipMM10,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM10,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivPrecipMM10,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivPrecipMM10,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM10,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumDivPrecipMM11,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM11,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivPrecipMM11,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivPrecipMM11,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM11,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumDivPrecipMM12,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM12,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivPrecipMM12,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivPrecipMM12,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivPrecipMM12,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumDivPrecipMMMA,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivPrecipMMMA,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivPrecipMMMA,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivPrecipMMMA,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivPrecipMMMA,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumDivROMA,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivROMA,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivROMA,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivROMA,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivROMA,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumDivROMM01,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivROMM01,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivROMM01,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivROMM01,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivROMM01,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumDivROMM02,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivROMM02,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivROMM02,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivROMM02,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivROMM02,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumDivROMM03,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivROMM03,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivROMM03,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivROMM03,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivROMM03,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumDivROMM04,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivROMM04,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivROMM04,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivROMM04,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivROMM04,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumDivROMM05,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivROMM05,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivROMM05,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivROMM05,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivROMM05,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumDivROMM06,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivROMM06,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivROMM06,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivROMM06,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivROMM06,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumDivROMM07,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivROMM07,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivROMM07,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivROMM07,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivROMM07,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumDivROMM08,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivROMM08,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivROMM08,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivROMM08,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivROMM08,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumDivROMM09,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivROMM09,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivROMM09,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivROMM09,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivROMM09,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumDivROMM10,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivROMM10,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivROMM10,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivROMM10,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivROMM10,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumDivROMM11,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivROMM11,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivROMM11,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivROMM11,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivROMM11,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumDivROMM12,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivROMM12,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivROMM12,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivROMM12,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivROMM12,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumDivROMMMA,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivROMMMA,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivROMMMA,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumDivROMMMA,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivROMMMA,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumDivTempMA,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivTempMA,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivTempMA,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumDivTempMA,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumDivTempMA,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivTempMM01,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivTempMM01,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivTempMM01,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumDivTempMM01,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumDivTempMM01,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivTempMM02,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivTempMM02,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivTempMM02,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumDivTempMM02,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumDivTempMM02,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivTempMM03,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivTempMM03,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivTempMM03,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumDivTempMM03,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumDivTempMM03,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivTempMM04,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivTempMM04,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivTempMM04,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumDivTempMM04,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumDivTempMM04,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivTempMM05,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivTempMM05,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivTempMM05,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumDivTempMM05,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumDivTempMM05,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivTempMM06,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivTempMM06,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivTempMM06,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumDivTempMM06,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumDivTempMM06,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivTempMM07,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivTempMM07,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivTempMM07,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumDivTempMM07,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumDivTempMM07,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivTempMM08,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivTempMM08,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivTempMM08,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumDivTempMM08,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumDivTempMM08,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivTempMM09,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivTempMM09,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivTempMM09,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumDivTempMM09,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumDivTempMM09,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivTempMM10,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivTempMM10,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivTempMM10,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumDivTempMM10,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumDivTempMM10,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivTempMM11,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivTempMM11,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivTempMM11,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumDivTempMM11,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumDivTempMM11,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivTempMM12,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivTempMM12,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivTempMM12,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumDivTempMM12,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumDivTempMM12,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumDivTempMMMA,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumDivTempMMMA,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumDivTempMMMA,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumDivTempMMMA,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumDivTempMMMA,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotPrecipMA,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotPrecipMA,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotPrecipMA,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotPrecipMA,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotPrecipMA,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumTotPrecipMM01,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM01,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotPrecipMM01,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotPrecipMM01,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM01,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumTotPrecipMM02,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM02,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotPrecipMM02,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotPrecipMM02,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM02,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumTotPrecipMM03,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM03,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotPrecipMM03,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotPrecipMM03,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM03,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumTotPrecipMM04,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM04,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotPrecipMM04,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotPrecipMM04,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM04,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumTotPrecipMM05,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM05,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotPrecipMM05,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotPrecipMM05,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM05,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumTotPrecipMM06,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM06,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotPrecipMM06,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotPrecipMM06,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM06,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumTotPrecipMM07,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM07,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotPrecipMM07,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotPrecipMM07,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM07,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumTotPrecipMM08,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM08,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotPrecipMM08,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotPrecipMM08,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM08,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumTotPrecipMM09,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM09,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotPrecipMM09,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotPrecipMM09,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM09,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumTotPrecipMM10,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM10,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotPrecipMM10,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotPrecipMM10,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM10,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumTotPrecipMM11,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM11,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotPrecipMM11,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotPrecipMM11,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM11,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumTotPrecipMM12,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM12,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotPrecipMM12,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotPrecipMM12,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotPrecipMM12,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumTotPrecipMMMA,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotPrecipMMMA,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotPrecipMMMA,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotPrecipMMMA,PrecipCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotPrecipMMMA,PrecipCV,,,"Num(5,2) ",Mean annual precipitation in area upstream of the bottom of flowline in millimeters * 100
+reach,NHDPlusAttributeExtension,CumTotROMA,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotROMA,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotROMA,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotROMA,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotROMA,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumTotROMM01,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotROMM01,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotROMM01,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotROMM01,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotROMM01,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumTotROMM02,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotROMM02,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotROMM02,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotROMM02,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotROMM02,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumTotROMM03,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotROMM03,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotROMM03,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotROMM03,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotROMM03,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumTotROMM04,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotROMM04,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotROMM04,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotROMM04,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotROMM04,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumTotROMM05,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotROMM05,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotROMM05,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotROMM05,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotROMM05,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumTotROMM06,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotROMM06,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotROMM06,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotROMM06,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotROMM06,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumTotROMM07,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotROMM07,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotROMM07,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotROMM07,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotROMM07,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumTotROMM08,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotROMM08,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotROMM08,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotROMM08,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotROMM08,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumTotROMM09,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotROMM09,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotROMM09,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotROMM09,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotROMM09,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumTotROMM10,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotROMM10,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotROMM10,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotROMM10,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotROMM10,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumTotROMM11,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotROMM11,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotROMM11,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotROMM11,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotROMM11,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumTotROMM12,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotROMM12,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotROMM12,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotROMM12,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotROMM12,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumTotROMMMA,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotROMMMA,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotROMMMA,MissDataA,,,"Num(13,4) ",Area of Drainage Area with no data
+reach,NHDPlusAttributeExtension,CumTotROMMMA,RunOffCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotROMMMA,RunOffCV,,,"Num(5,2) ",Mean Runoff in area upstream of the bottom of flowline (mm)
+reach,NHDPlusAttributeExtension,CumTotTempMA,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotTempMA,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotTempMA,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumTotTempMA,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumTotTempMA,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotTempMM01,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotTempMM01,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotTempMM01,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumTotTempMM01,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumTotTempMM01,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotTempMM02,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotTempMM02,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotTempMM02,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumTotTempMM02,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumTotTempMM02,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotTempMM03,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotTempMM03,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotTempMM03,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumTotTempMM03,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumTotTempMM03,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotTempMM04,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotTempMM04,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotTempMM04,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumTotTempMM04,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumTotTempMM04,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotTempMM05,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotTempMM05,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotTempMM05,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumTotTempMM05,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumTotTempMM05,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotTempMM06,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotTempMM06,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotTempMM06,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumTotTempMM06,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumTotTempMM06,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotTempMM07,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotTempMM07,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotTempMM07,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumTotTempMM07,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumTotTempMM07,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotTempMM08,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotTempMM08,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotTempMM08,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumTotTempMM08,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumTotTempMM08,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotTempMM09,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotTempMM09,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotTempMM09,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumTotTempMM09,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumTotTempMM09,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotTempMM10,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotTempMM10,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotTempMM10,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumTotTempMM10,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumTotTempMM10,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotTempMM11,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotTempMM11,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotTempMM11,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumTotTempMM11,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumTotTempMM11,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotTempMM12,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotTempMM12,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotTempMM12,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumTotTempMM12,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumTotTempMM12,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,CumTotTempMMMA,FeatureID,,,Long Integer,"ComID of an NHDFlowline feature and, where applicable, FeatureID of an NHDPlusV2 Catchment "
+reach,NHDPlusAttributeExtension,CumTotTempMMMA,Hydroseq,,,Num(11),Hydrologic Sequence Number of an NHDFlowline feature
+reach,NHDPlusAttributeExtension,CumTotTempMMMA,MissDataA,,,"Num(13,4) ",Area of Drainage Areas with no data
+reach,NHDPlusAttributeExtension,CumTotTempMMMA,TempVC,,,"Num(5,2) ",Mean annual temperature in area upstream of the bottom of  flowline in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,CumTotTempMMMA,TempVCT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrPrecipMA,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrPrecipMA,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrPrecipMA,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,NHDPlusAttributeExtension,IncrPrecipMA,PrecipV,,,"Num(5,2) ",Mean precipitation in millimeters * 100
+reach,NHDPlusAttributeExtension,IncrPrecipMA,PrecipVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrPrecipMM01,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrPrecipMM01,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrPrecipMM01,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,NHDPlusAttributeExtension,IncrPrecipMM01,PrecipV,,,"Num(5,2) ",Mean precipitation in millimeters * 100
+reach,NHDPlusAttributeExtension,IncrPrecipMM01,PrecipVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrPrecipMM02,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrPrecipMM02,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrPrecipMM02,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,NHDPlusAttributeExtension,IncrPrecipMM02,PrecipV,,,"Num(5,2) ",Mean precipitation in millimeters * 100
+reach,NHDPlusAttributeExtension,IncrPrecipMM02,PrecipVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrPrecipMM03,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrPrecipMM03,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrPrecipMM03,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,NHDPlusAttributeExtension,IncrPrecipMM03,PrecipV,,,"Num(5,2) ",Mean precipitation in millimeters * 100
+reach,NHDPlusAttributeExtension,IncrPrecipMM03,PrecipVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrPrecipMM04,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrPrecipMM04,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrPrecipMM04,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,NHDPlusAttributeExtension,IncrPrecipMM04,PrecipV,,,"Num(5,2) ",Mean precipitation in millimeters * 100
+reach,NHDPlusAttributeExtension,IncrPrecipMM04,PrecipVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrPrecipMM05,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrPrecipMM05,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrPrecipMM05,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,NHDPlusAttributeExtension,IncrPrecipMM05,PrecipV,,,"Num(5,2) ",Mean precipitation in millimeters * 100
+reach,NHDPlusAttributeExtension,IncrPrecipMM05,PrecipVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrPrecipMM06,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrPrecipMM06,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrPrecipMM06,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,NHDPlusAttributeExtension,IncrPrecipMM06,PrecipV,,,"Num(5,2) ",Mean precipitation in millimeters * 100
+reach,NHDPlusAttributeExtension,IncrPrecipMM06,PrecipVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrPrecipMM07,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrPrecipMM07,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrPrecipMM07,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,NHDPlusAttributeExtension,IncrPrecipMM07,PrecipV,,,"Num(5,2) ",Mean precipitation in millimeters * 100
+reach,NHDPlusAttributeExtension,IncrPrecipMM07,PrecipVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrPrecipMM08,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrPrecipMM08,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrPrecipMM08,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,NHDPlusAttributeExtension,IncrPrecipMM08,PrecipV,,,"Num(5,2) ",Mean precipitation in millimeters * 100
+reach,NHDPlusAttributeExtension,IncrPrecipMM08,PrecipVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrPrecipMM09,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrPrecipMM09,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrPrecipMM09,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,NHDPlusAttributeExtension,IncrPrecipMM09,PrecipV,,,"Num(5,2) ",Mean precipitation in millimeters * 100
+reach,NHDPlusAttributeExtension,IncrPrecipMM09,PrecipVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrPrecipMM10,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrPrecipMM10,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrPrecipMM10,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,NHDPlusAttributeExtension,IncrPrecipMM10,PrecipV,,,"Num(5,2) ",Mean precipitation in millimeters * 100
+reach,NHDPlusAttributeExtension,IncrPrecipMM10,PrecipVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrPrecipMM11,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrPrecipMM11,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrPrecipMM11,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,NHDPlusAttributeExtension,IncrPrecipMM11,PrecipV,,,"Num(5,2) ",Mean precipitation in millimeters * 100
+reach,NHDPlusAttributeExtension,IncrPrecipMM11,PrecipVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrPrecipMM12,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrPrecipMM12,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrPrecipMM12,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,NHDPlusAttributeExtension,IncrPrecipMM12,PrecipV,,,"Num(5,2) ",Mean precipitation in millimeters * 100
+reach,NHDPlusAttributeExtension,IncrPrecipMM12,PrecipVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrPrecipMMMA,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrPrecipMMMA,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrPrecipMMMA,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,NHDPlusAttributeExtension,IncrPrecipMMMA,PrecipV,,,"Num(5,2) ",Mean precipitation in millimeters * 100
+reach,NHDPlusAttributeExtension,IncrPrecipMMMA,PrecipVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrTempMA,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrTempMA,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrTempMA,MissDataA,,,"Num(13,4) ",Area of Catchments with no data
+reach,NHDPlusAttributeExtension,IncrTempMA,TempV,,,"Num(5,2) ",Mean annual temperature in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,IncrTempMA,TempVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrTempMM01,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrTempMM01,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrTempMM01,MissDataA,,,"Num(13,4) ",Area of Catchments with no data
+reach,NHDPlusAttributeExtension,IncrTempMM01,TempV,,,"Num(5,2) ",Mean annual temperature in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,IncrTempMM01,TempVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrTempMM02,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrTempMM02,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrTempMM02,MissDataA,,,"Num(13,4) ",Area of Catchments with no data
+reach,NHDPlusAttributeExtension,IncrTempMM02,TempV,,,"Num(5,2) ",Mean annual temperature in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,IncrTempMM02,TempVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrTempMM03,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrTempMM03,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrTempMM03,MissDataA,,,"Num(13,4) ",Area of Catchments with no data
+reach,NHDPlusAttributeExtension,IncrTempMM03,TempV,,,"Num(5,2) ",Mean annual temperature in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,IncrTempMM03,TempVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrTempMM04,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrTempMM04,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrTempMM04,MissDataA,,,"Num(13,4) ",Area of Catchments with no data
+reach,NHDPlusAttributeExtension,IncrTempMM04,TempV,,,"Num(5,2) ",Mean annual temperature in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,IncrTempMM04,TempVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrTempMM05,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrTempMM05,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrTempMM05,MissDataA,,,"Num(13,4) ",Area of Catchments with no data
+reach,NHDPlusAttributeExtension,IncrTempMM05,TempV,,,"Num(5,2) ",Mean annual temperature in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,IncrTempMM05,TempVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrTempMM06,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrTempMM06,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrTempMM06,MissDataA,,,"Num(13,4) ",Area of Catchments with no data
+reach,NHDPlusAttributeExtension,IncrTempMM06,TempV,,,"Num(5,2) ",Mean annual temperature in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,IncrTempMM06,TempVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrTempMM07,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrTempMM07,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrTempMM07,MissDataA,,,"Num(13,4) ",Area of Catchments with no data
+reach,NHDPlusAttributeExtension,IncrTempMM07,TempV,,,"Num(5,2) ",Mean annual temperature in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,IncrTempMM07,TempVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrTempMM08,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrTempMM08,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrTempMM08,MissDataA,,,"Num(13,4) ",Area of Catchments with no data
+reach,NHDPlusAttributeExtension,IncrTempMM08,TempV,,,"Num(5,2) ",Mean annual temperature in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,IncrTempMM08,TempVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrTempMM09,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrTempMM09,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrTempMM09,MissDataA,,,"Num(13,4) ",Area of Catchments with no data
+reach,NHDPlusAttributeExtension,IncrTempMM09,TempV,,,"Num(5,2) ",Mean annual temperature in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,IncrTempMM09,TempVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrTempMM10,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrTempMM10,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrTempMM10,MissDataA,,,"Num(13,4) ",Area of Catchments with no data
+reach,NHDPlusAttributeExtension,IncrTempMM10,TempV,,,"Num(5,2) ",Mean annual temperature in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,IncrTempMM10,TempVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrTempMM11,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrTempMM11,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrTempMM11,MissDataA,,,"Num(13,4) ",Area of Catchments with no data
+reach,NHDPlusAttributeExtension,IncrTempMM11,TempV,,,"Num(5,2) ",Mean annual temperature in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,IncrTempMM11,TempVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrTempMM12,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrTempMM12,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrTempMM12,MissDataA,,,"Num(13,4) ",Area of Catchments with no data
+reach,NHDPlusAttributeExtension,IncrTempMM12,TempV,,,"Num(5,2) ",Mean annual temperature in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,IncrTempMM12,TempVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributeExtension,IncrTempMMMA,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,NHDPlusAttributeExtension,IncrTempMMMA,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,NHDPlusAttributeExtension,IncrTempMMMA,MissDataA,,,"Num(13,4) ",Area of Catchments with no data
+reach,NHDPlusAttributeExtension,IncrTempMMMA,TempV,,,"Num(5,2) ",Mean annual temperature in degrees centigrade * 100
+reach,NHDPlusAttributeExtension,IncrTempMMMA,TempVT,,,Char(1),"Value Type, “V” meaning average "
+reach,NHDPlusAttributes,CumulativeArea,ComID,,1,Long Integer,Common identifier of an NHDFlowline feature
+reach,NHDPlusAttributes,CumulativeArea,DivDASqKm,,,"Num(14,6) ","Divergence-routed Cumulative Drainage Area, in square kilometers, at the downstream end of the NHDFlowline feature "
+reach,NHDPlusAttributes,CumulativeArea,TotDASqKm,,,"Num(14,6) ","Total Upstream Cumulative Drainage Area, in square kilometers, at the downstream end of the NHDFlowline feature "
+reach,NHDPlusAttributes,DivFracMP,ComID,,,Long Integer,ComID of an NHDFlowline feature which is a path in a divergence
+reach,NHDPlusAttributes,DivFracMP,DivFrac,,,"Num(5,4) ",Fraction used for routing cumulative attributes down the flowlines paths in a divergence. Values between 0 and 1
+reach,NHDPlusAttributes,DivFracMP,NodeNumber,,,Num(11),See PlusFlowlineVAA.FromNode
+reach,NHDPlusAttributes,DivFracMP,StatusFlag,,,Char(1),Reserved for use during NHDPlusV2 Build/Refresh Tools Processing
+reach,NHDPlusAttributes,ElevSlope,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,NHDPlusAttributes,ElevSlope,ElevFixed,,,Char(1),"Flag indicating that the downstream elevation is fixed (i.e. 
+not smoothed) "
+reach,NHDPlusAttributes,ElevSlope,FDate,,,,See NHDFlowline
+reach,NHDPlusAttributes,ElevSlope,HWType,,,Char(1),"“H” – real headwater,  “A” – Artificial Head water (i.e. all inflows have Gapdist > 43m) "
+reach,NHDPlusAttributes,ElevSlope,MaxElevRaw,,,"Num(10,3) ",Maximum elevation (unsmoothed) in centimeters
+reach,NHDPlusAttributes,ElevSlope,MaxElevSmo,,,"Num(10,3) ",Maximum elevation (smoothed) in centimeters
+reach,NHDPlusAttributes,ElevSlope,MinElevRaw,,,"Num(10,3) ",Minimum elevation (unsmoothed) in centimeters
+reach,NHDPlusAttributes,ElevSlope,MinElevSmo,,,"Num(10,3) ",Minimum elevation (smoothed) in centimeters
+reach,NHDPlusAttributes,ElevSlope,Slope,,,"Num(12,8) ","Slope of flowline (meters/meters) based on smoothed elevations; a value of -9998 means that no slope value is available. See Appendix A, step 22 for information about slope computation. "
+reach,NHDPlusAttributes,ElevSlope,SlopeLenKm,,,"Num(11,3) ","NHDFlowline feature length (kilometers) used to compute slope. Will be less than NHDFlowline.LengthKM when the NHDFlowline feature was trimmed during the hydroenforcement process. See Appendix A, step 14 and 15 for information about trimming of NHDFlowlines. "
+reach,NHDPlusAttributes,ElevSlope,StatusFlag,,,Char(1),Reserved for use during NHDPlusV2 Build/Refresh Tools Processing
+reach,NHDPlusAttributes,HeadwaterNodeArea,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,NHDPlusAttributes,HeadwaterNodeArea,FDate,,,,See NHDFlowline
+reach,NHDPlusAttributes,HeadwaterNodeArea,HwNodeSqKm,,,"Num(13,4) ",Catchment area in square kilometers that drains to the headwater node of the NHDFlowline feature
+reach,NHDPlusAttributes,MegaDiv,FromComID,,,Long Integer,Common identifier of the upstream NHDFlowline feature
+reach,NHDPlusAttributes,MegaDiv,ToComID,,,Long Integer,Common identifier of the downstream NHDFlowline feature
+reach,NHDPlusAttributes,PlusARPointEvent,ComID,,,Long Integer,A nationally unique negative ComID assigned to the point of addition or removal
+reach,NHDPlusAttributes,PlusARPointEvent,EventDate,,,Date,Data event was created
+reach,NHDPlusAttributes,PlusARPointEvent,EventType,,,Char(100),“Addition” or “Removal”
+reach,NHDPlusAttributes,PlusARPointEvent,FeatureCla,,,Char(15),Not valued
+reach,NHDPlusAttributes,PlusARPointEvent,FeatureCom,,,Long Integer,Not valued
+reach,NHDPlusAttributes,PlusARPointEvent,FeatureDet,,,Char(254),URL link to information about the event point
+reach,NHDPlusAttributes,PlusARPointEvent,Measure,,,"Num(8,5) ",m-value (0 to 100) of the point location along the NHDFlowline route defined by ReachCode
+reach,NHDPlusAttributes,PlusARPointEvent,Offset,,,Num,Not valued
+reach,NHDPlusAttributes,PlusARPointEvent,ReachCode,,,Char(14),See NHDFlowline
+reach,NHDPlusAttributes,PlusARPointEvent,ReachResol,,,Char(7 ),“Medium”
+reach,NHDPlusAttributes,PlusARPointEvent,ReachSMDat,,,Date,See NHDReachCode_ComID table
+reach,NHDPlusAttributes,PlusARPointEvent,Source_Dat,,,Char(100),Not valued
+reach,NHDPlusAttributes,PlusARPointEvent,Source_Fea,,,Char(40),"External identifier of the event point, generally a key in an external database "
+reach,NHDPlusAttributes,PlusARPointEvent,Source_Ori,,,Char(130),Not valued
+reach,NHDPlusAttributes,PlusFlow,DeltaLevel,,,Num(3),Numerical difference between StreamLevel for FromComID and StreamLevel for ToComID
+reach,NHDPlusAttributes,PlusFlow,Direction,,,Num(3),"714 – coastal connection (FromComID may be a coastline and ToComID is always a coastline) 
+709 – flowing connection 
+712 – network start (ToComID is a headwater) 713 – network end (FromComID is a network end) "
+reach,NHDPlusAttributes,PlusFlow,DivDASqKm,,,,See CumulativeArea
+reach,NHDPlusAttributes,PlusFlow,FromComID,,1,Long Integer,Common identifier for the upstream NHDFlowline feature
+reach,NHDPlusAttributes,PlusFlow,FromHydSeq,,,Num(11),HydroSeq of FromComID
+reach,NHDPlusAttributes,PlusFlow,FromLvlPat,,,Num(11),LevelPathID of FromComID
+reach,NHDPlusAttributes,PlusFlow,GapDistKm,,,"Num(13,4) ","Distance between the downstream end of 
+FromComID and the upstream end of ToComID "
+reach,NHDPlusAttributes,PlusFlow,HasGeo,,,Char(1),"“Y”es FromComID touches ToComID, “N”o, there is a geometry gap between FromComID and ToComID "
+reach,NHDPlusAttributes,PlusFlow,NodeNumber,,,Num(11),Node number at the bottom of FromComID and the top of ToComID
+reach,NHDPlusAttributes,PlusFlow,ToComID,,1,Long Integer,Common identifier for the downstream NHDFlowline feature
+reach,NHDPlusAttributes,PlusFlow,ToHydSeq,,,Num(11),Hydroseq of ToComID
+reach,NHDPlusAttributes,PlusFlow,ToLvlPat,,,Num(11),LevelPathID of ToComID
+reach,NHDPlusAttributes,PlusFlow,TotDASqKm,,,,See CumulativeArea
+reach,NHDPlusAttributes,PlusFlowAR,FromComID,,,Long Integer,"ComID of NHDFlowline feature, Addition point, or Removal point "
+reach,NHDPlusAttributes,PlusFlowAR,FromFC,,,Char(20),“NHDFlowline” or “PlusARPointEvent”
+reach,NHDPlusAttributes,PlusFlowAR,Quantity,,,"Num(14,7) ",Quantity of Flow through this connection
+reach,NHDPlusAttributes,PlusFlowAR,ToComID,,,Long Integer,"ComID of NHDFlowline feature, Addition point, or Removal point "
+reach,NHDPlusAttributes,PlusFlowAR,ToFC,,,Char(20),“NHDFlowline” or “PlusARPointEvent”
+reach,NHDPlusAttributes,PlusFlowAR,Units,,,Num(3),"Units of measurement for Quantity,  “CFS” = cubic feet per second "
+reach,NHDPlusAttributes,PlusFlowlineLakeMorphology,ComID,,1,Long Integer,Common identifier of NHDFlowline feature
+reach,NHDPlusAttributes,PlusFlowlineLakeMorphology,LakeFract,,,Num,Fraction of waterbody allocated to NHDFlowline feature
+reach,NHDPlusAttributes,PlusFlowlineLakeMorphology,RAreaHLoad,,,Num,"Reciprocal area hydraulic loads assigned to NHDFlowline feature in days/meter.  This is a useful parameter in water quality modeling.  It is, for example, used to determine if "
+reach,NHDPlusAttributes,PlusFlowlineLakeMorphology,SurfArea,,1,Num,Waterbody surface area assigned to NHDFlowline feature in square meters
+reach,NHDPlusAttributes,PlusFlowlineVAA,ArbolateSu,,,"Num(13,4) ",Arbolate Sum - Kilometers of stream upstream of the bottom of the NHDFlowline feature
+reach,NHDPlusAttributes,PlusFlowlineVAA,AreaSqKm,,,,See Catchment
+reach,NHDPlusAttributes,PlusFlowlineVAA,ComID,,1,Long Integer,Common identifier of an NHDFlowline feature
+reach,NHDPlusAttributes,PlusFlowlineVAA,DivDASqKm,,1,,See CumulativeArea
+reach,NHDPlusAttributes,PlusFlowlineVAA,DivEffect,,,Num(1),Not valued; Reserved for future use
+reach,NHDPlusAttributes,PlusFlowlineVAA,Divergence,,1,Num(1),"– feature is not part of a divergence 
+– feature is the main path of a divergence "
+reach,NHDPlusAttributes,PlusFlowlineVAA,DnDrainCou,,,Num(2),Count of NHDFlowline features immediately downstream
+reach,NHDPlusAttributes,PlusFlowlineVAA,DnHydroSeq,,1,Num(11),Downstream mainstem hydrologic sequence number
+reach,NHDPlusAttributes,PlusFlowlineVAA,DnLevel,,,Num(2),Streamlevel of main stem downstream NHDflowline feature
+reach,NHDPlusAttributes,PlusFlowlineVAA,DnLevelPat,,,Num(11),Downstream mainstem level path identifier
+reach,NHDPlusAttributes,PlusFlowlineVAA,DnMinorHyd,,,Num(11),Downstream minor hydrologic sequence number
+reach,NHDPlusAttributes,PlusFlowlineVAA,FCode,,1,,See NHDFlowline
+reach,NHDPlusAttributes,PlusFlowlineVAA,FDate,,,,See NHDFlowline
+reach,NHDPlusAttributes,PlusFlowlineVAA,FromMeas,,1,"Num(8,5) ",ReachCode route measure (m-value) at bottom of NHDFlowline feature
+reach,NHDPlusAttributes,PlusFlowlineVAA,FromNode,,1,Num(11),Unique identifier for the point at the top of the NHDFlowline feature
+reach,NHDPlusAttributes,PlusFlowlineVAA,HydroSeq,,1,Num(11),"Hydrologic sequence number; places flowlines in hydrologic order; processing NHDFlowline features in ascending order, encounters the features from downstream to upstream; processing the 
+NHDFlowline features in descending order, encounters the features from upstream to downstream "
+reach,NHDPlusAttributes,PlusFlowlineVAA,LengthKm,,,,See NHDFlowline
+reach,NHDPlusAttributes,PlusFlowlineVAA,LevelPathI,,,Num(11),Level Path Identifier - Hydrologic sequence number of most downstream NHDFlowline feature in the level path
+reach,NHDPlusAttributes,PlusFlowlineVAA,OutDiv,,,Num(1),Not valued; Reserved for future use
+reach,NHDPlusAttributes,PlusFlowlineVAA,PathLength,,,"Num(13,4) ",Distance to the terminal NHDFlowline feature downstream along the main path
+reach,NHDPlusAttributes,PlusFlowlineVAA,ReachCode,,1,,See NHDFlowline
+reach,NHDPlusAttributes,PlusFlowlineVAA,RtnDiv,,,Num(1),"Returning Divergence Flag; 
+= no upstream divergences return at the top of this NHDFlowline feature 
+= one or more upstream divergences returned to the network at the top of this NHDFlowline feature "
+reach,NHDPlusAttributes,PlusFlowlineVAA,StartFlag,,,Num(1),"– feature is not a headwater flowline 
+– feature is a headwater flowline "
+reach,NHDPlusAttributes,PlusFlowlineVAA,StreamCalc,,1,Num(2),Stream Calculator
+reach,NHDPlusAttributes,PlusFlowlineVAA,StreamLeve,,1,Num(2),Stream level
+reach,NHDPlusAttributes,PlusFlowlineVAA,StreamOrde,,1,Num(2),Modified Strahler Stream Order
+reach,NHDPlusAttributes,PlusFlowlineVAA,TerminalFl,,,Num(1),"– not a terminal NHDflowline feature 
+– a terminal NHDFlowline feature "
+reach,NHDPlusAttributes,PlusFlowlineVAA,TerminalPa,,1,Num(11),Terminal Path Identifier - Hydrologic sequence number of terminal NHDFlowline feature
+reach,NHDPlusAttributes,PlusFlowlineVAA,ThinnerCod,,,,Not valued; Reserved for future use
+reach,NHDPlusAttributes,PlusFlowlineVAA,Tidal,,1,Num(1),Is NHDFlowline feature considered Tidal? 0(no) or 1(yes)
+reach,NHDPlusAttributes,PlusFlowlineVAA,ToMeas,,1,"Num(8,5) ",ReachCode route measure (m-value) at top of NHDFlowline feature
+reach,NHDPlusAttributes,PlusFlowlineVAA,ToNode,,1,Num(11),Unique identifier for the point at the end of the NHDFlowline feature
+reach,NHDPlusAttributes,PlusFlowlineVAA,TotDASqKm,,1,,See CumulativeArea
+reach,NHDPlusAttributes,PlusFlowlineVAA,TOTMA,,1,"Num(10,5) ","Time of Travel (populated for non-tidal NHDFlowline Features) in days  Note:  Note:  TOTMA should not be used on minor paths at divergences (PlusFlowlineVAA.Divergence = 2), because these are treated as “start” reaches, with a corresponding lower flow and smaller velocity estimate. "
+reach,NHDPlusAttributes,PlusFlowlineVAA,UpHydroSeq,,1,Num(11),Upstream mainstem hydrologic sequence number
+reach,NHDPlusAttributes,PlusFlowlineVAA,UpLevelPat,,,Num(11),Upstream mainstem level path identifier
+reach,NHDPlusAttributes,PlusFlowlineVAA,VPUIn,,,Num(1),Are there VPU inflows? 0(no) or 1(yes)
+reach,NHDPlusAttributes,PlusFlowlineVAA,VPUOut,,,Num(1),Are there VPU Outflows? 0(no) or 1(yes)
+reach,NHDPlusAttributes,PlusFlowlineVAA,WBAreaType,,1,Char(24),"For FType = Artificial Path, the NHDWaterbody.FType or 
+NHDArea.FType for feature identified in NHDFlowline.WBAreaComID "
+waterbody,NHDPlusAttributes,PlusWaterbodyLakeMorphology,ComID,1,,Long Integer,Common identifier of NHDWaterbody feature
+waterbody,NHDPlusAttributes,PlusWaterbodyLakeMorphology,LakeArea,1,,Num,Lake area in square meters
+waterbody,NHDPlusAttributes,PlusWaterbodyLakeMorphology,LakeVolume,1,,Num,"Lake Volume in cubic meters from Jeff Hollister (2015,  "
+waterbody,NHDPlusAttributes,PlusWaterbodyLakeMorphology,MaxDepth,,,Num,"Max Lake Depth in meters from Jeff Hollister (2015,  "
+waterbody,NHDPlusAttributes,PlusWaterbodyLakeMorphology,MeanDCode,,,Short Integer,Mean Depth Code – source of MeanDUsed (see values below)
+waterbody,NHDPlusAttributes,PlusWaterbodyLakeMorphology,MeanDepth,1,,Long Integer,"Mean Lake Depth in meters from Jeff Hollister (2015,  "
+waterbody,NHDPlusAttributes,PlusWaterbodyLakeMorphology,MeanDUsed,,,Num,Mean lake depth used in computations (includes estimated values where MeanDepth is missing)
+reach,NHDPlusBurnComponents,BurnAddLine,GridCode,,,Long Integer,"Manually assigned gridcodes. See Appendix A, Step 15. "
+reach,NHDPlusBurnComponents,BurnAddLine,HydroSeq,,,Long Integer,See PlusFlowLineVAA; a manually assigned number that puts the additional line is the proper hydrologic sequence with BurnLineEvent.
+reach,NHDPlusBurnComponents,BurnAddLine,LineID,,,Long Integer,Unique identifier for wall line
+reach,NHDPlusBurnComponents,BurnAddLine,PurpCode,,,Text(2),Purpose of added line. See Appendix E.
+reach,NHDPlusBurnComponents,BurnAddLine,PurpDesc,,,Text(254),Description of added line.
+reach,NHDPlusBurnComponents,BurnAddLine,StreamLeve,,,Short Integer,Manually assigned stream level value. See Appendix A.
+reach,NHDPlusBurnComponents,BurnAddWaterbody,FCode,,,,See NHDFCode
+reach,NHDPlusBurnComponents,BurnAddWaterbody,OnOffNet,,,Short Integer,"Hydro Enforcement Flag - 1 = Hydro Enforced (i.e. On network or contains a sink), 0 = not Hydro Enforced "
+reach,NHDPlusBurnComponents,BurnAddWaterbody,PolyID,,,Long Integer,Unique identifier for wall line
+reach,NHDPlusBurnComponents,BurnAddWaterbody,PurpCode,,,Text(2),Purpose of added waterbody (see Appendix E)
+reach,NHDPlusBurnComponents,BurnAddWaterbody,PurpDesc,,,Text(254),Description of added waterbody
+reach,NHDPlusBurnComponents,BurnLineEvent,Burn,,,Text(1),"“Y” – line will be used for hydro-enforcement, “N” - will not be used for hydro-enforcement "
+reach,NHDPlusBurnComponents,BurnLineEvent,BurnLenKm,,,"Num(7,3) ",Length of BurnLineEvent feature
+reach,NHDPlusBurnComponents,BurnLineEvent,Catchment,,,Text(1),"“Y” – line will receive a catchment, “N” - will not receive a catchment "
+reach,NHDPlusBurnComponents,BurnLineEvent,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,NHDPlusBurnComponents,BurnLineEvent,Divergence,,,,See PlusFlowlineVAA
+reach,NHDPlusBurnComponents,BurnLineEvent,FCode,,,,See NHDFlowline
+reach,NHDPlusBurnComponents,BurnLineEvent,Fdate,,,,See NHDFlowline
+reach,NHDPlusBurnComponents,BurnLineEvent,FromMeas,,,"Num(8,5) ",Downstream BurnLineEvent Measure (m-value)
+reach,NHDPlusBurnComponents,BurnLineEvent,FType,,,,See NHDFlowline
+reach,NHDPlusBurnComponents,BurnLineEvent,GridCode,,,Long Integer,GridCode assigned to the NHDFlowline feature
+reach,NHDPlusBurnComponents,BurnLineEvent,Hydroseq,,,,See PlusFlowlineVAA
+reach,NHDPlusBurnComponents,BurnLineEvent,InRPU,,,Text(8),RPU that contains the BurnLineEvent feature
+reach,NHDPlusBurnComponents,BurnLineEvent,LengthKm,,,,See PlusFlowlineVAA
+reach,NHDPlusBurnComponents,BurnLineEvent,ReachCode,,,,See NHDFlowline
+reach,NHDPlusBurnComponents,BurnLineEvent,ReachSMDat,,,,See NHDReachCodeComID
+reach,NHDPlusBurnComponents,BurnLineEvent,StartFlag,,,,See PlusFlowlineVAA
+reach,NHDPlusBurnComponents,BurnLineEvent,StatusFlag,,,Char(1),Reserved for use during NHDPlusV2 Build/Refresh Tools Processing
+reach,NHDPlusBurnComponents,BurnLineEvent,StreamCalc,,,,See PlusFlowlineVAA
+reach,NHDPlusBurnComponents,BurnLineEvent,StreamLevel,,,,See PlusFlowlineVAA
+reach,NHDPlusBurnComponents,BurnLineEvent,ToMeas,,,"Num(8,5) ",Upstream BurnLineEvent Measure (m-value)
+reach,NHDPlusBurnComponents,BurnWaterbody,ComID,,,Long Integer,Common identifier of the NHDWaterbody feature or NHDArea feature
+reach,NHDPlusBurnComponents,BurnWaterbody,FCode,,,,See NHDWaterbody or NHDArea
+reach,NHDPlusBurnComponents,BurnWaterbody,OnOffNet,,,Num(1),"Hydro Enforcement Flag - 1 = Hydro Enforced (i.e. On network or contains a sink), 0 = not Hydro Enforced "
+reach,NHDPlusBurnComponents,BurnWaterbody,PurpCode,,,Char(2),Purpose Code
+reach,NHDPlusBurnComponents,BurnWaterbody,PurpDesc,,,Char(254),Purpose Description
+reach,NHDPlusBurnComponents,BurnWaterbody,ReachCode,,,,See NHDWaterbody
+reach,NHDPlusBurnComponents,BurnWaterbody,ReachSMDate,,,,See NHDReachCodeComID
+reach,NHDPlusBurnComponents,BurnWaterbody,SourceFC,,,Character(20),"NHD Feature Class – “NHDWaterbody”, “NHDArea” "
+reach,NHDPlusBurnComponents,LandSea,Land,,,Short Integer,"A numeric code to identify land/sea/estuary areas.  1 = Land, -2 = Sea, -1 = Estuary "
+reach,NHDPlusBurnComponents,LandSea,LandSeaID,,,Long Integer,Unique identifier for land/sea polygon
+reach,NHDPlusBurnComponents,Sink,Burn,,,Text(1),"“Y” – line will be used for hydro-enforcement, “N” or Null - will not be used for hydro-enforcement "
+reach,NHDPlusBurnComponents,Sink,Catchment,,,Text(1),"“Y” – line will receive a catchment, “N” or Null - will not receive a catchment "
+reach,NHDPlusBurnComponents,Sink,FDate,,,Date,"If SourceFC = “NHDFlowline”, this is the NHDFlowline.Fdate value. "
+reach,NHDPlusBurnComponents,Sink,FeatureID,,,Long Integer,"The id of a feature in another feature class.  This is a 
+ComID, if the feature is in NHDFLowline or  
+      NHDWaterbody 
+Gaz_ID, if the feature is in WBD_Subwatershed 
+PolyID, if the feature is in BurnAddWaterbody "
+reach,NHDPlusBurnComponents,Sink,GridCode,,,Long Integer,GridCode assigned to the Sink point
+reach,NHDPlusBurnComponents,Sink,InRPU,,,Char(8),RPU ID that holds the Sink.
+reach,NHDPlusBurnComponents,Sink,PurpCode,,,Char(2),"Purpose of Sink, See Appendix E "
+reach,NHDPlusBurnComponents,Sink,PurpDesc,,,Char(254),Description of Sink
+reach,NHDPlusBurnComponents,Sink,SinkID,,,Long Integer,Unique identifier for Sink point
+reach,NHDPlusBurnComponents,Sink,SourceFC,,,Char(20),"The feature class of the feature referenced in FeatureID.  
+Values are “NHDFlowline”, “NHDWaterbody”, 
+“WBD_Subwatershed”, and “BurnAddWaterbody”. "
+reach,NHDPlusBurnComponents,Sink,StatusFlag,,,Char(1),Reserved for use during NHDPlusV2 Build/Refresh Tools Processing
+reach,NHDPlusBurnComponents,Wall,Source_Id,,,Long Integer,Place holder for WBD unique identifier (not part of the WBD data model used for NHDPlus)
+reach,NHDPlusBurnComponents,Wall,WallID,,,Long Integer,Unique identifier for wall line
+reach,NHDPlusCatchment,cat,Count,,,Long Integer,Number of grid cells with a particular value in the Value field.
+reach,NHDPlusCatchment,cat,FeatureID,,,Long Integer,FeatureID of the Catchment which equals the ComID of an NHDFlowline feature or the SinkID of a Sink feature
+reach,NHDPlusCatchment,cat,SourceFC,,,Char(20),Source Feature Class (“NHDFlowline” or “Sink”)
+reach,NHDPlusCatchment,cat,Value,,,Long Integer,"The value stored in the grid cell; a unique, compact 
+identification number for each catchment; also referred to as GridCode – See FeatureIDGridCode "
+reach,NHDPlusCatchment,Catchment,AreaSqKm,,,"Num(13,4) ",Catchment area in square kilometers
+reach,NHDPlusCatchment,Catchment,FeatureID,,,Long Integer,FeatureID of a Catchment which is equal to the ComID of an NHDFlowline feature or the SinkID of a Sink feature
+reach,NHDPlusCatchment,Catchment,GridCode,,,,See FeaturnIDGridCode
+reach,NHDPlusCatchment,Catchment,SourceFC,,,Char(20),Source Feature Class (“NHDFlowline” or “Sink”)
+reach,NHDPlusCatchment,FeatureIDGridcode,FeatureID,,1,Long Integer,FeatureID of the Catchment which equals the ComID of an NHDFlowline feature or the SinkID of a Sink feature
+reach,NHDPlusCatchment,FeatureIDGridcode,GridCode,,1,Long Integer,"Unique, compact identification number for a Catchment "
+reach,NHDPlusCatchment,FeatureIDGridcode,RPUID,,,Char(8),RPU identifier for the Catchment
+reach,NHDPlusCatchment,FeatureIDGridcode,SourceFC,,,Char(20),Source Feature Class (“NHDFlowline” or “Sink”)
+reach,NHDPlusCatSeedrrrrrrrr,catseed,Value,,,Long Integer,Gridcode of the catchment. See FeaturnIDGridCode
+reach,NHDPlusFdrFacrrrrrrrr,fac,Value,,,Long Integer,Number of cells that drain to each cell.
+reach,NHDPlusFdrFacrrrrrrrr,fdr,Count,,,Long Integer,Number of cells with a particular value in the Value field
+reach,NHDPlusFdrFacrrrrrrrr,fdr,Value,,,Long Integer,"The value for the grid cell. Can be assigned one of eight possible values: 
+_  Flow ends (sink) 
+–  Flow is to the East 
+–  Flow is to the Southeast 
+   4 –  Flow is to the South 
+   8 –  Flow is to the Southwest 
+  16 –  Flow is to the West 
+  32 –  Flow is to the Northwest 
+  64 –  Flow is to the North 
+128 – Flow is to the Northeast "
+reach,NHDPlusFdrNullrrrrrrrr,fdrnull,Count,,,Long Integer,Number of cells with a particular value in the Value field
+reach,NHDPlusFdrNullrrrrrrrr,fdrnull,Value,,,Long Integer,"For Stream Network cells, No Data 
+For cells not on the stream network, the value for the grid cell is: 
+_  Flow ends (sink) 
+–  Flow is to the East 
+–  Flow is to the Southeast 
+   4 –  Flow is to the South 
+   8 –  Flow is to the Southwest 
+  16 –  Flow is to the West 
+  32 –  Flow is to the Northwest 
+  64 –  Flow is to the North 
+128 – Flow is to the Northeast 
+NoData – a stream network cell "
+reach,NHDPlusFilledAreasrrrrrrrr,filledareas,Count,,,Long Integer,Number of cells with a particular value in the Value field
+reach,NHDPlusFilledAreasrrrrrrrr,filledareas,Value,,,Long Integer,"The value for the grid cell. Can be assigned one of two possible values: 
+–  Cell was not changed by the Fill process 
+–  Cell was raised by the Fill process "
+reach,NHDPlusGlobalData,BoundaryUnit,AreaSqKM,,,"Num(13,4) ",Area in square kilometers of the unit
+reach,NHDPlusGlobalData,BoundaryUnit,DrainageID,,,Character (2),Drainage Area identifier
+reach,NHDPlusGlobalData,BoundaryUnit,Hydroseq,,,Num(11),Hydrologic order of Boundary Unit (populated for VPUs)
+reach,NHDPlusGlobalData,BoundaryUnit,Shape_Area,,,See ESRI documentation,Feature area in square decimal degrees
+reach,NHDPlusGlobalData,BoundaryUnit,UnitID,,,Character (8),Boundary Unit unique identifier
+reach,NHDPlusGlobalData,BoundaryUnit,UnitName,,,Character (100),Boundary Unit Name (populated for VPUs)
+reach,NHDPlusGlobalData,BoundaryUnit,UnitType,,,Character (5),"Boundary Unit Type - “VPU”, “RPU” "
+reach,NHDPlusGlobalData,SC<featureid>,Count,,,Long Integer,Number of grid cells with a particular value in the Value field.
+reach,NHDPlusGlobalData,SC<featureid>,Value,,,Long Integer,"The value stored in the grid cell; a unique, compact identification number for a NHDFlowline Super catchment; also referred to as GridCode – See FeatureIDGridCode "
+reach,NHDPlusGlobalData,SuperCatchments,AreaSqKM,,,"Num(18,6) ",Area of the supercatchment in square kilometers
+reach,NHDPlusGlobalData,SuperCatchments,FeatureID,,,Long Integer,ComID of the associated NHDFlowline
+reach,NHDPlusGlobalData,SuperCatchments,GridCode,,,"Num(10,0) ",Catchment gridcode for the NHDFlowline catchment
+reach,NHDPlusGlobalData,SuperCatchments,SourceFC,,,Char(20),“NHDFlowline”
+reach,NHDPlusGlobalData,SuperCatchments,VPUID,,,Char(8),Vector Processing Unit Identifier
+reach,NHDPlusHydroDemrrrrrrrr,hydrodem,Value,,,Long Integer,Elevation value in centimeters
+reach,NHDPlusNationalData,Gage_Smooth,Ave,,,The mean flow for the year/month at the gage (cfs),Double
+reach,NHDPlusNationalData,Gage_Smooth,CompleteRe,,,"= There is not a complete record for the time period.  
+ 
+= There is a complete record for the time period.   
+ 
+A complete record is daily flow values for every day in the time period. 
+ 
+The time period is the Year/Mo for a monthly mean and the Year for an annual mean. The gage adjustments are only done using records that have a complete record. ",Integer
+reach,NHDPlusNationalData,Gage_Smooth,Month,,,"The Month. “MA” = Mean Annual, “01” = January, “02” = February, etc. ",Char(2)
+reach,NHDPlusNationalData,Gage_Smooth,Site_No,,,The NWIS Gage ID,Char(16)
+reach,NHDPlusNationalData,Gage_Smooth,Variable,,,Description,Format
+reach,NHDPlusNationalData,Gage_Smooth,Year,,,The year,Char(4)
+reach,NHDPlusNationalData,GageInfo,Active,,,,"NWIS Status: 0 = Not Active, 1 = Active, 9 = Status Unknown "
+reach,NHDPlusNationalData,GageInfo,ActiveDate,,,,Date active status was determined
+reach,NHDPlusNationalData,GageInfo,Agency_CD,,,,Agency Code
+reach,NHDPlusNationalData,GageInfo,DASqKm,,,,NWIS Drainage Area (Sq. Kilometers)
+reach,NHDPlusNationalData,GageInfo,DASqMi,,,,NWIS Drainage Area (Sq. Miles)
+reach,NHDPlusNationalData,GageInfo,GageID,,,,NWIS Gage ID
+reach,NHDPlusNationalData,GageInfo,GagesII,,,,"Blank = not in GagesII dataset, “Ref” = Reference Gage in GagesII dataset, “Non-ref” = in GagesII dataset but not a reference gage "
+reach,NHDPlusNationalData,GageInfo,LatSite,,,,NWIS Latitude
+reach,NHDPlusNationalData,GageInfo,LonSite,,,,NWIS Longitude
+reach,NHDPlusNationalData,GageInfo,State,,,,State name
+reach,NHDPlusNationalData,GageInfo,State_CD,,,,State Code
+reach,NHDPlusNationalData,GageInfo,Station_NM,,,,Station Name
+reach,NHDPlusNationalData,GageLoc,ComID,,,,"Not populated, a unique id for each NHD event assigned during the central NHD update process. "
+reach,NHDPlusNationalData,GageLoc,EventDate,,,,Date event was created
+reach,NHDPlusNationalData,GageLoc,EventType,,,,“StreamGage”
+reach,NHDPlusNationalData,GageLoc,FeatureCla,,,,Reserved for future use
+reach,NHDPlusNationalData,GageLoc,FeatureCom,,,,Reserved for future use
+reach,NHDPlusNationalData,GageLoc,Featuredet,,,,URL where detailed gage data can be found (NWISWEB)
+reach,NHDPlusNationalData,GageLoc,FLComID,,,,ComID of the NHDFlowline feature on which the gage is located.
+reach,NHDPlusNationalData,GageLoc,Measure,,,,Measure along reach where Stream Gage is located in percent from downstream end of the one or more NHDFlowline features that are assigned to the ReachCode
+reach,NHDPlusNationalData,GageLoc,Offset,,,,Always zero
+reach,NHDPlusNationalData,GageLoc,ReachCode,,,,ReachCode on which Stream Gage is located
+reach,NHDPlusNationalData,GageLoc,Reachresol,,,,"Reach Resolution, always “Medium” (i.e. 1:100K scale) "
+reach,NHDPlusNationalData,GageLoc,ReachSMDat,,,,Reach Version Date (Not populated)
+reach,NHDPlusNationalData,GageLoc,Source_Dat,,,,Description of point entity
+reach,NHDPlusNationalData,GageLoc,Source_Fea,,,,Gage ID/USGS Site Number
+reach,NHDPlusNationalData,GageLoc,Source_Ori,,,,Originator of Event
+reach,NHDPlusNationalData,nationalcat,Value,,,Long Integer,"The value stored in the grid cell; a unique, compact 
+identification number for each catchment; also referred to as GridCode – See FeatureIDGridCode "
+reach,NHDSnapshot,NHDFCode,FCode ,,,Long Integer ,A numeric code that represents the feature type plus its encoded attribute values 
+reach,NHDSnapshot,NHDFCode,Descriptio ,,,Character (255) ,Text description of feature type and the encoded attributes 
+reach,NHDSnapshot,NHDFCode,CanalDitch ,,,Character (32) ,"Canal Ditch Type (aqueduct, unspecified) "
+reach,NHDSnapshot,NHDFCode,Constructi ,,,Character (32) ,"Construction material (earthen, nonearthen, unspecified) "
+reach,NHDSnapshot,NHDFCode,Hydrograph ,,,Character (32) ,Intermittent or perennial 
+reach,NHDSnapshot,NHDFCode,Inundation ,,,Character (32) ,"Inundation Area Type (debris basin, dewatering area, duck pond, general case, percolation basin, retarding basin) "
+reach,NHDSnapshot,NHDFCode,Operationa ,,,Character (32) ,"Operational Status (abandoned, operational, under construction) "
+reach,NHDSnapshot,NHDFCode,PipelineTy ,,,Character (32) ,"Pipeline type (aqueduct, general case, penstock, siphon) "
+reach,NHDSnapshot,NHDFCode,Positional ,,,Character (32) ,"Positional accuracy (approximate, definite, indefinite, not applicable) "
+reach,NHDSnapshot,NHDFCode,Relationsh ,,,Character (32) ,"Relationship to surface (abovewater, at or near, elevated, underground, underwater, unspecified) "
+reach,NHDSnapshot,NHDFCode,ReservoirT ,,,Character (32) ,"Reservoir type (aquaculture, decorative pool, disposal-tailings pond, disposal-unspecified, evaporator, swimming pool, treatment-cooling pond, treatment-filtration pond, treatment-settling pond, treatment-sewage treatment pond, unspecified water storage) "
+reach,NHDSnapshot,NHDFCode,Stage ,,,Character (32) ,"Elevation stage (Normal Pool, Flood Elevation, Average Water Elevation, Date of Photography, High Water Elevation, Spillway Elevation) "
+reach,NHDSnapshot,NHDFCode,SpecialUse ,,,Character (32) ,"Special use category (dump site, spoil area) "
+reach,NHDSnapshot,NHDFCode,KCode ,,,Character (30) ,
+reach,NHDSnapshot\Hydrography,NHDArea,ComID ,,,Long Integer ,Common identifier of the NHD area feature 
+reach,NHDSnapshot\Hydrography,NHDArea,FDate ,,,Date ,Feature Currency Date 
+reach,NHDSnapshot\Hydrography,NHDArea,Resolution ,,,Character (6) ,"NHD database resolution (i.e. 'high', 'medium' or 'local') "
+reach,NHDSnapshot\Hydrography,NHDArea,GNIS_ID ,,,Character(10) ,Geographic Names Information System ID for the value in GNIS_Name 
+reach,NHDSnapshot\Hydrography,NHDArea,GNIS_Name ,,,Character 65) ,Feature Name from the Geographic Names Information System 
+reach,NHDSnapshot\Hydrography,NHDArea,AreaSqKm ,,,"Num(11,3) ",Feature area in square kilometers 
+reach,NHDSnapshot\Hydrography,NHDArea,Elevation ,,,"Num(9,3) ",Feature elevation in feet 
+reach,NHDSnapshot\Hydrography,NHDArea,FType ,,,Character (32) ,NHD Feature Type 
+reach,NHDSnapshot\Hydrography,NHDArea,FCode ,,,Num(5) ,Numeric codes for various feature attributes; definitions for codes found in the NHDFCode lookup table 
+reach,NHDSnapshot\Hydrography,NHDArea,Shape_Leng ,,,See ESRI documentation ,Feature length in decimal degrees 
+reach,NHDSnapshot\Hydrography,NHDArea,Shape_Area ,,,See ESRI documentation ,Feature area in square decimal degrees 
+reach,NHDSnapshot\Hydrography,NHDFlowline,ComID,,1,Long Integer ,Common identifier of the NHD feature 
+reach,NHDSnapshot\Hydrography,NHDFlowline,FDate,,,Date ,Feature Currency Date 
+reach,NHDSnapshot\Hydrography,NHDFlowline,Resolution,,,Character (6) ,"NHD database resolution (i.e. 'high', 'medium' or 'local') "
+reach,NHDSnapshot\Hydrography,NHDFlowline,GNIS_ID,,,Character(10) ,Geographic Names Information System ID for the value in GNIS_Name 
+reach,NHDSnapshot\Hydrography,NHDFlowline,GNIS_Name,,,Character(65) ,Feature Name from the Geographic Names Information System 
+reach,NHDSnapshot\Hydrography,NHDFlowline,LengthKM,,1,"Num(11,3) ",Feature length in kilometers 
+reach,NHDSnapshot\Hydrography,NHDFlowline,ReachCode,,,Character (14) ,Reach Code assigned to feature 
+reach,NHDSnapshot\Hydrography,NHDFlowline,FlowDir,,,Character (14) ,Flow direction is 'With Digitized' or 'Uninitialized' Only flowlines with FlowDir = 'With Digitized' are used to define the surface water network used in NHDPlus. All other flowlines are ignored by NHDPlus. 
+reach,NHDSnapshot\Hydrography,NHDFlowline,WBAreaComI,,1,Long Integer ,ComID of the NHD polygonal water feature through which a NHD 'Artificial Path' flowline flows 
+reach,NHDSnapshot\Hydrography,NHDFlowline,FType,,,Character (32) ,NHD Feature Type 
+reach,NHDSnapshot\Hydrography,NHDFlowline,FCode,,,Num(5) ,Numeric codes for various feature attributes in the NHDFCode lookup table 
+reach,NHDSnapshot\Hydrography,NHDFlowline,Shape_Leng,,,See ESRI documentation ,Feature length in decimal degrees 
+reach,NHDSnapshot\Hydrography,NHDFlowline,Enabled,,,Character (6) ,Always 'True' 
+reach,NHDSnapshot\Hydrography,NHDWaterbody,ComID ,,,Long Integer ,Common identifier of the NHD Waterbody feature 
+reach,NHDSnapshot\Hydrography,NHDWaterbody,FDate ,,,Date ,Feature Currency Date 
+reach,NHDSnapshot\Hydrography,NHDWaterbody,Resolution ,,,Character (6) ,"NHD database resolution (i.e. 'high', 'medium' or 'local') "
+reach,NHDSnapshot\Hydrography,NHDWaterbody,GNIS_ID ,,,Character(10) ,Geographic Names Information System ID for the value in GNIS_Name 
+reach,NHDSnapshot\Hydrography,NHDWaterbody,GNIS_Name ,,,Character (65) ,Feature Name from the Geographic Names Information System 
+reach,NHDSnapshot\Hydrography,NHDWaterbody,AreaSqKm ,,,"Num(11,3) ",Feature area in square kilometers 
+reach,NHDSnapshot\Hydrography,NHDWaterbody,Elevation ,,,"Num(10,3) ",Feature elevation in feet 
+reach,NHDSnapshot\Hydrography,NHDWaterbody,ReachCode ,,,Character (14) ,Reach Code assigned to feature 
+reach,NHDSnapshot\Hydrography,NHDWaterbody,FType ,,,Character (32) ,NHD Feature Type 
+reach,NHDSnapshot\Hydrography,NHDWaterbody,FCode ,,,Num(5) ,Numeric code for various feature attributes; definitions for codes found in the NHDFCode lookup table 
+reach,NHDSnapshot\Hydrography,NHDWaterbody,Shape_Leng ,,,See ESRI documentation ,Feature length in decimal degrees 
+reach,NHDSnapshot\Hydrography,NHDWaterbody,Shape_Area ,,,See ESRI documentation ,Feature area in square decimal degrees 
+reach,VogelExtension,VogelFlow,ComID,,,Long Integer,Common identifier of an NHDFlowline feature
+reach,VogelExtension,VogelFlow,MAFlowV,,,"Num(14,7) ",Mean Annual Flow (cfs) at bottom of flowline using Vogel Method.
+reach,VogelExtension,VogelFlow,MAVelV,,,"Num(8,5) ",Mean Annual Velocity (fps) at bottom of flowline using Jobson Method (1996) with MAFlowV.
+reach,VPUAttributeExtension,IncrLat,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,VPUAttributeExtension,IncrLat,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,VPUAttributeExtension,IncrLat,LatV,,,"Num(5,2) ",Mean latitude in degrees
+reach,VPUAttributeExtension,IncrLat,LatVT,,,Char(1),"Value Type, “V” meaning average "
+reach,VPUAttributeExtension,IncrLat,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,VPUAttributeExtension,ROMA,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,VPUAttributeExtension,ROMA,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,VPUAttributeExtension,ROMA,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,VPUAttributeExtension,ROMA,RunOffV,,,"Num(5,2) ",Mean runoff  (mm)
+reach,VPUAttributeExtension,ROMA,RunOffVT,,,Char(1),"Value Type, “V” meaning average "
+reach,VPUAttributeExtension,ROMM01,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,VPUAttributeExtension,ROMM01,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,VPUAttributeExtension,ROMM01,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,VPUAttributeExtension,ROMM01,RunOffV,,,"Num(5,2) ",Mean runoff  (mm)
+reach,VPUAttributeExtension,ROMM01,RunOffVT,,,Char(1),"Value Type, “V” meaning average "
+reach,VPUAttributeExtension,ROMM02,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,VPUAttributeExtension,ROMM02,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,VPUAttributeExtension,ROMM02,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,VPUAttributeExtension,ROMM02,RunOffV,,,"Num(5,2) ",Mean runoff  (mm)
+reach,VPUAttributeExtension,ROMM02,RunOffVT,,,Char(1),"Value Type, “V” meaning average "
+reach,VPUAttributeExtension,ROMM03,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,VPUAttributeExtension,ROMM03,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,VPUAttributeExtension,ROMM03,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,VPUAttributeExtension,ROMM03,RunOffV,,,"Num(5,2) ",Mean runoff  (mm)
+reach,VPUAttributeExtension,ROMM03,RunOffVT,,,Char(1),"Value Type, “V” meaning average "
+reach,VPUAttributeExtension,ROMM04,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,VPUAttributeExtension,ROMM04,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,VPUAttributeExtension,ROMM04,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,VPUAttributeExtension,ROMM04,RunOffV,,,"Num(5,2) ",Mean runoff  (mm)
+reach,VPUAttributeExtension,ROMM04,RunOffVT,,,Char(1),"Value Type, “V” meaning average "
+reach,VPUAttributeExtension,ROMM05,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,VPUAttributeExtension,ROMM05,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,VPUAttributeExtension,ROMM05,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,VPUAttributeExtension,ROMM05,RunOffV,,,"Num(5,2) ",Mean runoff  (mm)
+reach,VPUAttributeExtension,ROMM05,RunOffVT,,,Char(1),"Value Type, “V” meaning average "
+reach,VPUAttributeExtension,ROMM06,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,VPUAttributeExtension,ROMM06,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,VPUAttributeExtension,ROMM06,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,VPUAttributeExtension,ROMM06,RunOffV,,,"Num(5,2) ",Mean runoff  (mm)
+reach,VPUAttributeExtension,ROMM06,RunOffVT,,,Char(1),"Value Type, “V” meaning average "
+reach,VPUAttributeExtension,ROMM07,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,VPUAttributeExtension,ROMM07,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,VPUAttributeExtension,ROMM07,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,VPUAttributeExtension,ROMM07,RunOffV,,,"Num(5,2) ",Mean runoff  (mm)
+reach,VPUAttributeExtension,ROMM07,RunOffVT,,,Char(1),"Value Type, “V” meaning average "
+reach,VPUAttributeExtension,ROMM08,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,VPUAttributeExtension,ROMM08,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,VPUAttributeExtension,ROMM08,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,VPUAttributeExtension,ROMM08,RunOffV,,,"Num(5,2) ",Mean runoff  (mm)
+reach,VPUAttributeExtension,ROMM08,RunOffVT,,,Char(1),"Value Type, “V” meaning average "
+reach,VPUAttributeExtension,ROMM09,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,VPUAttributeExtension,ROMM09,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,VPUAttributeExtension,ROMM09,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,VPUAttributeExtension,ROMM09,RunOffV,,,"Num(5,2) ",Mean runoff  (mm)
+reach,VPUAttributeExtension,ROMM09,RunOffVT,,,Char(1),"Value Type, “V” meaning average "
+reach,VPUAttributeExtension,ROMM10,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,VPUAttributeExtension,ROMM10,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,VPUAttributeExtension,ROMM10,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,VPUAttributeExtension,ROMM10,RunOffV,,,"Num(5,2) ",Mean runoff  (mm)
+reach,VPUAttributeExtension,ROMM10,RunOffVT,,,Char(1),"Value Type, “V” meaning average "
+reach,VPUAttributeExtension,ROMM11,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,VPUAttributeExtension,ROMM11,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,VPUAttributeExtension,ROMM11,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,VPUAttributeExtension,ROMM11,RunOffV,,,"Num(5,2) ",Mean runoff  (mm)
+reach,VPUAttributeExtension,ROMM11,RunOffVT,,,Char(1),"Value Type, “V” meaning average "
+reach,VPUAttributeExtension,ROMM12,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,VPUAttributeExtension,ROMM12,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,VPUAttributeExtension,ROMM12,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,VPUAttributeExtension,ROMM12,RunOffV,,,"Num(5,2) ",Mean runoff  (mm)
+reach,VPUAttributeExtension,ROMM12,RunOffVT,,,Char(1),"Value Type, “V” meaning average "
+reach,VPUAttributeExtension,ROMMMA,FeatureID,,,Long Integer,FeatureID of an NHDPlusV2 Catchment
+reach,VPUAttributeExtension,ROMMMA,HydroSeq,,,Num(11),"When FeatureID represents an NHDFlowline feature, the 
+Hydrologic Sequence Number of the feature; When FeatureID represents a Sink, set to -9998 "
+reach,VPUAttributeExtension,ROMMMA,MissDataA,,,"Num(13,4) ",Area of Catchment with no data
+reach,VPUAttributeExtension,ROMMMA,RunOffV,,,"Num(5,2) ",Mean runoff  (mm)
+reach,VPUAttributeExtension,ROMMMA,RunOffVT,,,Char(1),"Value Type, “V” meaning average "

@@ -1,0 +1,8 @@
+long_name,species,acute_duration,chronic_duration,overall_duration
+Human health DWLOC (ug/L),human,4,21,60
+Freshwater Fish (Tox x LOC),fw_fish,4,60,
+Freshwater Invertebrate (Tox x LOC),fw_inv,4,21,
+Estuarine/Marine Fish (Tox x LOC),em_fish,4,21,
+Estuarine/Marine Invertebrate (Tox x LOC),em_inv,4,21,
+Aquatic non-vascular plant (Tox x LOC),nonvasc_plant,4,21,
+Aquatic vascular plant (Tox x LOC),vasc_plant,4,21,

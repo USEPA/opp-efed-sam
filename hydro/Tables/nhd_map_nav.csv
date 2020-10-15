@@ -1,0 +1,13 @@
+feature_type,path,table,field,internal_name
+reach,NHDPlusAttributes,PlusFlow,FromComID,comid
+reach,NHDPlusAttributes,PlusFlow,ToComID,
+reach,NHDPlusAttributes,PlusFlow,Direction,
+reach,NHDPlusAttributes,PlusFlowlineVAA,ComID,
+reach,NHDPlusAttributes,PlusFlowlineVAA,Divergence,
+reach,NHDPlusAttributes,PlusFlowlineVAA,FCode,
+reach,NHDPlusAttributes,PlusFlowlineVAA,PathTimeMA,path_time
+reach,NHDPlusAttributes,PlusFlowlineVAA,StreamCalc,stream_calc
+reach,NHDPlusAttributes,PlusFlowlineVAA,TerminalPa,terminal_path
+reach,NHDPlusAttributes,PlusFlowlineVAA,TOTMA,travel_time
+reach,NHDPlusAttributes,PlusFlowlineVAA,LengthKM,
+reach,NHDPlusAttributes,PlusFlowlineVAA,HydroSeq,
