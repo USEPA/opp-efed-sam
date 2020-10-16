@@ -13,6 +13,7 @@ def upload_file(local, remote):
     report("{} -> {}".format(local, remote))
     try:
         sam_staged_bucket.upload_file(local, remote)
+        exit()
     except Exception as e:
         raise e
 
