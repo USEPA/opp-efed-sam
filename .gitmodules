@@ -1,9 +1,11 @@
 [submodule "efed-lib"]
 	path = efed-lib
 	url = https://github.com/usepa/opp-efed
-[submodule "tools"]
-	path = tools
-	url = https://github.com/usepa/opp-efed-tools
 [submodule "hydro"]
 	path = hydro
 	url = https://github.com/usepa/opp-efed-hydro
+	branch = master
+[submodule "tools"]
+	path = tools
+	url = https://github.com/usepa/opp-efed-tools
+	branch = master
