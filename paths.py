@@ -3,9 +3,9 @@ import os
 # If running locally (Trip's computer), point to an external hard drive. If in AWS, use a different path
 local_run = True
 if local_run:
-    project_root = "/src/app-data"
+    sam_root = r"E:\opp-efed-data\sam"
 else:
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__)))
+    sam_root = "/src/app-data"
 
 scenario_root = os.path.join("scenarios", "Production")
 table_root = os.path.join("Tables")

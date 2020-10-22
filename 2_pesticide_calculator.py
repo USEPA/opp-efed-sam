@@ -1,16 +1,6 @@
 from utilities import Simulation, HydroRegion, ModelOutputs, WatershedRecipes, ReachManager, report
 from utilities import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
 
-# This is a temporary attribute for developmental purposes. Specifies a sub-regional set of scenarios
-load_subset = 'mtb'
-run_diagnostic = True
-diagnostic_reach = 5641062
-diagnostic_scenario = "-CDo1r1a1l1-18071-1"
-
-# FOR WEEK OF 10/14
-# THE MECHANISTICS SEEM TO BE WORKING, BUT THE RESULTS ARE PROBABLY OFF. MASSES SEEM TOO LOW, MAYBE A FEW
-# ORDERS OF MAGNITUDE. MAY BE A UNITS ISSUE - CHECK SCENARIO RESULTS AND VERIFY NUMBERS
-
 # TODO - why are there fewer scenarios than recipes?
 # TODO - what do years do?
 # TODO - Check the output arrays
@@ -24,7 +14,7 @@ diagnostic_scenario = "-CDo1r1a1l1-18071-1"
 # TODO - confirm that it's handling double-crops and seasons right
 #  In fact, design unit tests for all different components - recipe recall, etc.
 
-def pesticide_calculator(input_data, dask_process=True):
+def pesticide_calculator(input_data):
 
     # Initialize parameters from front end
     sim = Simulation(input_data)
@@ -86,13 +76,13 @@ def pesticide_calculator(input_data, dask_process=True):
 
 
 if __name__ == "__main__":
+    """ This is what gets run when running straight from Python """
     from dev.test_inputs import atrazine_json_mtb
-    from sam_exe_dev import Sam
+    from sam_exe import Sam
 
-    dask_process = False
     input_dict = Sam(atrazine_json_mtb).input_dict
     if False:
         import cProfile
-        cProfile.run('pesticide_calculator(input_dict, dask_process)')
+        cProfile.run('pesticide_calculator(input_dict)')
     else:
-        pesticide_calculator(input_dict, dask_process)
+        pesticide_calculator(input_dict)

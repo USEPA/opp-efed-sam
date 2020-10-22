@@ -521,7 +521,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
             messages.append("end date is later")
         if any(messages):
             report(f"Simulation {' and '.join(messages)} than range of available scenario data. "
-                   f"Date range has been truncated to {self.sim.start_date}-{self.sim.end_date}.")
+                   f"Date range has been truncated at {self.sim.start_date} to {self.sim.end_date}.")
     
     def align_met_dates(self):
         # TODO - this should be combined with align_sim_dates and probably put into the parent DateManager class
