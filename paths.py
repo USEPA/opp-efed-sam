@@ -3,17 +3,16 @@ import os
 # If running locally (Trip's computer), point to an external hard drive. If in AWS, use a different path
 local_run = True
 if local_run:
-    project_root = r"E:\opp-efed-data"
+    project_root = "/src/app-data"
 else:
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 
-sam_root = os.path.join(project_root, "sam")
 scenario_root = os.path.join("scenarios", "Production")
-table_root = os.path.join("..", "Tables")
+table_root = os.path.join("Tables")
 input_dir = os.path.join(sam_root, "Inputs")
 intermediate_dir = os.path.join(sam_root, "Intermediate")
-output_path = os.path.join(sam_root, "Results")
-scratch_path = os.path.join(sam_root, "temp")
+output_path = os.path.join("Results")
+scratch_path = os.path.join("temp")
 diagnostic_path = os.path.join(sam_root, "diagnostic")
 
 # Input data

@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
     dask_process = False
     input_dict = Sam(atrazine_json_mtb).input_dict
-    if True:
+    if False:
         import cProfile
         cProfile.run('pesticide_calculator(input_dict, dask_process)')
     else:
