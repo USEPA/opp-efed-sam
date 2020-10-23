@@ -1,5 +1,5 @@
-from utilities import Simulation, HydroRegion, ModelOutputs, WatershedRecipes, ReachManager, report
-from utilities import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
+from sam.utilities import Simulation, HydroRegion, ModelOutputs, WatershedRecipes, ReachManager, report
+from sam.utilities import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
 
 # TODO - why are there fewer scenarios than recipes?
 # TODO - what do years do?

@@ -7,18 +7,18 @@ import pandas as pd
 import json
 from ast import literal_eval
 
-from tools.efed_lib import MemoryMatrix, FieldManager, DateManager, report
-from hydro.nhd.params_nhd import nhd_regions
-from hydro.nhd.navigator import Navigator
-from hydro.nhd.process_nhd import identify_waterbody_outlets, calculate_surface_area
-from paths import weather_path, stage_one_scenario_path, stage_two_scenario_path, recipe_path, scratch_path, \
+from sam.tools.efed_lib import MemoryMatrix, FieldManager, DateManager, report
+from sam.hydro.nhd.params_nhd import nhd_regions
+from sam.hydro.nhd.navigator import Navigator
+from sam.hydro.nhd.process_nhd import identify_waterbody_outlets, calculate_surface_area
+from sam.paths import weather_path, stage_one_scenario_path, stage_two_scenario_path, recipe_path, scratch_path, \
     dwi_path, manual_points_path, output_path, fields_and_qc_path, endpoint_format_path, condensed_nhd_path, \
     navigator_path
-from parameters import hydrology_params, soil_params, plant_params, output_params, fields
-from parameters import scenario_defaults, scenario_start_date, scenario_end_date, batch_size, stage_one_chunksize, \
+from sam.parameters import hydrology_params, soil_params, plant_params, output_params, fields
+from sam.parameters import scenario_defaults, scenario_start_date, scenario_end_date, batch_size, stage_one_chunksize, \
     crop_group_field
-from aquatic_concentration import compute_concentration, partition_benthic, exceedance_probability
-from scenario_processing import stage_two_to_three
+from sam.aquatic_concentration import compute_concentration, partition_benthic, exceedance_probability
+from sam.scenario_processing import stage_two_to_three
 
 # Initialize endpoints
 endpoint_format = pd.read_csv(endpoint_format_path)

@@ -1,13 +1,11 @@
 import dask
 import pandas as pd
 import numpy as np
-from utilities import WeatherArray, StageOneScenarios, StageTwoScenarios, WatershedRecipes
-from hydro.nhd.navigator import Navigator
-from parameters import batch_size, crop_group_field
-from scenario_processing import stage_one_to_two
-from utilities import fields, report
-
-dask_process = True
+from sam.utilities import WeatherArray, StageOneScenarios, StageTwoScenarios, WatershedRecipes
+from sam.hydro.nhd.navigator import Navigator
+from sam.parameters import batch_size, crop_group_field
+from sam.scenario_processing import stage_one_to_two
+from sam.utilities import fields, report
 
 
 # TODO - complete preprocessing script for building condensed nhd (sam and nav), navs, etc
