@@ -1,11 +1,11 @@
 import os
 
 # If running locally (Trip's computer), point to an external hard drive. If in AWS, use a different path
-local_run = True
+local_run = False
 if local_run:
     sam_root = r"E:\opp-efed-data\sam"
 else:
-    sam_root = "/src/app-data"
+    sam_root = "/src/app-data/sampreprocessed"
 
 scenario_root = os.path.join("scenarios", "Production")
 table_root = os.path.join("Tables")
@@ -23,6 +23,7 @@ stage_one_scenario_path = os.path.join(input_dir, "SamScenarios", "r{}_{}.csv") 
 dwi_path = os.path.join(input_dir, "Intakes", "intake_locations.csv")
 manual_points_path = os.path.join(input_dir, "Intakes", "mtb_single_intake.csv")
 navigator_path = os.path.join(input_dir, "NavigatorFiles", "nav{}.npz")  # region
+
 # Intermediate data
 stage_two_scenario_path = os.path.join(intermediate_dir, "StageTwoScenarios", "r{}")  # region
 
