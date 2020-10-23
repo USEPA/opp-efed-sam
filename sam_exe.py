@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
 
-from utilities import fields
-from tools.efed_lib import report
+from sam.utilities import fields
+from sam.tools.efed_lib import report
+
 
 class InputDict(dict):
     """ Processes the input string from the front end into a form usable by tool """
