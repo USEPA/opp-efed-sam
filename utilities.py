@@ -8,9 +8,9 @@ import json
 from ast import literal_eval
 
 from .tools.efed_lib import MemoryMatrix, FieldManager, DateManager, report
-from .hydro.nhd.params_nhd import nhd_regions
-from .hydro.nhd.navigator import Navigator
-from .hydro.nhd.process_nhd import identify_waterbody_outlets, calculate_surface_area
+from .hydro.params_nhd import nhd_regions
+from .hydro.navigator import Navigator
+from .hydro.process_nhd import identify_waterbody_outlets, calculate_surface_area
 from .paths import weather_path, stage_one_scenario_path, stage_two_scenario_path, recipe_path, scratch_path, \
     dwi_path, manual_points_path, output_path, fields_and_qc_path, endpoint_format_path, condensed_nhd_path, \
     navigator_path

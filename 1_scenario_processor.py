@@ -2,7 +2,7 @@ import dask
 import pandas as pd
 import numpy as np
 from .utilities import WeatherArray, StageOneScenarios, StageTwoScenarios, WatershedRecipes
-from .hydro.nhd.navigator import Navigator
+from .hydro.navigator import Navigator
 from .parameters import batch_size, crop_group_field
 from .scenario_processing import stage_one_to_two
 from .utilities import fields, report
