@@ -1,8 +1,8 @@
-[submodule "hydro"]
-	path = hydro
-	url = https://github.com/usepa/opp-efed-hydro
-	branch = dev
 [submodule "tools"]
 	path = tools
 	url = https://github.com/usepa/opp-efed-tools
+	branch = dev
+[submodule "hydro"]
+	path = hydro
+	url = https://github.com/usepa/opp-efed-hydro
 	branch = dev
