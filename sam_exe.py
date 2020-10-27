@@ -68,7 +68,7 @@ class InputDict(dict):
         return map(date_format, (self['sim_date_start'], self['sim_date_end']))
 
     def process_endpoints(self):
-        from utilities import endpoint_format
+        from .utilities import endpoint_format
 
         endpoints = []
         for level in ('acute', 'chronic', 'overall'):
