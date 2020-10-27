@@ -1,5 +1,6 @@
-from sam.utilities import Simulation, HydroRegion, ModelOutputs, WatershedRecipes, ReachManager, report
-from sam.utilities import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
+from .utilities import Simulation, HydroRegion, ModelOutputs, WatershedRecipes, ReachManager, report
+from .utilities import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
+
 
 # TODO - why are there fewer scenarios than recipes?
 # TODO - what do years do?
@@ -15,7 +16,6 @@ from sam.utilities import StageOneScenarios, StageTwoScenarios, StageThreeScenar
 #  In fact, design unit tests for all different components - recipe recall, etc.
 
 def pesticide_calculator(input_data):
-
     # Initialize parameters from front end
     sim = Simulation(input_data)
 
@@ -83,6 +83,7 @@ if __name__ == "__main__":
     input_dict = Sam(atrazine_json_mtb).input_dict
     if False:
         import cProfile
+
         cProfile.run('pesticide_calculator(input_dict)')
     else:
         pesticide_calculator(input_dict)

@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from sam.utilities import fields
-from sam.tools.efed_lib import report
+from .utilities import fields
+from .tools.efed_lib import report
 
 
 class InputDict(dict):
