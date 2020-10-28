@@ -1,14 +1,16 @@
 import os
+import pathlib
 
 # If running locally (Trip's computer), point to an external hard drive. If in AWS, use a different path
 local_run = False
 if local_run:
     sam_root = r"E:\opp-efed-data\sam"
+    local_root = r"A:\opp-efed\sam"
 else:
     sam_root = "/src/app-data/sampreprocessed"
+    local_root = pathlib.Path(__file__).parent.absolute()
 
 scenario_root = os.path.join("scenarios", "Production")
-table_root = os.path.join("Tables")
 input_dir = os.path.join(sam_root, "Inputs")
 intermediate_dir = os.path.join(sam_root, "Intermediate")
 output_path = os.path.join("Results")
@@ -28,6 +30,7 @@ navigator_path = os.path.join(input_dir, "NavigatorFiles", "nav{}.npz")  # regio
 stage_two_scenario_path = os.path.join(intermediate_dir, "StageTwoScenarios", "r{}")  # region
 
 # Tables
+table_root = os.path.join(local_root, "Tables")
 endpoint_format_path = os.path.join(table_root, "endpoint_format.csv")
 fields_and_qc_path = os.path.join(table_root, "fields_and_qc.csv")
 types_path = os.path.join(table_root, "tr_55.csv")

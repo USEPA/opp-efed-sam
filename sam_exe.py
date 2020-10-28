@@ -67,7 +67,7 @@ class InputDict(dict):
         date_format = lambda x: np.datetime64("{2}-{0}-{1}".format(*x.split("/")))
         return map(date_format, (self['sim_date_start'], self['sim_date_end']))
 
-    def process_endpoints(self):
+    def process_endpoints(self):ls
         from .utilities import endpoint_format
 
         endpoints = []
