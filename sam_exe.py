@@ -67,9 +67,9 @@ class InputDict(dict):
         date_format = lambda x: np.datetime64("{2}-{0}-{1}".format(*x.split("/")))
         return map(date_format, (self['sim_date_start'], self['sim_date_end']))
 
-    def process_endpoints(self):ls
+    def process_endpoints(self):
         from .utilities import endpoint_format
-
+    
         endpoints = []
         for level in ('acute', 'chronic', 'overall'):
             endpoints.append([self.pop("{}_{}".format(level, species), np.nan) for species in endpoint_format.species])
