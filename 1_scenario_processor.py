@@ -1,13 +1,11 @@
 import dask
 import pandas as pd
 import numpy as np
-from utilities import WeatherArray, StageOneScenarios, StageTwoScenarios, WatershedRecipes
-from hydro.nhd_tools.navigator import Navigator
-from parameters import batch_size, crop_group_field
-from scenario_processing import stage_one_to_two
-from utilities import fields, report
-
-dask_process = True
+from .utilities import WeatherArray, StageOneScenarios, StageTwoScenarios, WatershedRecipes
+from .hydro.navigator import Navigator
+from .parameters import batch_size, crop_group_field
+from .scenario_processing import stage_one_to_two
+from .utilities import fields, report
 
 
 # TODO - complete preprocessing script for building condensed nhd (sam and nav), navs, etc
@@ -35,7 +33,7 @@ def process_batch(stage_one, stage_two, met):
 
     # Group by weather grid to reduce the overhead from fetching met data
     for weather_grid, scenarios in stage_one.iterate():
-        precip, pet, temp, *_ = met.fetch_station(weather_grid)[:, stage_two.start_offset:stage_two.end_offset]
+        precip, pet, temp, *_ = met.fetch_station(weather_grid)
         for _, s in scenarios.iterrows():
             # Result - arrays of runoff, erosion, leaching, soil_water, rain
             scenario = \
@@ -81,7 +79,7 @@ def main():
 
         # Build an experimental subset
         # THIS IS JUST TEMPORARY WHILE I BUILD AN MTB DEMO
-        nav = Navigator(r"E:\opp-efed-data\sam\Inputs\NavigatorFiles\nav07.npz")
+        nav = Navigator(region)
         outlets = [4867727]
         active_reaches = nav.batch_upstream(outlets)
         subset_id = 'mtb'
@@ -90,7 +88,7 @@ def main():
         # Initialize scenarios
         stage_one = StageOneScenarios(region, active_reaches, 2015, recipes)  # in
         stage_two = StageTwoScenarios(region, met, stage_one.fetch('scenario_id'), tag=subset_id)  # out
-
+        
         # Run weather simulations to generate stage two scenarios
         for batch_count, result in process_batch(stage_one, stage_two, met):
             stage_two.write(batch_count, result)
@@ -100,7 +98,6 @@ if __name__ == "__main__":
     profile = False
     if profile:
         import cProfile
-
         cProfile.run('main()')
     else:
         main()

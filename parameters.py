@@ -1,9 +1,9 @@
 import re
 import pandas as pd
 import numpy as np
-from hydro.nhd_tools.params_nhd import nhd_states
-from tools.efed_lib import FieldManager
-from paths import types_path, fields_and_qc_path
+from .hydro.params_nhd import nhd_states
+from .tools.efed_lib import FieldManager
+from .paths import types_path, fields_and_qc_path
 
 # Initialize field matrix
 fields = FieldManager(fields_and_qc_path)

@@ -7,18 +7,18 @@ import pandas as pd
 import json
 from ast import literal_eval
 
-from tools.efed_lib import MemoryMatrix, FieldManager, DateManager, report
-from hydro.nhd_tools.params_nhd import nhd_regions
-from hydro.nhd_tools.navigator import Navigator
-from hydro.nhd_tools.process_nhd import identify_waterbody_outlets, calculate_surface_area
-from paths import weather_path, stage_one_scenario_path, stage_two_scenario_path, recipe_path, scratch_path, \
+from .tools.efed_lib import MemoryMatrix, FieldManager, DateManager, report
+from .hydro.params_nhd import nhd_regions
+from .hydro.navigator import Navigator
+from .hydro.process_nhd import identify_waterbody_outlets, calculate_surface_area
+from .paths import weather_path, stage_one_scenario_path, stage_two_scenario_path, recipe_path, scratch_path, \
     dwi_path, manual_points_path, output_path, fields_and_qc_path, endpoint_format_path, condensed_nhd_path, \
     navigator_path
-from parameters import hydrology_params, soil_params, plant_params, output_params, fields
-from parameters import scenario_defaults, scenario_start_date, scenario_end_date, batch_size, stage_one_chunksize, \
+from .parameters import hydrology_params, soil_params, plant_params, output_params, fields
+from .parameters import scenario_defaults, scenario_start_date, scenario_end_date, batch_size, stage_one_chunksize, \
     crop_group_field
-from aquatic_concentration import compute_concentration, partition_benthic, exceedance_probability
-from scenario_processing import stage_two_to_three
+from .aquatic_concentration import compute_concentration, partition_benthic, exceedance_probability
+from .scenario_processing import stage_two_to_three
 
 # Initialize endpoints
 endpoint_format = pd.read_csv(endpoint_format_path)
@@ -40,7 +40,7 @@ class HydroRegion(Navigator):
         self.id = region
 
         # Assign a watershed navigator to the class
-        super(HydroRegion, self).__init__(navigator_path.format(self.id))
+        super(HydroRegion, self).__init__(self.id)
 
         # Read hydrological input files
         self.reach_table = pd.read_csv(condensed_nhd_path.format('sam', region, 'reach'))
@@ -375,7 +375,7 @@ class StageOneScenarios(object):
         self.scratch_path = os.path.join(scratch_path, f"s1_subset.csv")
 
         if subset_outlets is not None:
-            # self.build_subset(subset_outlets, subset_year, recipes)
+            self.build_subset(subset_outlets, subset_year, recipes)
             self._subset = True
 
     def build_subset(self, outlets, year, recipes):
@@ -484,13 +484,14 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
         self.array_path = self.path + "_arrays.dat"
         self.index_path = self.path + "_index.csv"
         self.sim = sim
+        self.met = met
 
         build = met is not None and scenario_index is not None and sim is None
         # If build is True, create the Stage 2 Scenarios by running model routines on Stage 1 scenario inputs
         if build:
             self.arrays = fields.fetch('s2_arrays')
-            DateManager.__init__(self, met.start_date, met.end_date)
-            self.start_offset, self.end_offset = self.date_offset(scenario_start_date, scenario_end_date)
+            DateManager.__init__(self, scenario_start_date, scenario_end_date)
+            self.align_met_dates()
             MemoryMatrix.__init__(self, [scenario_index, self.arrays, self.n_dates],
                                   dtype=np.float32, path=self.array_path, persistent_read=True)
 
@@ -520,7 +521,21 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
             messages.append("end date is later")
         if any(messages):
             report(f"Simulation {' and '.join(messages)} than range of available scenario data. "
-                   f"Date range has been truncated to {self.sim.start_date}-{self.sim.end_date}.")
+                   f"Date range has been truncated at {self.sim.start_date} to {self.sim.end_date}.")
+    
+    def align_met_dates(self):
+        # TODO - this should be combined with align_sim_dates and probably put into the parent DateManager class
+        messages = []
+        if self.start_date < self.met.start_date:
+            messages.append("start date is earlier")
+            self.start_date = self.met.start_date
+        else:
+            self.met.start_offset = (self.start_date - self.met.start_date).astype(np.int32)
+        if self.met.end_date < self.end_date:
+            messages.append("end date is later")
+            self.end_date = self.met.end_date
+        else:
+            self.met.end_offset = (self.end_date - self.met.end_date).astype(np.int32)
 
     def create_keyfile(self):
         with open(self.keyfile_path, 'w') as f:
@@ -555,6 +570,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
         return time_series, start_date, time_series_shape
 
     def write(self, batch_num, data):
+        d = np.array(data)
         if batch_num == 'index':
             data.to_csv(self.index_path, index=None)
         else:
@@ -821,6 +837,9 @@ class WeatherArray(MemoryMatrix, DateManager):
         index, header, start_date, end_date = self.load_key(key_path)
 
         # Set dates
+        # TODO - this could be an intrinsic function of the date manager class
+        self.start_offset = 0
+        self.end_offset = 0
         DateManager.__init__(self, start_date, end_date)
 
         # Initialize memory matrix
@@ -835,9 +854,11 @@ class WeatherArray(MemoryMatrix, DateManager):
         return points.T[0], header, start_date, end_date
 
     def fetch_station(self, station_id):
+        if self.end_offset == 0:
+            self.end_offset = self.n_dates
         data = self.fetch(station_id, copy=True, verbose=True).T
         data[:2] /= 100.  # Precip, PET  cm -> m
-        return data
+        return data[:, self.start_offset:self.end_offset]
 
 
 

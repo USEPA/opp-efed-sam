@@ -9,7 +9,6 @@ def compute_concentration(transported_mass, runoff, n_dates, q):
     """
 
     mean_runoff = runoff.mean()  # m3/d
-    print(q.shape, mean_runoff.shape, n_dates)
     baseflow = np.subtract(q, mean_runoff, out=np.zeros(n_dates), where=(q > mean_runoff))
     total_flow = runoff + baseflow
     concentration = np.divide(transported_mass, total_flow, out=np.zeros(n_dates), where=(total_flow != 0))

@@ -1,37 +1,18 @@
-from __future__ import division
 import numpy as np
 import pandas as pd
-from ..base.uber_model import UberModel, ModelSharedInputs
 
-from .Code.utilities import fields
-
-
-class SamInputs(ModelSharedInputs):
-    """
-    Input class for SAM.
-    """
-
-    def __init__(self):
-        """Class representing the inputs for SAM"""
-        super(SamInputs, self).__init__()
-
-
-class SamOutputs(object):
-    """
-    Output class for SAM.
-    """
-
-    def __init__(self):
-        """Class representing the outputs for SAM"""
-        super(SamOutputs, self).__init__()
+from .utilities import fields
+from .tools.efed_lib import report
 
 
 class InputDict(dict):
+    """ Processes the input string from the front end into a form usable by tool """
+
     def __init__(self, pd_obj):
 
         # Unpack JSON string into dictionary
-        # JCH - Taking a dict at the moment, will need json
-        super(InputDict, self).__init__((k, v['0']) for k, v in pd_obj.to_dict().items())
+        # TODO - Taking a dict at the moment, will need json
+        super(InputDict, self).__init__((k, v['0']) for k, v in pd_obj.items())
 
         self['applications'] = self.process_applications()
         self['endpoints'] = self.process_endpoints()
@@ -47,50 +28,47 @@ class InputDict(dict):
         unknown_fields = provided_fields - required_fields
         missing_fields = required_fields - provided_fields
         if unknown_fields:
-            report("Input field(s) \"{}\" not understood".format(", ".join(unknown_fields)), warn=1)
+            report("Input field(s) \"{}\" not understood".format(", ".join(unknown_fields)))
         assert not missing_fields, "Required input field(s) \"{}\" not provided".format(", ".join(missing_fields))
 
     def coerce_data_type(self):
-        input_fields = fields.fetch('input_param')
-        for field, data_type in zip(input_fields, fields.data_type(input_fields)):
-            self[field] = data_type(self[field])
+        _, data_types = fields.fetch('input_param', dtypes=True)
+        for field, data_type in data_types.items():
+            if data_type != object:
+                self[field] = data_type(self[field])
 
     def process_applications(self):
 
-        input_indices = {'event': ['plant', 'harvest', 'emergence', 'bloom', 'maturity'],
-                         'dist': ['ground', 'foliar'],
-                         'method': ['uniform', 'step']}
-
         # Get fields and field types
-        app_fields = fields.fetch_old('applications')
-        app_fields.remove('crop')
-        data_types = fields.data_type(app_fields, old_fields=True)
+        app_fields, data_types = fields.fetch('applications', dtypes=True)
 
         # Populate matrix
         matrix = []
-        for i in range(int(self['napps'])):
-            crops = self.pop("crop_{}".format(i + 1)).split(" ")
-            row_fields = ["{}_{}".format(field, i + 1) for field in app_fields]
+        for app_num in range(1, int(self['napps']) + 1):
+            crops = self[f"crop_{app_num}"].split(" ")
             for crop in crops:
-                row = [int(float(crop))]
-                for field, field_type in zip(app_fields, data_types):
-                    val = self["{}_{}".format(field, i + 1)]
-                    replacement = input_indices.get(field)
-                    if replacement:
-                        val = replacement.index(val)
-                    row.append(field_type(val))
+                row = []
+                for field in app_fields:
+                    if field == 'crop':
+                        val = crop
+                    else:
+                        val = self[f"{field}_{app_num}"]
+                    dtype = data_types[field]
+                    if dtype != object:
+                        val = dtype(val)
+                    row.append(val)
                 matrix.append(row)
-            for field in row_fields:
-                del self[field]
+            for field in app_fields:
+                del self[f"{field}_{app_num}"]
 
-        return np.float32(matrix)
+        return matrix
 
     def process_dates(self):
         date_format = lambda x: np.datetime64("{2}-{0}-{1}".format(*x.split("/")))
         return map(date_format, (self['sim_date_start'], self['sim_date_end']))
 
-    def process_endpoints(self):
-        from .Code.utilities import endpoint_format
+    def process_endpoints(self):ls
+        from .utilities import endpoint_format
 
         endpoints = []
         for level in ('acute', 'chronic', 'overall'):
@@ -101,19 +79,9 @@ class InputDict(dict):
         return np.float32(endpoints)
 
 
-class Sam(UberModel, SamInputs, SamOutputs):
-    """
-    Estimate chemical exposure from drinking water alone in birds and mammals.
-    """
-
-    def __init__(self, pd_obj, pd_obj_exp):
-        """Class representing the Terrplant model and containing all its methods"""
+class Sam():
+    def __init__(self, pd_obj):
         super(Sam, self).__init__()
         self.pd_obj = pd_obj
-        self.pd_obj_exp = pd_obj_exp
         self.pd_obj_out = pd.DataFrame(data=np.array([[0, 0], [0, 0]]), columns=["foo", "bar"])
         self.input_dict = InputDict(self.pd_obj)
-
-    def execute_model(self):
-        from old import PesticideCalculator as pesticide_calculator
-        pesticide_calculator(self.input_dict)

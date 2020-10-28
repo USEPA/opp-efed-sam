@@ -1,9 +1,9 @@
 import dask
 import numpy as np
-from field import plant_growth, initialize_soil, process_erosion
-from hydrology import surface_hydrology
-from transport import pesticide_to_field, field_to_soil, soil_to_water
-from parameters import soil_params, types, fields
+from .field import plant_growth, initialize_soil, process_erosion
+from .hydrology import surface_hydrology
+from .transport import pesticide_to_field, field_to_soil, soil_to_water
+from .parameters import soil_params, types, fields
 from ast import literal_eval
 
 @dask.delayed
