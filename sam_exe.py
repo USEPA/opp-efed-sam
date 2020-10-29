@@ -69,7 +69,7 @@ class InputDict(dict):
 
     def process_endpoints(self):
         from .utilities import endpoint_format
-    
+
         endpoints = []
         for level in ('acute', 'chronic', 'overall'):
             endpoints.append([self.pop("{}_{}".format(level, species), np.nan) for species in endpoint_format.species])
