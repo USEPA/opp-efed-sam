@@ -80,7 +80,7 @@ class InputDict(dict):
 
 
 class Sam():
-    def __init__(self, pd_obj):
+    def __init__(self, pd_obj, dummy_param=None):
         super(Sam, self).__init__()
         self.pd_obj = pd_obj
         self.pd_obj_out = pd.DataFrame(data=np.array([[0, 0], [0, 0]]), columns=["foo", "bar"])
