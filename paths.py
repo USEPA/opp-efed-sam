@@ -2,7 +2,7 @@ import os
 import pathlib
 
 # If running locally (Trip's computer), point to an external hard drive. If in AWS, use a different path
-local_run = True
+local_run = False
 if local_run:
     sam_root = r"E:\opp-efed-data\sam"
     local_root = r"A:\opp-efed\sam"
