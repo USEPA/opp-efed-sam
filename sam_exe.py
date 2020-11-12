@@ -102,7 +102,7 @@ class InputDict(dict):
         return np.float32(endpoints)
 
 
-class Sam():
+class Sam(UberModel, SamInputs, SamOutputs):
     def __init__(self, pd_obj, dummy_param=None):
         super(Sam, self).__init__()
         self.pd_obj = pd_obj
