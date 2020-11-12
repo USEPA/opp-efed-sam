@@ -6,12 +6,13 @@ import numpy as np
 import pandas as pd
 import json
 from ast import literal_eval
+from distributed import Client
 
 from .tools.efed_lib import MemoryMatrix, FieldManager, DateManager, report
 from .hydro.params_nhd import nhd_regions
 from .hydro.navigator import Navigator
 from .hydro.process_nhd import identify_waterbody_outlets, calculate_surface_area
-from .paths import weather_path, stage_one_scenario_path, stage_two_scenario_path, recipe_path, scratch_path, \
+from .paths import weather_path, stage_one_scenario_path, stage_two_scenario_path, stage_three_scenario_path, recipe_path, scratch_path, \
     dwi_path, manual_points_path, output_path, fields_and_qc_path, endpoint_format_path, condensed_nhd_path, \
     navigator_path
 from .parameters import hydrology_params, soil_params, plant_params, output_params, fields
@@ -26,7 +27,6 @@ endpoint_format = pd.read_csv(endpoint_format_path)
 # If true, only return 5 time series fields, otherwise, return 13
 # TODO - there's a better way to do this
 compact_out = True
-
 
 class HydroRegion(Navigator):
     """
@@ -205,15 +205,13 @@ class Simulation(DateManager):
     @staticmethod
     def initialize():
         # Make sure needed subdirectories exist
-        preexisting_subdirs = (os.path.join("..", "bin", d) for d in ("Results", "temp"))
-        for subdir in preexisting_subdirs:
+        for subdir in scratch_path, output_path:
             if not os.path.exists(subdir):
                 os.makedirs(subdir)
 
         # Purge temp folder
-        temp_folder = os.path.join("..", "bin", "temp")
-        for f in os.listdir(temp_folder):
-            os.remove(os.path.join(temp_folder, f))
+        for f in os.listdir(scratch_path):
+            os.remove(os.path.join(scratch_path, f))
 
     def adjust_data(self):
         """ Convert half-lives to degradation rates """
@@ -235,7 +233,7 @@ class Simulation(DateManager):
                          ('hydrolysis', 'hydrolysis'), ('wc', 'wc_metabolism')]:
             setattr(self, 'deg_{}'.format(old), adjust(getattr(self, f"{new}_hl")))
 
-        self.applications.rate *= 0.0001  # convert kg/ha -> kg/m2 (1 ha = 10,000 m2)
+        self.applications.apprate *= 0.0001  # convert kg/ha -> kg/m2 (1 ha = 10,000 m2)
 
     def read_applications(self):
         applications = pd.DataFrame(self.applications, columns=fields.fetch('applications'))
@@ -258,8 +256,11 @@ class Simulation(DateManager):
             "Invalid simulation type '{}'".format(self.sim_type)
 
         # Get the path of the table used for intakes
+        # TODO - there's an issue here. I have to manually assign 'manual' as a value for now and 'eco' isn't working
+        report(self.sim_type)
+        self.sim_type = 'manual'
         intake_file = {'drinking_water': dwi_path, 'manual': manual_points_path}.get(self.sim_type)
-
+        self.intakes_only = (self.sim_type != 'eco')
         # Get reaches and regions to be processed if not running eco
         # Intake files must contain 'comid' and 'region' fields
         if intake_file is not None:
@@ -279,6 +280,7 @@ class ModelOutputs(DateManager):
         self.input = i
         self.output_dir = os.path.join(output_path, i.token)
         self.output_reaches = output_reaches
+        self.array_path = os.path.join(scratch_path, "model_out")
         DateManager.__init__(self, start_date, end_date)
 
         # Initialize output JSON dict
@@ -287,13 +289,13 @@ class ModelOutputs(DateManager):
         # Initialize output matrices
         self.output_fields = fields.fetch("time_series_compact" if compact_out else "time_series")
         self.time_series = MemoryMatrix([self.output_reaches, self.output_fields, self.n_dates],
-                                        name='output time series')
+                                        name='output time series', path=self.array_path + "_ts")
 
         # Initialize exceedances matrix: the probability that concentration exceeds endpoint thresholds
-        self.exceedances = MemoryMatrix([self.output_reaches, self.input.endpoints.shape[0], 3], name='exceedance')
+        self.exceedances = MemoryMatrix([self.output_reaches, self.input.endpoints.shape[0], 3], name='exceedance', path=self.array_path + "_ex")
 
         # Initialize contributions matrix: loading data broken down by crop and runoff v. erosion source
-        self.contributions = MemoryMatrix([2, self.output_reaches, self.input.crops], name='contributions')
+        self.contributions = MemoryMatrix([2, self.output_reaches, self.input.crops], name='contributions', path=self.array_path + "_cn")
         self.contributions.columns = self.input.crops
         self.contributions.header = ["cls" + str(c) for c in self.contributions.columns]
 
@@ -477,6 +479,7 @@ class StageOneScenarios(object):
 
 class StageTwoScenarios(DateManager, MemoryMatrix):
     def __init__(self, region, met=None, scenario_index=None, sim=None, tag=None):
+        self.region = region
         self.path = stage_two_scenario_path.format(region)
         if tag is not None:
             self.path += f"_{tag}"
@@ -578,12 +581,15 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
             start_pos = (batch_num - 1) * batch_size
             self.writer[start_pos:start_pos + batch_size_actual] = np.array(data)
 
+def inc(x):
+    return x + 1
 
 class StageThreeScenarios(DateManager, MemoryMatrix):
     def __init__(self, inputs, stage_one, stage_two):
         self.s1 = stage_one
         self.s2 = stage_two
         self.i = inputs
+        self.array_path = stage_three_scenario_path.format(self.s2.region)
         self.scenario_vars, self.lookup = self.select_scenarios(self.i.crops)
 
         # Set dates
@@ -592,7 +598,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         # Initialize memory matrix
         # arrays - runoff_mass, erosion_mass
         MemoryMatrix.__init__(self, [len(self.scenario_vars.s3_index), 2, self.n_dates], name='pesticide mass',
-                              persistent_read=True, persistent_write=True)
+                              dtype=np.float32, path=self.array_path, persistent_read=True, persistent_write=True)
 
     def select_scenarios(self, crops):
         """ Use the Stage Two Scenarios index, but filter by crops """
@@ -607,7 +613,9 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
     def build_from_stage_two(self):
         # TODO - can the dask allocation part of this be put into a function or wrapper?
         #  it's also used in s1->s2
-        # Reminder: array_matrix.shape, processed_matrix.shape = (scenario, variable, date)
+        dask_scheduler = os.environ.get("DASK_SCHEDULER")
+        dask_client = Client(dask_scheduler)
+
         var_table = self.scenario_vars.set_index('s2_index')
 
         batch = []
@@ -631,19 +639,20 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
             if not crop_applications.empty:
 
                 # Get crop ID of scenario and find all associated crops in group
-                scenario = \
-                    stage_two_to_three(crop_applications.values,
-                                       self.new_year, self.i.kd_flag, self.i.koc, self.i.deg_aqueous,
-                                       leaching, runoff, erosion, soil_water, rain,
-                                       soil_params.cm_2, soil_params.surface_dx, soil_params.erosion_effic,
-                                       soil_params.soil_depth, plant_params.deg_foliar, plant_params.washoff_coeff,
-                                       soil_params.runoff_effic, s.plant_date, s.emergence_date, s.maxcover_date,
-                                       s.harvest_date, s.max_canopy, s.orgC_5, s.bd_5, s.season)
+                scenario = [crop_applications.values,
+                            self.new_year, self.i.kd_flag, self.i.koc, self.i.deg_aqueous,
+                            leaching, runoff, erosion, soil_water, rain,
+                            soil_params.cm_2, soil_params.surface_dx, soil_params.erosion_effic,
+                            soil_params.soil_depth, plant_params.deg_foliar, plant_params.washoff_coeff,
+                            soil_params.runoff_effic, s.plant_date, s.emergence_date, s.maxcover_date,
+                            s.harvest_date, s.max_canopy, s.orgC_5, s.bd_5, s.season]
 
-                batch.append(scenario)
+                batch.append(dask_client.submit(stage_two_to_three, *scenario))
                 if len(batch) == batch_size or (count + 1) == n_scenarios:
                     try:
-                        arrays = dask.delayed()(batch).compute()
+                        report("Starting Dask batch...")
+                        arrays = dask_client.gather(batch)
+                        report("Batch gathered successfully!")
                         start_pos = batch_count * batch_size
                         self.writer[start_pos:start_pos + len(batch)] = arrays
                         batch_count += 1
@@ -667,13 +676,14 @@ class ReachManager(DateManager, MemoryMatrix):
         self.recipes = recipes
         self.region = region
         self.progress_interval = progress_interval
+        self.array_path = os.path.join(scratch_path, "_reach_mgr{}".format(self.s2.region))
 
         # Initialize dates
         DateManager.__init__(self, s3_scenarios.start_date, s3_scenarios.end_date)
 
         # Initialize a matrix to store time series data for reaches (crunched scenarios)
         # vars: runoff, runoff_mass, erosion, erosion_mass
-        MemoryMatrix.__init__(self, [region.active_reaches, 4, self.n_dates], name='reach manager')
+        MemoryMatrix.__init__(self, [region.active_reaches, 4, self.n_dates], name='reach manager', path=self.array_path)
 
         # Keep track of which reaches have been run
         self.burned_reaches = set()  # reaches that have been processed

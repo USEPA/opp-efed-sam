@@ -3,7 +3,7 @@ import pandas as pd
 
 from .utilities import fields
 from .tools.efed_lib import report
-
+from .pesticide_calculator import pesticide_calculator
 
 class InputDict(dict):
     """ Processes the input string from the front end into a form usable by tool """
@@ -85,3 +85,6 @@ class Sam():
         self.pd_obj = pd_obj
         self.pd_obj_out = pd.DataFrame(data=np.array([[0, 0], [0, 0]]), columns=["foo", "bar"])
         self.input_dict = InputDict(self.pd_obj)
+
+    def execute_model(self):
+        pesticide_calculator(self.input_dict)

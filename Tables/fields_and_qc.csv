@@ -32,7 +32,7 @@ leaching,,np.float32,,,,,,30
 pct1,,np.float32,,,70,,,
 pct2,,np.float32,,,90,,,
 rain,,np.float32,,,,,,50
-rate,,np.float32,,,110,,,
+apprate,,np.float32,,,110,,,
 runoff,,np.float32,,,,,,10
 soil_hl,,np.float32,,,,1,,
 wc_metabolism_hl,,np.float32,,,,1,,

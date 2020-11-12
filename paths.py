@@ -13,8 +13,8 @@ else:
 scenario_root = os.path.join("scenarios", "Production")
 input_dir = os.path.join(sam_root, "Inputs")
 intermediate_dir = os.path.join(sam_root, "Intermediate")
-output_path = os.path.join("Results")
-scratch_path = os.path.join("temp")
+output_path = os.path.join(sam_root, "Results")
+scratch_path = os.path.join(sam_root, "temp")
 diagnostic_path = os.path.join(sam_root, "diagnostic")
 
 # Input data
@@ -28,6 +28,7 @@ navigator_path = os.path.join(input_dir, "NavigatorFiles", "nav{}.npz")  # regio
 
 # Intermediate data
 stage_two_scenario_path = os.path.join(intermediate_dir, "StageTwoScenarios", "r{}")  # region
+stage_three_scenario_path = os.path.join(scratch_path, "r{}")  # region
 
 # Tables
 table_root = os.path.join(local_root, "Tables")
