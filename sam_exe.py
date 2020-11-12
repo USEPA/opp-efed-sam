@@ -5,6 +5,29 @@ from .utilities import fields
 from .tools.efed_lib import report
 from .pesticide_calculator import pesticide_calculator
 
+from ..base.uber_model import UberModel, ModelSharedInputs
+
+
+class SamInputs(ModelSharedInputs):
+    """
+    Input class for SAM.
+    """
+
+    def __init__(self):
+        """Class representing the inputs for SAM"""
+        super(SamInputs, self).__init__()
+
+
+class SamOutputs(object):
+    """
+    Output class for SAM.
+    """
+
+    def __init__(self):
+        """Class representing the outputs for SAM"""
+        super(SamOutputs, self).__init__()
+
+
 class InputDict(dict):
     """ Processes the input string from the front end into a form usable by tool """
 
@@ -87,4 +110,4 @@ class Sam():
         self.input_dict = InputDict(self.pd_obj)
 
     def execute_model(self):
-        pesticide_calculator(self.input_dict)
+        self.pd_obj_out = pesticide_calculator(self.input_dict)

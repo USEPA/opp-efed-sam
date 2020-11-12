@@ -284,7 +284,7 @@ class ModelOutputs(DateManager):
         DateManager.__init__(self, start_date, end_date)
 
         # Initialize output JSON dict
-        self.out_json = {}
+        self.json_out = {}
 
         # Initialize output matrices
         self.output_fields = fields.fetch("time_series_compact" if compact_out else "time_series")
@@ -329,24 +329,24 @@ class ModelOutputs(DateManager):
 
         json.encoder.FLOAT_REPR = lambda o: format(o, '.4f')
         out_file = os.path.join(self.output_dir, "{}_json.csv".format(self.input.chemical_name))
-        out_json = {"COMID": {}}
+        self.json_out = {"COMID": {}}
         for recipe_id in self.output_reaches:
-            out_json["COMID"][str(recipe_id)] = {}
+            self.json_out["COMID"][str(recipe_id)] = {}
             if write_exceedances:
                 labels = ["{}_{}".format(species, level)
                           for species in self.input.endpoints.species for level in ('acute', 'chronic', 'overall')]
                 exceedance_dict = dict(zip(labels, np.float64(self.exceedances.fetch(recipe_id)).flatten()))
-                out_json["COMID"][str(recipe_id)].update(exceedance_dict)
+                self.json_out["COMID"][str(recipe_id)].update(exceedance_dict)
             if write_contributions:
                 contributions = self.contributions.fetch(recipe_id)
                 for i, category in enumerate(("runoff", "erosion")):
                     labels = ["{}_load_{}".format(category, label) for label in self.contributions.header]
                     contribution_dict = dict(zip(labels, np.float64(contributions[i])))
-                    out_json["COMID"][str(recipe_id)].update(contribution_dict)
+                    self.json_out["COMID"][str(recipe_id)].update(contribution_dict)
 
-        out_json = json.dumps(dict(out_json), sort_keys=True, indent=4, separators=(',', ': '))
+        self.json_out = json.dumps(dict(self.json_out), sort_keys=True, indent=4, separators=(',', ': '))
         with open(out_file, 'w') as f:
-            f.write(out_json)
+            f.write(self.json_out)
 
     def write_output(self):
 

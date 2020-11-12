@@ -73,6 +73,7 @@ def pesticide_calculator(input_data):
         # Write output
         report("Writing output...")
         outputs.write_output()
+        return outputs.json_output
 
 
 if __name__ == "__main__":
@@ -83,7 +84,6 @@ if __name__ == "__main__":
     input_dict = Sam(atrazine_json_mtb).input_dict
     if False:
         import cProfile
-
         cProfile.run('pesticide_calculator(input_dict)')
     else:
         pesticide_calculator(input_dict)
