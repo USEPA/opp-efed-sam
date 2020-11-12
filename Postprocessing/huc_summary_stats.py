@@ -11,8 +11,6 @@ import requests
 # from pram_flask.tasks import sam_status
 from celery_cgi import celery
 
-from .tools.efed_lib import report
-
 IN_DOCKER = os.environ.get("IN_DOCKER")
 
 
@@ -53,7 +51,7 @@ class SamPostprocessor(object):
         return
 
     def calc_huc_summary(self):
-        report(sam_properties)
+        print(self.sam_data)
         sam_properties = [x["properties"] for x in self.sam_data['features']]
         data = pd.DataFrame(sam_properties)
         data['COMID'] = data['COMID'].astype(str)
