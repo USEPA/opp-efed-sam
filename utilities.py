@@ -12,7 +12,8 @@ from .tools.efed_lib import MemoryMatrix, FieldManager, DateManager, report
 from .hydro.params_nhd import nhd_regions
 from .hydro.navigator import Navigator
 from .hydro.process_nhd import identify_waterbody_outlets, calculate_surface_area
-from .paths import weather_path, stage_one_scenario_path, stage_two_scenario_path, stage_three_scenario_path, recipe_path, scratch_path, \
+from .paths import weather_path, stage_one_scenario_path, stage_two_scenario_path, stage_three_scenario_path, \
+    recipe_path, scratch_path, \
     dwi_path, manual_points_path, output_path, fields_and_qc_path, endpoint_format_path, condensed_nhd_path, \
     navigator_path
 from .parameters import hydrology_params, soil_params, plant_params, output_params, fields
@@ -27,6 +28,7 @@ endpoint_format = pd.read_csv(endpoint_format_path)
 # If true, only return 5 time series fields, otherwise, return 13
 # TODO - there's a better way to do this
 compact_out = True
+
 
 class HydroRegion(Navigator):
     """
@@ -284,7 +286,7 @@ class ModelOutputs(DateManager):
         DateManager.__init__(self, start_date, end_date)
 
         # Initialize output JSON dict
-        self.json_out = {}
+        self.json_output = {}
 
         # Initialize output matrices
         self.output_fields = fields.fetch("time_series_compact" if compact_out else "time_series")
@@ -292,10 +294,12 @@ class ModelOutputs(DateManager):
                                         name='output time series', path=self.array_path + "_ts")
 
         # Initialize exceedances matrix: the probability that concentration exceeds endpoint thresholds
-        self.exceedances = MemoryMatrix([self.output_reaches, self.input.endpoints.shape[0], 3], name='exceedance', path=self.array_path + "_ex")
+        self.exceedances = MemoryMatrix([self.output_reaches, self.input.endpoints.shape[0], 3], name='exceedance',
+                                        path=self.array_path + "_ex")
 
         # Initialize contributions matrix: loading data broken down by crop and runoff v. erosion source
-        self.contributions = MemoryMatrix([2, self.output_reaches, self.input.crops], name='contributions', path=self.array_path + "_cn")
+        self.contributions = MemoryMatrix([2, self.output_reaches, self.input.crops], name='contributions',
+                                          path=self.array_path + "_cn")
         self.contributions.columns = self.input.crops
         self.contributions.header = ["cls" + str(c) for c in self.contributions.columns]
 
@@ -329,24 +333,24 @@ class ModelOutputs(DateManager):
 
         json.encoder.FLOAT_REPR = lambda o: format(o, '.4f')
         out_file = os.path.join(self.output_dir, "{}_json.csv".format(self.input.chemical_name))
-        self.json_out = {"COMID": {}}
+        self.json_output = {"COMID": {}}
         for recipe_id in self.output_reaches:
-            self.json_out["COMID"][str(recipe_id)] = {}
+            self.json_output["COMID"][str(recipe_id)] = {}
             if write_exceedances:
                 labels = ["{}_{}".format(species, level)
                           for species in self.input.endpoints.species for level in ('acute', 'chronic', 'overall')]
                 exceedance_dict = dict(zip(labels, np.float64(self.exceedances.fetch(recipe_id)).flatten()))
-                self.json_out["COMID"][str(recipe_id)].update(exceedance_dict)
+                self.json_output["COMID"][str(recipe_id)].update(exceedance_dict)
             if write_contributions:
                 contributions = self.contributions.fetch(recipe_id)
                 for i, category in enumerate(("runoff", "erosion")):
                     labels = ["{}_load_{}".format(category, label) for label in self.contributions.header]
                     contribution_dict = dict(zip(labels, np.float64(contributions[i])))
-                    self.json_out["COMID"][str(recipe_id)].update(contribution_dict)
+                    self.json_output["COMID"][str(recipe_id)].update(contribution_dict)
 
-        self.json_out = json.dumps(dict(self.json_out), sort_keys=True, indent=4, separators=(',', ': '))
+        self.json_output = json.dumps(dict(self.json_output), sort_keys=True, indent=4, separators=(',', ': '))
         with open(out_file, 'w') as f:
-            f.write(self.json_out)
+            f.write(self.json_output)
 
     def write_output(self):
 
@@ -525,7 +529,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
         if any(messages):
             report(f"Simulation {' and '.join(messages)} than range of available scenario data. "
                    f"Date range has been truncated at {self.sim.start_date} to {self.sim.end_date}.")
-    
+
     def align_met_dates(self):
         # TODO - this should be combined with align_sim_dates and probably put into the parent DateManager class
         messages = []
@@ -581,8 +585,6 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
             start_pos = (batch_num - 1) * batch_size
             self.writer[start_pos:start_pos + batch_size_actual] = np.array(data)
 
-def inc(x):
-    return x + 1
 
 class StageThreeScenarios(DateManager, MemoryMatrix):
     def __init__(self, inputs, stage_one, stage_two):
@@ -649,16 +651,10 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
                 batch.append(dask_client.submit(stage_two_to_three, *scenario))
                 if len(batch) == batch_size or (count + 1) == n_scenarios:
-                    try:
-                        report("Starting Dask batch...")
-                        arrays = dask_client.gather(batch)
-                        report("Batch gathered successfully!")
-                        start_pos = batch_count * batch_size
-                        self.writer[start_pos:start_pos + len(batch)] = arrays
-                        batch_count += 1
-                    except Exception as e:
-                        raise e
-                        report(e)
+                    arrays = dask_client.gather(batch)
+                    start_pos = batch_count * batch_size
+                    self.writer[start_pos:start_pos + len(batch)] = arrays
+                    batch_count += 1
                     batch = []
 
     def fetch_from_recipe(self, recipe, verbose=False):
@@ -683,10 +679,17 @@ class ReachManager(DateManager, MemoryMatrix):
 
         # Initialize a matrix to store time series data for reaches (crunched scenarios)
         # vars: runoff, runoff_mass, erosion, erosion_mass
-        MemoryMatrix.__init__(self, [region.active_reaches, 4, self.n_dates], name='reach manager', path=self.array_path)
+        MemoryMatrix.__init__(self, [region.active_reaches, 4, self.n_dates], name='reach manager',
+                              path=self.array_path)
 
         # Keep track of which reaches have been run
         self.burned_reaches = set()  # reaches that have been processed
+
+    def process_local_batch(self, reach_ids, year):
+        dask_scheduler = os.environ.get("DASK_SCHEDULER")
+        dask_client = Client(dask_scheduler)
+        batch = [dask_client.submit(self.process_local, reach_id, year) for reach_id in reach_ids]
+        dask_client.gather(batch)
 
     def process_local(self, reach_id, year, verbose=False):
         """  Fetch all scenarios and multiply by area. For erosion, area is adjusted. """
@@ -869,7 +872,6 @@ class WeatherArray(MemoryMatrix, DateManager):
         data = self.fetch(station_id, copy=True, verbose=True).T
         data[:2] /= 100.  # Precip, PET  cm -> m
         return data[:, self.start_offset:self.end_offset]
-
 
 
 def report(message, tabs=0):
