@@ -9,13 +9,14 @@ from ..base.uber_model import UberModel, ModelSharedInputs
 # Do this to trigger the addition of the local dir to python path
 
 local_root = pathlib.Path(__file__).parent.absolute()
+print(f"Local root: {local_root}")
 try:
     sys.path.index(local_root)
 except ValueError:
     sys.path.insert(0, local_root)
 
 for p in sys.path:
-    print(p)
+    print(f"Path: {p}")
 
 from sam.utilities import fields
 from sam.tools.efed_lib import report
