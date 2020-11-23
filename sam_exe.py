@@ -14,6 +14,9 @@ try:
 except ValueError:
     sys.path.insert(0, local_root)
 
+for p in sys.path:
+    print(p)
+
 from sam.utilities import fields
 from sam.tools.efed_lib import report
 from sam.pesticide_calculator import pesticide_calculator
