@@ -1,9 +1,9 @@
 # Create condensed nhd files here
 # Do nhd modifications here too?
 import os
-from hydro.nhd_tools.process_nhd import condense_nhd
-from hydro.nhd_tools.params_nhd import nhd_regions
-from hydro.nhd_tools.navigator import build_navigators
+from sam.hydro.nhd_tools.process_nhd import condense_nhd
+from sam.hydro.nhd_tools.params_nhd import nhd_regions
+from sam.hydro.nhd_tools.navigator import build_navigators
 from utilities import report
 from paths import condensed_nhd_path, sam_nhd_map
 
