@@ -1,18 +1,22 @@
 import numpy as np
 import pandas as pd
-# Do this to trigger the addition of the local dir to python path
-import paths
+
+import pathlib
 import sys
-for p in sys.path:
-    print(p)
+
+from ..base.uber_model import UberModel, ModelSharedInputs
+
+# Do this to trigger the addition of the local dir to python path
+
+local_root = pathlib.Path(__file__).parent.absolute()
+try:
+    sys.path.index(local_root)
+except ValueError:
+    sys.path.insert(0, local_root)
 
 from sam.utilities import fields
 from sam.tools.efed_lib import report
 from sam.pesticide_calculator import pesticide_calculator
-
-from ..base.uber_model import UberModel, ModelSharedInputs
-
-
 class SamInputs(ModelSharedInputs):
     """
     Input class for SAM.
