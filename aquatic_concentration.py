@@ -1,6 +1,6 @@
 import numpy as np
 from numba import njit, guvectorize
-
+from sam.parameters import benthic_params
 
 def compute_concentration(transported_mass, runoff, n_dates, q):
     """
@@ -18,8 +18,6 @@ def compute_concentration(transported_mass, runoff, n_dates, q):
 
 def partition_benthic(erosion, erosion_mass, surface_area):
     """ Compute concentration in the benthic layer based on mass of eroded sediment """
-
-    from parameters import benthic_params
 
     soil_volume = benthic_params.depth * surface_area
     pore_water_volume = soil_volume * benthic_params.porosity

@@ -1,24 +1,31 @@
 import os
 import pathlib
+import sys
 
 # If running locally (Trip's computer), point to an external hard drive. If in AWS, use a different path
-local_run = False
+local_run = any([r'C:' in p for p in sys.path])
 if local_run:
-    sam_root = r"E:\opp-efed-data\sam"
-    local_root = r"A:\opp-efed\sam"
+    data_root = r"E:\opp-efed-data\sam"
 else:
-    sam_root = "/src/app-data/sampreprocessed"
-    local_root = pathlib.Path(__file__).parent.absolute()
+    data_root = "/src/app-data/sampreprocessed"
+local_root = pathlib.Path(__file__).parent.absolute()
+
+
+try:
+    sys.path.index(local_root)
+except ValueError:
+    sys.path.insert(0, local_root)
 
 scenario_root = os.path.join("scenarios", "Production")
-input_dir = os.path.join(sam_root, "Inputs")
-intermediate_dir = os.path.join(sam_root, "Intermediate")
-output_path = os.path.join("Results")
-scratch_path = os.path.join("temp")
-diagnostic_path = os.path.join(sam_root, "diagnostic")
+input_dir = os.path.join(data_root, "Inputs")
+intermediate_dir = os.path.join(data_root, "Intermediate")
+output_path = os.path.join(data_root, "Results")
+scratch_path = os.path.join(data_root, "temp")
+diagnostic_path = os.path.join(data_root, "diagnostic")
 
 # Input data
-condensed_nhd_path = os.path.join(input_dir, "CondensedNHD", "{}", "r{}_{}.csv")  # 'nav' or 'sam', region, 'reach' or 'waterbody'
+condensed_nhd_path = os.path.join(input_dir, "CondensedNHD", "{}",
+                                  "r{}_{}.csv")  # 'nav' or 'sam', region, 'reach' or 'waterbody'
 weather_path = os.path.join(input_dir, "Weather", "weather_{}")  # 'array' or 'key'
 recipe_path = os.path.join(input_dir, "RecipeFiles", "r{}")  # region
 stage_one_scenario_path = os.path.join(input_dir, "SamScenarios", "r{}_{}.csv")  # region, i
@@ -28,6 +35,7 @@ navigator_path = os.path.join(input_dir, "NavigatorFiles", "nav{}.npz")  # regio
 
 # Intermediate data
 stage_two_scenario_path = os.path.join(intermediate_dir, "StageTwoScenarios", "r{}")  # region
+stage_three_scenario_path = os.path.join(scratch_path, "r{}")  # region
 
 # Tables
 table_root = os.path.join(local_root, "Tables")
@@ -35,4 +43,3 @@ endpoint_format_path = os.path.join(table_root, "endpoint_format.csv")
 fields_and_qc_path = os.path.join(table_root, "fields_and_qc.csv")
 types_path = os.path.join(table_root, "tr_55.csv")
 sam_nhd_map = os.path.join(table_root, "nhd_map_sam.csv")
-

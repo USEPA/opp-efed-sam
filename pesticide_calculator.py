@@ -1,5 +1,5 @@
-from .utilities import Simulation, HydroRegion, ModelOutputs, WatershedRecipes, ReachManager, report
-from .utilities import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
+from sam.utilities import Simulation, HydroRegion, ModelOutputs, WatershedRecipes, ReachManager, report
+from sam.scenarios import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
 
 
 # TODO - why are there fewer scenarios than recipes?
@@ -30,7 +30,7 @@ def pesticide_calculator(input_data):
         stage_two = StageTwoScenarios(region_id, sim=sim, tag='mtb')
 
         # Initialize Stage 3 scenarios (time series of chemical transport data e.g., runoff mass, erosion mass)
-        stage_three = StageThreeScenarios(sim, stage_one, stage_two)
+        stage_three = StageThreeScenarios(sim, stage_two)
 
         report(f"Building Stage 3 scenarios...")
         stage_three.build_from_stage_two()
@@ -59,31 +59,17 @@ def pesticide_calculator(input_data):
                 report(f"Running tier {tier}, ({len(reach_ids)} reaches)...")
 
                 # Crunch the scenarios for each reach
-                for reach_id in reach_ids:
-                    reaches.process_local(reach_id, year)
+                reaches.process_local_batch(reach_ids, year)
 
                 # Perform full analysis including time-of-travel and concentration for active reaches
                 for reach_id in reach_ids & set(region.output_reaches):
                     reaches.report(reach_id)
 
                 # Pass each reach in the tier through a downstream lake
-                for _, lake in lakes.iterrows():
-                    reaches.burn(lake)
+                reaches.burn_batch(lakes)
+
 
         # Write output
         report("Writing output...")
         outputs.write_output()
-
-
-if __name__ == "__main__":
-    """ This is what gets run when running straight from Python """
-    from dev.test_inputs import atrazine_json_mtb
-    from sam_exe import Sam
-
-    input_dict = Sam(atrazine_json_mtb).input_dict
-    if False:
-        import cProfile
-
-        cProfile.run('pesticide_calculator(input_dict)')
-    else:
-        pesticide_calculator(input_dict)
+        return outputs.json_output

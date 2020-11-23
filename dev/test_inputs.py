@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from .sam import hellow
 
 atrazine_json_mtb = {'csrfmiddlewaretoken': {'0': 'atrazine_r7'},
                      'simulation_name': {'0': 'Mark Twain Atrazine 062217'},
@@ -25,7 +26,7 @@ atrazine_json_mtb = {'csrfmiddlewaretoken': {'0': 'atrazine_r7'},
                      'window2_1': {'0': '7'},
                      'pct2_1': {'0': '100'},
                      'method_1': {'0': 'uniform'},
-                     'rate_1': {'0': '1'},
+                     'apprate_1': {'0': '1'},
                      'effic_1': {'0': '1'},
                      'acute_human': {'0': '3.4'},
                      'chronic_human': {'0': ''},
