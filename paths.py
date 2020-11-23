@@ -1,7 +1,6 @@
 import os
 import pathlib
 import sys
-from sam.tools.efed_lib import report
 
 # If running locally (Trip's computer), point to an external hard drive. If in AWS, use a different path
 local_run = any([r'C:' in p for p in sys.path])
@@ -10,6 +9,12 @@ if local_run:
 else:
     data_root = "/src/app-data/sampreprocessed"
 local_root = pathlib.Path(__file__).parent.absolute()
+
+
+try:
+    sys.path.index(local_root)
+except ValueError:
+    sys.path.insert(0, local_root)
 
 scenario_root = os.path.join("scenarios", "Production")
 input_dir = os.path.join(data_root, "Inputs")

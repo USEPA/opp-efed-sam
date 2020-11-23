@@ -1,10 +1,11 @@
 import numpy as np
 import pandas as pd
+# Do this to trigger the addition of the local dir to python path
+import paths
 import sys
-
 for p in sys.path:
     print(p)
-    
+
 from sam.utilities import fields
 from sam.tools.efed_lib import report
 from sam.pesticide_calculator import pesticide_calculator
