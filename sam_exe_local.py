@@ -1,32 +1,9 @@
 import numpy as np
 import pandas as pd
-import sys
 
 from sam.utilities import fields
 from sam.tools.efed_lib import report
 from sam.pesticide_calculator import pesticide_calculator
-
-from ..base.uber_model import UberModel, ModelSharedInputs
-
-
-class SamInputs(ModelSharedInputs):
-    """
-    Input class for SAM.
-    """
-
-    def __init__(self):
-        """Class representing the inputs for SAM"""
-        super(SamInputs, self).__init__()
-
-
-class SamOutputs(object):
-    """
-    Output class for SAM.
-    """
-
-    def __init__(self):
-        """Class representing the outputs for SAM"""
-        super(SamOutputs, self).__init__()
 
 
 class InputDict(dict):
@@ -103,7 +80,7 @@ class InputDict(dict):
         return np.float32(endpoints)
 
 
-class Sam(UberModel, SamInputs, SamOutputs):
+class Sam:
     def __init__(self, pd_obj, dummy_param=None):
         super(Sam, self).__init__()
         self.pd_obj = pd_obj
@@ -112,3 +89,15 @@ class Sam(UberModel, SamInputs, SamOutputs):
 
     def execute_model(self):
         self.pd_obj_out = pesticide_calculator(self.input_dict)
+
+
+if __name__ == "__main__":
+    """ This is what gets run when running straight from Python """
+    from sam.dev.test_inputs import atrazine_json_mtb
+
+    input_dict = Sam(atrazine_json_mtb).input_dict
+    if False:
+        import cProfile
+        cProfile.run('pesticide_calculator(input_dict)')
+    else:
+        pesticide_calculator(input_dict)

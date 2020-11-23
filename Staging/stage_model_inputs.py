@@ -2,7 +2,7 @@ import os
 import boto3
 
 from utilities import report
-from paths import input_dir, sam_root
+from paths import input_dir, data_root
 
 session = boto3.session.Session(profile_name='sam')
 c = session.get_credentials()
@@ -22,7 +22,7 @@ def main():
     for a, _, c in os.walk(input_dir):
         for f in c:
             d = os.path.join(a, f)
-            new_d = d.lstrip(sam_root).replace(os.path.sep, os.path.altsep)
+            new_d = d.lstrip(data_root).replace(os.path.sep, os.path.altsep)
             upload_file(d, new_d)
 
 
