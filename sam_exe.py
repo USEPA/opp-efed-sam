@@ -1,14 +1,13 @@
 import numpy as np
 import pandas as pd
-
-import pathlib
+import os
 import sys
 
 from ..base.uber_model import UberModel, ModelSharedInputs
 
 # Do this to trigger the addition of the local dir to python path
 
-local_root = pathlib.Path(__file__).parent.absolute()
+local_root = os.getcwd()
 print(f"Local root: {local_root}")
 try:
     sys.path.index(local_root)
