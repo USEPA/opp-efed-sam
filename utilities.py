@@ -5,16 +5,16 @@ import numpy as np
 import pandas as pd
 import json
 from ast import literal_eval
-from distributed import Client
 
-from sam.tools.efed_lib import MemoryMatrix, DateManager, report
-from sam.hydro.params_nhd import nhd_regions
-from sam.hydro.navigator import Navigator
-from sam.hydro.process_nhd import identify_waterbody_outlets, calculate_surface_area
-from sam.paths import weather_path, recipe_path, scratch_path, dwi_path, manual_points_path, output_path, \
+from .paths import dask_client, local_run
+from .tools.efed_lib import MemoryMatrix, DateManager, report
+from .hydro.params_nhd import nhd_regions
+from .hydro.navigator import Navigator
+from .hydro.process_nhd import identify_waterbody_outlets, calculate_surface_area
+from .aquatic_concentration import compute_concentration, partition_benthic, exceedance_probability
+from .paths import weather_path, recipe_path, scratch_path, dwi_path, manual_points_path, output_path, \
     endpoint_format_path, condensed_nhd_path
-from sam.parameters import hydrology_params, output_params, fields
-from sam.aquatic_concentration import compute_concentration, partition_benthic, exceedance_probability
+from .parameters import hydrology_params, output_params, fields
 
 # Initialize endpoints
 endpoint_format = pd.read_csv(endpoint_format_path)
@@ -410,10 +410,14 @@ class ReachManager(DateManager, MemoryMatrix):
         self.update(lake.outlet_comid, np.array([new_runoff, new_mass, erosion, erosion_mass]))
 
     def burn_batch(self, lakes):
-        dask_scheduler = os.environ.get("DASK_SCHEDULER")
-        dask_client = Client(dask_scheduler)
-        batch = [dask_client.submit(self.burn, lake) for _, lake in lakes.iterrows()]
-        dask_client.gather(batch)
+        if local_run:
+            for _, lake in lakes.iterrows():
+                self.burn(lake)
+        else:
+            batch = []
+            for _, lake in lakes.iterrows():
+                batch.append(dask_client.submit(self.burn, lake))
+            dask_client.gather(batch)
 
     def process_local(self, reach_id, year, verbose=False):
         """  Fetch all scenarios and multiply by area. For erosion, area is adjusted. """
@@ -445,10 +449,14 @@ class ReachManager(DateManager, MemoryMatrix):
             report("No scenarios found for {}".format(reach_id))
 
     def process_local_batch(self, reach_ids, year):
-        dask_scheduler = os.environ.get("DASK_SCHEDULER")
-        dask_client = Client(dask_scheduler)
-        batch = [dask_client.submit(self.process_local, reach_id, year) for reach_id in reach_ids]
-        dask_client.gather(batch)
+        if local_run:
+            for reach_id in reach_ids:
+                self.process_local(reach_id, year)
+        else:
+            batch = []
+            for reach_id in reach_ids:
+                batch.append(dask_client.submit(self.process_local, reach_id, year))
+            dask_client.gather(batch)
 
     def report(self, reach_id):
         # Get flow values for reach

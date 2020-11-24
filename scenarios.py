@@ -1,18 +1,16 @@
 import os
 import numpy as np
 import pandas as pd
-from distributed import Client
 
-from sam.tools.efed_lib import report, DateManager, MemoryMatrix
-from sam.field import plant_growth, initialize_soil, process_erosion
-from sam.hydrology import surface_hydrology
-from sam.transport import pesticide_to_field, field_to_soil, soil_to_water
-from sam.paths import stage_one_scenario_path, stage_two_scenario_path, stage_three_scenario_path, scratch_path
-from sam.parameters import soil_params, plant_params, fields, types
-from sam.parameters import scenario_defaults, scenario_start_date, scenario_end_date, batch_size, stage_one_chunksize, \
+from .tools.efed_lib import report, DateManager, MemoryMatrix
+from .field import plant_growth, initialize_soil, process_erosion
+from .hydrology import surface_hydrology
+from .transport import pesticide_to_field, field_to_soil, soil_to_water
+from .paths import dask_client
+from .paths import stage_one_scenario_path, stage_two_scenario_path, stage_three_scenario_path, scratch_path
+from .parameters import soil_params, plant_params, fields, types
+from .parameters import scenario_defaults, scenario_start_date, scenario_end_date, batch_size, stage_one_chunksize, \
     crop_group_field
-
-from dask.distributed import Client, TimeoutError
 
 
 class StageOneScenarios(object):
@@ -132,7 +130,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
         self.keyfile_path = self.path + "_key.txt"
         self.array_path = self.path + "_arrays.dat"
         self.index_path = self.path + "_index.csv"
-        self.mode = 'build' if stage_one is not None else 'read'
+        self.mode = 'read' if stage_one is None else 'build'
         self.s1 = stage_one
         self.sim = sim
         self.met = met
@@ -193,10 +191,6 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
             self.met.end_offset = (self.end_date - self.met.end_date).astype(np.int32)
 
     def build_from_stage_one(self):
-
-        dask_scheduler = os.environ.get("DASK_SCHEDULER")
-        dask_client = Client(dask_scheduler)
-
         batch = []
         scenario_count = 0
         batch_count = 0
@@ -284,8 +278,6 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
     def build_from_stage_two(self):
         # TODO - can the dask allocation part of this be put into a function or wrapper?
         #  it's also used in s1->s2
-        dask_scheduler = os.environ.get("DASK_SCHEDULER")
-        dask_client = Client(dask_scheduler)
 
         var_table = self.scenario_vars.set_index('s2_index')
 

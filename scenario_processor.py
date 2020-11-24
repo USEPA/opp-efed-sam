@@ -1,7 +1,7 @@
-from sam.utilities import WeatherArray, WatershedRecipes
-from sam.scenarios import StageOneScenarios, StageTwoScenarios
-from sam.hydro.navigator import Navigator
-from sam.utilities import report
+from .utilities import WeatherArray, WatershedRecipes
+from .scenarios import StageOneScenarios, StageTwoScenarios
+from .hydro.navigator import Navigator
+from .utilities import report
 
 
 # TODO - complete preprocessing script for building condensed nhd (sam and nav), navs, etc

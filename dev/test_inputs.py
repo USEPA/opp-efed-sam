@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from .sam import hellow
 
 atrazine_json_mtb = {'csrfmiddlewaretoken': {'0': 'atrazine_r7'},
                      'simulation_name': {'0': 'Mark Twain Atrazine 062217'},

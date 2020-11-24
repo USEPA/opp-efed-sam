@@ -1,6 +1,6 @@
 import numpy as np
 from numba import njit, guvectorize
-from sam.parameters import benthic_params
+from .parameters import benthic_params
 
 def compute_concentration(transported_mass, runoff, n_dates, q):
     """

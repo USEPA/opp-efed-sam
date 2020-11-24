@@ -2,9 +2,9 @@ import numpy as np
 import pandas as pd
 from ..base.uber_model import UberModel, ModelSharedInputs
 
-from sam.utilities import fields
-from sam.tools.efed_lib import report
-from sam.pesticide_calculator import pesticide_calculator
+from .utilities import fields
+from .tools.efed_lib import report
+from .pesticide_calculator import pesticide_calculator
 
 class SamInputs(ModelSharedInputs):
     """
@@ -89,7 +89,7 @@ class InputDict(dict):
         return map(date_format, (self['sim_date_start'], self['sim_date_end']))
 
     def process_endpoints(self):
-        from sam.utilities import endpoint_format
+        from .utilities import endpoint_format
 
         endpoints = []
         for level in ('acute', 'chronic', 'overall'):

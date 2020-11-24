@@ -1,6 +1,7 @@
 import os
 import pathlib
 import sys
+from distributed import Client
 
 # If running locally (Trip's computer), point to an external hard drive. If in AWS, use a different path
 local_run = any([r'C:' in p for p in sys.path])
@@ -10,11 +11,12 @@ else:
     data_root = "/src/app-data/sampreprocessed"
 local_root = pathlib.Path(__file__).parent.absolute()
 
-
-try:
-    sys.path.index(local_root)
-except ValueError:
-    sys.path.insert(0, local_root)
+# Initialize a dask scheduler
+if local_run:
+    dask_client = Client(processes=False)
+else:
+    dask_scheduler = os.environ.get("DASK_SCHEDULER")
+    dask_client = Client(dask_scheduler)
 
 scenario_root = os.path.join("scenarios", "Production")
 input_dir = os.path.join(data_root, "Inputs")

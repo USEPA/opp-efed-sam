@@ -1,6 +1,6 @@
-from sam.utilities import Simulation, HydroRegion, ModelOutputs, WatershedRecipes, ReachManager, report
-from sam.scenarios import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
-
+from .utilities import Simulation, HydroRegion, ModelOutputs, WatershedRecipes, ReachManager, report
+from .scenarios import StageTwoScenarios, StageThreeScenarios
+from .paths import local_run
 
 # TODO - why are there fewer scenarios than recipes?
 # TODO - what do years do?
@@ -22,9 +22,6 @@ def pesticide_calculator(input_data):
     # Loop through all NHD regions included in selected runs
     for region_id in sim.run_regions:
         report("Processing hydroregion {}...".format(region_id))
-
-        # Initialize Stage 1 scenarios (tabular field parameters comparable to PWC scenarios)
-        stage_one = StageOneScenarios(region_id)
 
         # Initialize Stage 2 scenarios (time series of non-chemical data, e.g., runoff, erosion, rainfall...)
         stage_two = StageTwoScenarios(region_id, sim=sim, tag='mtb')
@@ -67,7 +64,6 @@ def pesticide_calculator(input_data):
 
                 # Pass each reach in the tier through a downstream lake
                 reaches.burn_batch(lakes)
-
 
         # Write output
         report("Writing output...")
