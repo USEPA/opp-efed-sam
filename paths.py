@@ -1,6 +1,7 @@
 import os
 import pathlib
 import sys
+from .tools.efed_lib import report
 from distributed import Client
 
 # If running locally (Trip's computer), point to an external hard drive. If in AWS, use a different path
@@ -10,8 +11,8 @@ if local_run:
 else:
     data_root = "/src/app-data/sampreprocessed"
 local_root = pathlib.Path(__file__).parent.absolute()
-print(f"Local root: {local_root}")
-print(f"Data root: {data_root}")
+report(f"Local root: {local_root}")
+report(f"Data root: {data_root}")
 
 # Initialize a dask scheduler
 if local_run:
