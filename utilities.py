@@ -203,6 +203,7 @@ class Simulation(DateManager):
         # Make sure needed subdirectories exist
         for subdir in scratch_path, output_path:
             if not os.path.exists(subdir):
+                report(f"Creating path {subdir}...")
                 os.makedirs(subdir)
 
         # Purge temp folder
