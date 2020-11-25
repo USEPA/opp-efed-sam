@@ -3,7 +3,7 @@ import pathlib
 import sys
 from .tools.efed_lib import report
 from distributed import Client
-
+report("Setting paths now")
 # If running locally (Trip's computer), point to an external hard drive. If in AWS, use a different path
 local_run = any([r'C:' in p for p in sys.path])
 if local_run:
