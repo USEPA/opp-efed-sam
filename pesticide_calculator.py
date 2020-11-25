@@ -1,6 +1,10 @@
 from .utilities import Simulation, HydroRegion, ModelOutputs, WatershedRecipes, ReachManager, report
 from .scenarios import StageTwoScenarios, StageThreeScenarios
-from .paths import local_run
+from .paths import local_run, local_root, data_root
+report(f"Local run? {local_run}")
+report(f"Local root: {local_root}")
+report(f"Data root: {data_root}")
+
 
 # TODO - why are there fewer scenarios than recipes?
 # TODO - what do years do?
