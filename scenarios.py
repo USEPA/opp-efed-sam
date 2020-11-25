@@ -312,9 +312,12 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
                 batch.append(dask_client.submit(stage_two_to_three, *scenario))
                 if len(batch) == batch_size or (count + 1) == n_scenarios:
+                    report(f"starting batch {batch_count}")
                     arrays = dask_client.gather(batch)
+                    report(f"batch {batch_count} finished. writing...")
                     start_pos = batch_count * batch_size
                     self.writer[start_pos:start_pos + len(batch)] = arrays
+                    report(f"batch {batch_count} written successfully")
                     batch_count += 1
                     batch = []
 
