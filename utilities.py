@@ -493,10 +493,11 @@ class ReachManager(DateManager, MemoryMatrix):
         self.update(lake.outlet_comid, np.array([new_runoff, new_mass, erosion, erosion_mass]))
 
     def burn_batch(self, lakes):
-        if self.sim.local_run:
+        if True or self.sim.local_run:
             for _, lake in lakes.iterrows():
                 self.burn(lake)
         else:
+            # TODO - this doesn't work yet. Dask doesn't like async calls to class functions
             batch = []
             for _, lake in lakes.iterrows():
                 batch.append(self.sim.dask_client.submit(self.burn, lake))
@@ -532,10 +533,11 @@ class ReachManager(DateManager, MemoryMatrix):
             report("No scenarios found for {}".format(reach_id))
 
     def process_local_batch(self, reach_ids, year):
-        if self.sim.local_run:
+        if True or self.sim.local_run:
             for reach_id in reach_ids:
                 self.process_local(reach_id, year)
         else:
+            # TODO - this doesn't work yet. Dask doesn't seem to like the async call on a self. function
             batch = []
             for reach_id in reach_ids:
                 batch.append(self.sim.dask_client.submit(self.process_local, reach_id, year))
