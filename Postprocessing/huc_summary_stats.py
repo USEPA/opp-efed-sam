@@ -52,11 +52,17 @@ class SamPostprocessor(object):
 
     def calc_huc_summary(self):
         print(self.sam_data)
+        path_to_csv = os.path.join(os.path.dirname(__file__), 'HUC12_comids.csv')
+        print(path_to_csv)
+        try:
+            huc_comid = pd.read_csv(path_to_csv)
+            print(huc_comid)
+        except Exception as e:
+            print(e)
         sam_properties = [x["properties"] for x in self.sam_data['features']]
         data = pd.DataFrame(sam_properties)
         data['COMID'] = data['COMID'].astype(str)
-        path_to_csv = os.path.join(os.path.dirname(__file__), 'HUC12_comids.csv')
-        huc_comid = pd.read_csv(path_to_csv)
+
         huc_comid[["HUC12", "COMID"]] = huc_comid[["HUC12", "COMID"]].astype(str)
         huc_comid['HUC12'] = huc_comid['HUC12'].apply(replace_leading_0)
         data = data.merge(huc_comid[["COMID", "HUC12"]], on="COMID")

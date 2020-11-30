@@ -2,19 +2,6 @@ from .utilities import Simulation, HydroRegion, ModelOutputs, WatershedRecipes, 
 from .scenarios import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
 
 
-# TODO - why are there fewer scenarios than recipes?
-# TODO - what do years do?
-# TODO - Check the output arrays
-#  Check the local arrays
-#  Check the results
-# TODO - confirm that the stage 2 scenario data looks good
-# TODO - check units, esp NHD stuff (flow et al), check residence times
-# TODO - did we change erosion? like, is the area modifier still needed?
-# TODO - what are the bottlenecks? faster?
-# TODO - should it really raise an error when the application dates start to go out of bounds?
-# TODO - confirm that it's handling double-crops and seasons right
-#  In fact, design unit tests for all different components - recipe recall, etc.
-
 def pesticide_calculator(input_data):
     # Initialize parameters from front end
     sim = Simulation(input_data)
