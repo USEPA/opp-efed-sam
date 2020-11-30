@@ -6,19 +6,16 @@ from .tools.efed_lib import report, DateManager, MemoryMatrix
 from .field import plant_growth, initialize_soil, process_erosion
 from .hydrology import surface_hydrology
 from .transport import pesticide_to_field, field_to_soil, soil_to_water
-from .paths import dask_client
-from .paths import stage_one_scenario_path, stage_two_scenario_path, stage_three_scenario_path, scratch_path
-from .parameters import soil_params, plant_params, fields, types
-from .parameters import scenario_defaults, scenario_start_date, scenario_end_date, batch_size, stage_one_chunksize, \
-    crop_group_field
 
 
 class StageOneScenarios(object):
-    def __init__(self, region, subset_outlets=None, subset_year=None, recipes=None):
+    def __init__(self, region, sim, recipes=None, subset_outlets=None, subset_year=None):
         self.region = region
+        self.sim = sim
+        self.path = sim.paths.s1_scenarios
         self._subset = False
         self._scenario_id = None
-        self.scratch_path = os.path.join(scratch_path, f"s1_subset.csv")
+        self.scratch_path = os.path.join(sim.paths.scratch_path, f"s1_subset.csv")
 
         if subset_outlets is not None:
             self.build_subset(subset_outlets, subset_year, recipes)
@@ -61,7 +58,7 @@ class StageOneScenarios(object):
     def iterate(self):
         for path in self.paths:
             report(f"Reading scenario table {path}...")
-            for chunk in pd.read_csv(path, chunksize=stage_one_chunksize):
+            for chunk in pd.read_csv(path, chunksize=self.sim.stage_one_chunksize):
                 chunk = self.modify_array(chunk)
                 for weather_grid, scenarios in chunk.groupby('weather_grid'):
                     yield weather_grid, scenarios
@@ -72,11 +69,10 @@ class StageOneScenarios(object):
             self._scenario_id = self.fetch('scenario_id', True)
         return self._scenario_id
 
-    @staticmethod
-    def modify_array(array):
+    def modify_array(self, array):
         # TODO - can we clean this up? what needs to be here vs in scenarios project?
 
-        for field, val in scenario_defaults.items():
+        for field, val in self.sim.scenario_defaults.items():
             array[field] = val
         for var in ('orgC_5', 'crop_intercept', 'slope', 'max_canopy', 'root_depth'):
             array[var] /= 100.  # cm -> m
@@ -109,7 +105,7 @@ class StageOneScenarios(object):
             i = 0
             while True:
                 i += 1
-                path = stage_one_scenario_path.format(self.region, i)
+                path = self.path.format(self.region, i)
                 if os.path.exists(path):
                     paths.append(path)
                 else:
@@ -122,24 +118,25 @@ class StageOneScenarios(object):
 
 
 class StageTwoScenarios(DateManager, MemoryMatrix):
-    def __init__(self, region, stage_one=None, met=None, sim=None, tag=None):
+    def __init__(self, region, sim, stage_one, met, tag=None, build=False):
         self.region = region
-        self.path = stage_two_scenario_path.format(region)
+        self.sim = sim
+        self.s1 = stage_one
+        self.met = met
+
+        self.fields = sim.fields
+        self.path = sim.paths.s2_scenarios.format(region)
         if tag is not None:
             self.path += f"_{tag}"
         self.keyfile_path = self.path + "_key.txt"
         self.array_path = self.path + "_arrays.dat"
         self.index_path = self.path + "_index.csv"
-        self.mode = 'read' if stage_one is None else 'build'
-        self.s1 = stage_one
-        self.sim = sim
-        self.met = met
 
         # If build is True, create the Stage 2 Scenarios by running model routines on Stage 1 scenario inputs
-        if self.mode == 'build':
+        if build:
             report("Building Stage Two Scenarios from Stage One...")
-            DateManager.__init__(self, scenario_start_date, scenario_end_date)
-            self.arrays = fields.fetch('s2_arrays')
+            DateManager.__init__(self, self.sim.scenario_start_date, self.sim.scenario_end_date)
+            self.arrays = self.fields.fetch('s2_arrays')
             self.align_met_dates()
             scenario_index = self.s1.fetch('scenario_id')
             MemoryMatrix.__init__(self, [scenario_index, self.arrays, self.n_dates],
@@ -160,6 +157,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
             DateManager.__init__(self, self.array_start_date, self.array_end_date)
             self.start_offset, self.end_offset = self.date_offset(self.sim.start_date, self.sim.end_date,
                                                                   n_dates=self.n_dates_array)
+
             # Initialize MemoryMatrix
             MemoryMatrix.__init__(self, time_series_shape, path=self.array_path, existing=True, name='scenario')
 
@@ -194,8 +192,10 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
         batch = []
         scenario_count = 0
         batch_count = 0
-        keep_fields = list(fields.fetch('s1_keep_cols')) + [crop_group_field]
+        keep_fields = list(self.fields.fetch('s1_keep_cols')) + [self.sim.crop_group_field]
         stage_two_index = []
+        soil = self.sim.soil
+        types = pd.read_csv(self.sim.types_path).set_index('type')
 
         # Group by weather grid to reduce the overhead from fetching met data
         for weather_grid, scenarios in self.s1.iterate():
@@ -207,13 +207,15 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
                             s.max_root_depth, s.crop_intercept, s.slope, s.slope_length,
                             s.water_max_5, s.water_min_5, s.water_max_20, s.water_min_20,
                             s.cn_cov, s.cn_fal, s.usle_k, s.usle_ls, s.usle_c_cov, s.usle_c_fal, s.usle_p,
-                            s.irrigation_type, s.ireg, s.depletion_allowed, s.leaching_fraction]
-                batch.append(dask_client.submit(stage_one_to_two, *scenario))
+                            s.irrigation_type, s.ireg, s.depletion_allowed, s.leaching_fraction, types,
+                            soil.cn_min, soil.delta_x, soil.bins, soil.depth, soil.anetd, soil.n_increments,
+                            soil.sfac]
+                batch.append(self.sim.dask_client.submit(stage_one_to_two, *scenario))
                 scenario_count += 1
                 scenario_vars = s[keep_fields]
                 stage_two_index.append(scenario_vars.values)
-                if len(batch) == batch_size or scenario_count == self.s1.n_scenarios:
-                    results = dask_client.gather(batch)
+                if len(batch) == self.sim.batch_size or scenario_count == self.s1.n_scenarios:
+                    results = self.sim.dask_client.gather(batch)
                     batch_count += 1
                     batch = []
                     report(f"Processed {scenario_count} of {self.s1.n_scenarios} scenarios", 1)
@@ -256,16 +258,16 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
             data.to_csv(self.index_path, index=None)
         else:
             batch_size_actual = len(data)
-            start_pos = (batch_num - 1) * batch_size
+            start_pos = (batch_num - 1) * self.sim.batch_size
             self.writer[start_pos:start_pos + batch_size_actual] = np.array(data)
 
 
 class StageThreeScenarios(DateManager, MemoryMatrix):
-    def __init__(self, inputs, stage_two):
+    def __init__(self, sim, stage_two):
         self.s2 = stage_two
-        self.i = inputs
-        self.array_path = stage_three_scenario_path.format(self.s2.region)
-        self.scenario_vars, self.lookup = self.select_scenarios(self.i.crops)
+        self.sim = sim
+        self.array_path = sim.paths.s3_scenarios.format(self.s2.region)
+        self.scenario_vars, self.lookup = self.select_scenarios(self.sim.crops)
 
         # Set dates
         DateManager.__init__(self, stage_two.start_date, stage_two.end_date)
@@ -275,51 +277,57 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         MemoryMatrix.__init__(self, [len(self.scenario_vars.s3_index), 2, self.n_dates], name='pesticide mass',
                               dtype=np.float32, path=self.array_path, persistent_read=True, persistent_write=True)
 
+        report(f"Building Stage 3 scenarios...")
+        #self.build_from_stage_two()
+
     def build_from_stage_two(self):
         # TODO - can the dask allocation part of this be put into a function or wrapper?
         #  it's also used in s1->s2
+        soil = self.sim.soil
+        plant = self.sim.plant
 
         var_table = self.scenario_vars.set_index('s2_index')
 
         batch = []
         batch_count = 0
         n_scenarios = var_table.shape[0]
+        dask_client = self.sim.dask_client
 
         # Iterate scenarios
         for count, (s2_index, s3_index) in enumerate(self.lookup[['s2_index', 's3_index']].values):
-            if not (count + 1) % 100:
-                report(f"Processed {count + 1} of {n_scenarios} scenarios...", 1)
 
             # Get the non-array values associated with the scenario
-            s = var_table.loc[s2_index]
+            s2 = var_table.loc[s2_index]
 
             # Extract stored data
             runoff, erosion, leaching, soil_water, rain = self.s2.fetch(s2_index, iloc=True)
 
             # Get application information for the active crop
-            crop_applications = self.i.applications[self.i.applications.crop == s[crop_group_field]]
+            crop_applications = \
+                self.sim.applications[self.sim.applications.crop == s2[self.sim.crop_group_field]]
 
             if not crop_applications.empty:
 
                 # Get crop ID of scenario and find all associated crops in group
                 scenario = [crop_applications.values,
-                            self.new_year, self.i.kd_flag, self.i.koc, self.i.deg_aqueous,
+                            self.new_year, self.sim.kd_flag, self.sim.koc, self.sim.deg_aqueous,
                             leaching, runoff, erosion, soil_water, rain,
-                            soil_params.cm_2, soil_params.surface_dx, soil_params.erosion_effic,
-                            soil_params.soil_depth, plant_params.deg_foliar, plant_params.washoff_coeff,
-                            soil_params.runoff_effic, s.plant_date, s.emergence_date, s.maxcover_date,
-                            s.harvest_date, s.max_canopy, s.orgC_5, s.bd_5, s.season]
+                            s2.plant_date, s2.emergence_date, s2.maxcover_date, s2.harvest_date,
+                            s2.max_canopy, s2.orgC_5, s2.bd_5, s2.season,
+                            soil.runoff_effic, soil.erosion_effic, soil.surface_dx, soil.cm_2, soil.soil_depth,
+                            plant.deg_foliar, plant.washoff_coeff]
 
+                # HERE
+                # k so it seems like maybe you can't call a local class function with dask like this
                 batch.append(dask_client.submit(stage_two_to_three, *scenario))
-                if len(batch) == batch_size or (count + 1) == n_scenarios:
-                    report(f"starting batch {batch_count}")
+                if len(batch) == self.sim.batch_size or (count + 1) == n_scenarios:
+                    print("starting batch delete this line later")
                     arrays = dask_client.gather(batch)
-                    report(f"batch {batch_count} finished. writing...")
-                    start_pos = batch_count * batch_size
+                    start_pos = batch_count * self.sim.batch_size
                     self.writer[start_pos:start_pos + len(batch)] = arrays
-                    report(f"batch {batch_count} written successfully")
                     batch_count += 1
                     batch = []
+                    report(f"Processed {count + 1} of {n_scenarios} scenarios...", 1)
 
     def fetch_from_recipe(self, recipe, verbose=False):
         found = recipe.join(self.lookup, how='inner')
@@ -328,8 +336,8 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
     def select_scenarios(self, crops):
         """ Use the Stage Two Scenarios index, but filter by crops """
-        crops = pd.DataFrame({crop_group_field: list(crops)}, dtype=np.int32)
-        selected = self.s2.scenario_vars.merge(crops, on=crop_group_field, how='inner')
+        crops = pd.DataFrame({self.sim.crop_group_field: list(crops)}, dtype=np.int32)
+        selected = self.s2.scenario_vars.merge(crops, on=self.sim.crop_group_field, how='inner')
         selected['s3_index'] = np.arange(selected.shape[0])
         scenario_vars = selected.sort_values('s3_index')
         # JCH - for diagnostic purposes, 'scenario_id' can be added to the lookup table
@@ -342,9 +350,10 @@ def stage_one_to_two(precip, pet, temp, new_year,  # weather params
                      max_root_depth, crop_intercept,  # crop properties
                      slope, slope_length,  # field properties
                      fc_5, wp_5, fc_20, wp_20,  # soil properties
-                     cn_cov, cn_fallow, usle_k, usle_ls, usle_c_cov, usle_c_fal, usle_p,  # curve numbers and usle vars
-                     irrigation_type, ireg, depletion_allowed, leaching_fraction):  # irrigation params
-
+                     cn_cov, cn_fallow, usle_k, usle_ls, usle_c_cov, usle_c_fal, usle_p,  # usle params
+                     irrigation_type, ireg, depletion_allowed, leaching_fraction,  # irrigation params
+                     cn_min, delta_x, bins, depth, anetd, n_increments, sfac,  # simulation soil params
+                     types):
     # Model the growth of plant between emergence and maturity (defined as full canopy cover)
     plant_factor = plant_growth(precip.size, new_year, plant_date, emergence_date, maxcover_date, harvest_date)
 
@@ -365,15 +374,18 @@ def stage_one_to_two(precip, pet, temp, new_year,  # weather params
 
     # Output array order is specified in fields_and_qc.py
     arrays = []
-    for field in fields.fetch('s2_arrays'):
+    for field in self.fields.fetch('s2_arrays'):
         arrays.append(eval(field))
     return np.float32(arrays)
 
 
-def stage_two_to_three(application_matrix, new_year, kd_flag, koc, deg_aqueous, leaching, runoff, erosion, soil_water,
-                       rain, cm_2, delta_x_top_layer, erosion_effic, soil_depth, deg_foliar,
-                       washoff_coeff, runoff_effic, plant_date, emergence_date, maxcover_date, harvest_date,
-                       covmax, org_carbon, bulk_density, season):
+def stage_two_to_three(application_matrix, new_year, kd_flag, koc, deg_aqueous, leaching, runoff, erosion,
+                       soil_water, rain, plant_date, emergence_date, maxcover_date, harvest_date, covmax,
+                       org_carbon, bulk_density, season,
+                       runoff_effic, erosion_effic, surface_dx, cm_2, soil_depth,
+                       deg_foliar, washoff_coeff):
+    # TODO - season?
+
     # Use Kd instead of Koc if flag is on. Kd = Koc * organic C in the top layer of soil
     # Reference: PRZM5 Manual(Young and Fry, 2016), Section 4.13
     if kd_flag:
@@ -394,6 +406,7 @@ def stage_two_to_three(application_matrix, new_year, kd_flag, koc, deg_aqueous, 
     # Also need to add deg_soil, deg_benthic here - NT 8/28/18
     aquatic_pesticide_mass = \
         soil_to_water(pesticide_mass_soil, runoff, erosion, leaching, bulk_density, soil_water, koc,
-                      deg_aqueous, runoff_effic, delta_x_top_layer, erosion_effic, soil_depth)
+                      deg_aqueous, runoff_effic, surface_dx, erosion_effic,
+                      soil_depth)
 
     return aquatic_pesticide_mass

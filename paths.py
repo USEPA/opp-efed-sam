@@ -1,49 +1,39 @@
 import os
 import pathlib
 import sys
-from .tools.efed_lib import report
-from distributed import Client
 
-report("Setting paths now")
-# If running locally (Trip's computer), point to an external hard drive. If in AWS, use a different path
-local_run = any([r'C:' in p for p in sys.path])
-if local_run:
-    data_root = r"E:\opp-efed-data\sam"
-else:
-    data_root = "/src/app-data/sampreprocessed"
-local_root = pathlib.Path(__file__).parent.absolute()
 
-# Initialize a dask scheduler
-if local_run:
-    dask_client = Client(processes=False)
-else:
-    dask_scheduler = os.environ.get("DASK_SCHEDULER")
-    dask_client = Client(dask_scheduler)
+class PathManager(object):
+    def __init__(self):
+        # Root directories
+        self.data_root = r"E:\opp-efed-data\sam" if self.local_run else "/src/app-data/sampreprocessed"
+        self.local_root = pathlib.Path(__file__).parent.absolute()
+        self.input_path = os.path.join(self.data_root, "Inputs")
+        self.intermediate_path = os.path.join(self.data_root, "Intermediate")
+        self.output_path = os.path.join(self.data_root, "Results")
+        self.scratch_path = os.path.join(self.data_root, "temp")
+        self.table_path = os.path.join(self.local_root, "Tables")
 
-scenario_root = os.path.join("scenarios", "Production")
-input_dir = os.path.join(data_root, "Inputs")
-intermediate_dir = os.path.join(data_root, "Intermediate")
-output_path = os.path.join(data_root, "Results")
-scratch_path = os.path.join(data_root, "temp")
-diagnostic_path = os.path.join(data_root, "diagnostic")
+        # Input data
+        self.condensed_nhd = os.path.join(self.input_path, "CondensedNHD", "{}", "r{}_{}.csv")
+        # 'nav' or 'sam', region, 'reach' or 'waterbody'
+        self.weather = os.path.join(self.input_path, "Weather", "weather_{}")  # 'array' or 'key'
+        self.recipes = os.path.join(self.input_path, "RecipeFiles", "r{}")  # region
+        self.s1_scenarios = os.path.join(self.input_path, "SamScenarios", "r{}_{}.csv")  # region, i
+        self.dw_intakes = os.path.join(self.input_path, "Intakes", "intake_locations.csv")
+        self.manual_intakes = os.path.join(self.input_path, "Intakes", "mtb_single_intake.csv")
+        self.navigator = os.path.join(self.input_path, "NavigatorFiles", "nav{}.npz")  # region
 
-# Input data
-condensed_nhd_path = os.path.join(input_dir, "CondensedNHD", "{}",
-                                  "r{}_{}.csv")  # 'nav' or 'sam', region, 'reach' or 'waterbody'
-weather_path = os.path.join(input_dir, "Weather", "weather_{}")  # 'array' or 'key'
-recipe_path = os.path.join(input_dir, "RecipeFiles", "r{}")  # region
-stage_one_scenario_path = os.path.join(input_dir, "SamScenarios", "r{}_{}.csv")  # region, i
-dwi_path = os.path.join(input_dir, "Intakes", "intake_locations.csv")
-manual_points_path = os.path.join(input_dir, "Intakes", "mtb_single_intake.csv")
-navigator_path = os.path.join(input_dir, "NavigatorFiles", "nav{}.npz")  # region
+        # Intermediate data
+        self.s2_scenarios = os.path.join(self.intermediate_path, "StageTwoScenarios", "r{}")  # region
+        self.s3_scenarios = os.path.join(self.scratch_path, "r{}")  # region
 
-# Intermediate data
-stage_two_scenario_path = os.path.join(intermediate_dir, "StageTwoScenarios", "r{}")  # region
-stage_three_scenario_path = os.path.join(scratch_path, "r{}")  # region
+        # Tables
+        self.fields_and_qc = os.path.join(self.table_path, "fields_and_qc.csv")
+        self.types = os.path.join(self.table_path, "tr_55.csv")
+        self.sam_nhd_map = os.path.join(self.table_path, "nhd_map_sam.csv")
+        self.endpoint_format = os.path.join(self.table_path, "endpoint_format.csv")
 
-# Tables
-table_root = os.path.join(local_root, "Tables")
-endpoint_format_path = os.path.join(table_root, "endpoint_format.csv")
-fields_and_qc_path = os.path.join(table_root, "fields_and_qc.csv")
-types_path = os.path.join(table_root, "tr_55.csv")
-sam_nhd_map = os.path.join(table_root, "nhd_map_sam.csv")
+    @property
+    def local_run(self):
+        return any([r'C:' in p for p in sys.path])

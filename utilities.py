@@ -5,19 +5,15 @@ import numpy as np
 import pandas as pd
 import json
 from ast import literal_eval
+from distributed import Client
 
-from .paths import dask_client, local_run
-from .tools.efed_lib import MemoryMatrix, DateManager, report
+from .tools.efed_lib import FieldManager, MemoryMatrix, DateManager, report
+from .parameters import ParameterManager
+from .paths import PathManager
 from .hydro.params_nhd import nhd_regions
 from .hydro.navigator import Navigator
 from .hydro.process_nhd import identify_waterbody_outlets, calculate_surface_area
 from .aquatic_concentration import compute_concentration, partition_benthic, exceedance_probability
-from .paths import weather_path, recipe_path, scratch_path, dwi_path, manual_points_path, output_path, \
-    endpoint_format_path, condensed_nhd_path
-from .parameters import hydrology_params, output_params, fields
-
-# Initialize endpoints
-endpoint_format = pd.read_csv(endpoint_format_path)
 
 # If true, only return 5 time series fields, otherwise, return 13
 # TODO - there's a better way to do this
@@ -31,16 +27,17 @@ class HydroRegion(Navigator):
     active_reaches: reaches upstream of the outlet (or for eco, all of them)
     """
 
-    def __init__(self, sim, region):
+    def __init__(self, region, sim):
 
         self.id = region
 
         # Assign a watershed navigator to the class
+        # TODO - a path should be provided here
         super(HydroRegion, self).__init__(self.id)
 
         # Read hydrological input files
-        self.reach_table = pd.read_csv(condensed_nhd_path.format('sam', region, 'reach'))
-        self.lake_table = pd.read_csv(condensed_nhd_path.format('sam', region, 'waterbody'))
+        self.reach_table = pd.read_csv(sim.paths.condensed_nhd.format('sam', region, 'reach'))
+        self.lake_table = pd.read_csv(sim.paths.condensed_nhd.format('sam', region, 'waterbody'))
         self.process_nhd()
 
         # Initialize the fields that will be used to pull flows based on month
@@ -169,27 +166,41 @@ class Simulation(DateManager):
     run including Endpoints, Crops, Dates, Intake reaches, and Impulse Response Functions
     """
 
-    def __init__(self, input_dict):
+    def __init__(self, input_json):
 
-        # Read input dictionary
+        # Get paths for model resources
+        self.paths = PathManager()
+        self.local_run = self.paths.local_run
+
+        # Initialize field manager
+        self.fields = FieldManager(self.paths.fields_and_qc)
+
+        # Read the inputs supplied by the user in the GUI
+        input_dict = InputDict(input_json, self.paths.endpoint_format, self.fields)
         self.__dict__.update(input_dict)
 
+        # Read the hardwired parameters
+        external_params = ParameterManager()
+        self.__dict__.update(external_params.__dict__)
+
         # Initialize file structure
-        self.initialize()
+        self.check_directories()
 
-        # Read endpoints and applications
-        self.endpoints = self.read_endpoints()
-        self.applications = self.read_applications()
-        self.crops = set(self.applications.crop)
+        # Initialize Dask client
+        if self.local_run:
+            self.dask_client = Client(processes=False)
+        else:
+            dask_scheduler = os.environ.get("DASK_SCHEDULER")
+            self.dask_client = Client(dask_scheduler)
 
-        # Dates
+        # Initialize dates
         DateManager.__init__(self, np.datetime64(self.sim_date_start), np.datetime64(self.sim_date_end))
 
         # Select regions and reaches that will be run
         self.intakes, self.run_regions, self.intake_reaches = self.processing_extent()
 
-        # Initialize an impulse response matrix if convolving timesheds
-        self.irf = None if not hydrology_params.gamma_convolve else ImpulseResponseMatrix(self.dates.size)
+        # Initialize an impulse response matrix if convolving time of travel
+        self.irf = None if not self.hydrology.gamma_convolve else ImpulseResponseMatrix(self.dates.size)
 
         # Make numerical adjustments (units etc)
         self.adjust_data()
@@ -198,17 +209,15 @@ class Simulation(DateManager):
         self.token = \
             self.simulation_name if not hasattr(self, 'csrfmiddlewaretoken') else self.csrfmiddlewaretoken
 
-    @staticmethod
-    def initialize():
+    def check_directories(self):
         # Make sure needed subdirectories exist
-        for subdir in scratch_path, output_path:
+        for subdir in self.paths.scratch_path, self.paths.output_path:
             if not os.path.exists(subdir):
-                report(f"Creating path {subdir}...")
                 os.makedirs(subdir)
 
         # Purge temp folder
-        for f in os.listdir(scratch_path):
-            os.remove(os.path.join(scratch_path, f))
+        for f in os.listdir(self.paths.scratch_path):
+            os.remove(os.path.join(self.paths.scratch_path, f))
 
     def adjust_data(self):
         """ Convert half-lives to degradation rates """
@@ -232,20 +241,6 @@ class Simulation(DateManager):
 
         self.applications.apprate *= 0.0001  # convert kg/ha -> kg/m2 (1 ha = 10,000 m2)
 
-    def read_applications(self):
-        applications = pd.DataFrame(self.applications, columns=fields.fetch('applications'))
-
-        # Create a float array of the applications table for faster use
-        for i, row in applications.iterrows():
-            applications.loc[i, 'event'] = ['plant', 'harvest', 'maxcover', 'harvest'].index(row.event)
-            applications.loc[i, 'dist'] = ['canopy', 'ground'].index(row.dist)
-            applications.loc[i, 'method'] = ['uniform', 'step'].index(row.method)
-        return applications.astype(np.float32)
-
-    def read_endpoints(self):
-        endpoints = pd.DataFrame(self.endpoints.T, columns=('acute_tox', 'chronic_tox', 'overall_tox'))
-        return pd.concat([endpoint_format, endpoints], axis=1)
-
     def processing_extent(self):
         """ Determine which NHD regions need to be run to process the specified reacches """
 
@@ -254,9 +249,9 @@ class Simulation(DateManager):
 
         # Get the path of the table used for intakes
         # TODO - there's an issue here. I have to manually assign 'manual' as a value for now and 'eco' isn't working
-        report(self.sim_type)
         self.sim_type = 'manual'
-        intake_file = {'drinking_water': dwi_path, 'manual': manual_points_path}.get(self.sim_type)
+        intake_file = {'drinking_water': self.paths.dw_intakes,
+                       'manual': self.paths.manual_intakes}.get(self.sim_type)
         self.intakes_only = (self.sim_type != 'eco')
         # Get reaches and regions to be processed if not running eco
         # Intake files must contain 'comid' and 'region' fields
@@ -272,30 +267,115 @@ class Simulation(DateManager):
         return intakes, run_regions, intake_reaches
 
 
+class InputDict(dict):
+    """ Processes the input string from the front end into a form usable by tool """
+
+    # TODO - combine this into Simulation?  clean it up
+    def __init__(self, pd_obj, endpoint_format_path, fields):
+
+        # Unpack JSON string into dictionary
+        # TODO - Taking a dict at the moment, will need json
+        super(InputDict, self).__init__((k, v['0']) for k, v in pd_obj.items())
+        self.fields = fields
+        self.endpoint_format = pd.read_csv(endpoint_format_path)
+        self['applications'] = self.process_applications()
+        self['endpoints'] = self.process_endpoints()
+        self['sim_date_start'], self['sim_date_end'] = self.process_dates()
+        self['crops'] = set(self['applications'].crop)
+
+        self.coerce_data_type()
+        self.check_fields()
+
+    def check_fields(self):
+
+        # Check if any required input data are missing or extraneous data are provided
+        provided_fields = set(self.keys())
+        required_fields = set(self.fields.fetch('input_param')) | {'applications', 'endpoints'}
+        unknown_fields = provided_fields - required_fields
+        missing_fields = required_fields - provided_fields
+        if unknown_fields:
+            report("Input field(s) \"{}\" not understood".format(", ".join(unknown_fields)))
+        assert not missing_fields, "Required input field(s) \"{}\" not provided".format(", ".join(missing_fields))
+
+    def coerce_data_type(self):
+        _, data_types = self.fields.fetch('input_param', dtypes=True)
+        for field, data_type in data_types.items():
+            if data_type != object:
+                self[field] = data_type(self[field])
+
+    def process_applications(self):
+        # TODO - I'm sure this can be cleaned up drastically
+        # Get fields and field types
+        app_fields, data_types = self.fields.fetch('applications', dtypes=True)
+
+        # Populate matrix
+        matrix = []
+        for app_num in range(1, int(self['napps']) + 1):
+            crops = self[f"crop_{app_num}"].split(" ")
+            for crop in crops:
+                row = []
+                for field in app_fields:
+                    if field == 'crop':
+                        val = crop
+                    else:
+                        val = self[f"{field}_{app_num}"]
+                    dtype = data_types[field]
+                    if dtype != object:
+                        val = dtype(val)
+                    row.append(val)
+                matrix.append(row)
+            for field in app_fields:
+                del self[f"{field}_{app_num}"]
+
+        applications = pd.DataFrame(matrix, columns=self.fields.fetch('applications'))
+
+        # Create a float array of the applications table for faster use
+        for i, row in applications.iterrows():
+            applications.loc[i, 'event'] = ['plant', 'harvest', 'maxcover', 'harvest'].index(row.event)
+            applications.loc[i, 'dist'] = ['canopy', 'ground'].index(row.dist)
+            applications.loc[i, 'method'] = ['uniform', 'step'].index(row.method)
+        return applications.astype(np.float32)
+
+    def process_dates(self):
+        date_format = lambda x: np.datetime64("{2}-{0}-{1}".format(*x.split("/")))
+        return map(date_format, (self['sim_date_start'], self['sim_date_end']))
+
+    def process_endpoints(self):
+        # TODO - this can probably be cleaned up
+        endpoints = []
+        for level in ('acute', 'chronic', 'overall'):
+            endpoints.append([self.pop("{}_{}".format(level, species), np.nan)
+                              for species in self.endpoint_format.species])
+        endpoints = np.array(endpoints)
+        endpoints[endpoints == ''] = np.nan
+        endpoints = pd.DataFrame(endpoints.T, columns=('acute_tox', 'chronic_tox', 'overall_tox'))
+        return pd.concat([self.endpoint_format, endpoints], axis=1)
+
+
 class ModelOutputs(DateManager):
-    def __init__(self, i, output_reaches, start_date, end_date):
-        self.input = i
-        self.output_dir = os.path.join(output_path, i.token)
+    def __init__(self, sim, output_reaches, start_date, end_date):
+        self.sim = sim
+        self.output_dir = os.path.join(sim.paths.output_path, sim.token)
         self.output_reaches = output_reaches
-        self.array_path = os.path.join(scratch_path, "model_out")
+        self.array_path = os.path.join(sim.paths.scratch_path, "model_out")
         DateManager.__init__(self, start_date, end_date)
 
         # Initialize output JSON dict
         self.json_output = {}
 
         # Initialize output matrices
-        self.output_fields = fields.fetch("time_series_compact" if compact_out else "time_series")
+        self.output_fields = sim.fields.fetch("time_series_compact" if compact_out else "time_series")
         self.time_series = MemoryMatrix([self.output_reaches, self.output_fields, self.n_dates],
                                         name='output time series', path=self.array_path + "_ts")
 
         # Initialize exceedances matrix: the probability that concentration exceeds endpoint thresholds
-        self.exceedances = MemoryMatrix([self.output_reaches, self.input.endpoints.shape[0], 3], name='exceedance',
+        self.exceedances = MemoryMatrix([self.output_reaches, self.sim.endpoints.shape[0], 3], name='exceedance',
                                         path=self.array_path + "_ex")
 
         # Initialize contributions matrix: loading data broken down by crop and runoff v. erosion source
-        self.contributions = MemoryMatrix([2, self.output_reaches, self.input.crops], name='contributions',
+        self.contributions = MemoryMatrix([2, self.output_reaches, self.sim.crops], name='contributions',
                                           path=self.array_path + "_cn")
-        self.contributions.columns = self.input.crops
+        self.contributions.columns = self.sim.crops
         self.contributions.header = ["cls" + str(c) for c in self.contributions.columns]
 
     def update_contributions(self, recipe_id, scenario_names, loads):
@@ -311,9 +391,9 @@ class ModelOutputs(DateManager):
 
         # Extract exceedance durations and corresponding thresholds from endpoints table
         durations = \
-            np.int16(self.input.endpoints[['acute_duration', 'chronic_duration', 'overall_duration']].values)
+            np.int16(self.sim.endpoints[['acute_duration', 'chronic_duration', 'overall_duration']].values)
         thresholds = \
-            np.int16(self.input.endpoints[['acute_tox', 'chronic_tox', 'overall_tox']].values)
+            np.float32(self.sim.endpoints[['acute_tox', 'chronic_tox', 'overall_tox']].values)
 
         # Calculate excedance probabilities
         exceed = exceedance_probability(concentration, durations.flatten(), thresholds.flatten(), self.year_index)
@@ -327,13 +407,13 @@ class ModelOutputs(DateManager):
     def write_json(self, write_exceedances=False, write_contributions=False):
 
         json.encoder.FLOAT_REPR = lambda o: format(o, '.4f')
-        out_file = os.path.join(self.output_dir, "{}_json.csv".format(self.input.chemical_name))
+        out_file = os.path.join(self.output_dir, "{}_json.csv".format(self.sim.chemical_name))
         self.json_output = {"COMID": {}}
         for recipe_id in self.output_reaches:
             self.json_output["COMID"][str(recipe_id)] = {}
             if write_exceedances:
                 labels = ["{}_{}".format(species, level)
-                          for species in self.input.endpoints.species for level in ('acute', 'chronic', 'overall')]
+                          for species in self.sim.endpoints.species for level in ('acute', 'chronic', 'overall')]
                 exceedance_dict = dict(zip(labels, np.float64(self.exceedances.fetch(recipe_id)).flatten()))
                 self.json_output["COMID"][str(recipe_id)].update(exceedance_dict)
             if write_contributions:
@@ -354,7 +434,7 @@ class ModelOutputs(DateManager):
             os.makedirs(self.output_dir)
 
         # Write JSON output
-        self.write_json(output_params.write_exceedances, output_params.write_contributions)
+        self.write_json(self.sim.output.write_exceedances, self.sim.output.write_contributions)
 
         # Write time series
         if self.write_time_series:
@@ -369,14 +449,16 @@ class ModelOutputs(DateManager):
 
 
 class ReachManager(DateManager, MemoryMatrix):
-    def __init__(self, s2_scenarios, s3_scenarios, recipes, region, output, progress_interval=10000):
+    def __init__(self, sim, s2_scenarios, s3_scenarios, recipes, region, output, progress_interval=10000):
         self.output = output
+        self.sim = sim
         self.s2 = s2_scenarios
         self.s3 = s3_scenarios  # stage 3
         self.recipes = recipes
         self.region = region
         self.progress_interval = progress_interval
-        self.array_path = os.path.join(scratch_path, "_reach_mgr{}".format(self.s2.region))
+        self.array_path = os.path.join(sim.paths.scratch_path, "_reach_mgr{}".format(self.s2.region))
+        self.i = sim
 
         # Initialize dates
         DateManager.__init__(self, s3_scenarios.start_date, s3_scenarios.end_date)
@@ -399,7 +481,7 @@ class ReachManager(DateManager, MemoryMatrix):
 
         # Modify combined time series to reflect lake
         new_mass = np.convolve(total_mass, irf)[:self.n_dates]
-        if hydrology_params.convolve_runoff:  # Convolve runoff
+        if self.sim.hydrology.convolve_runoff:  # Convolve runoff
             new_runoff = np.convolve(total_runoff, irf)[:self.n_dates]
         else:  # Flatten runoff
             new_runoff = np.repeat(np.mean(total_runoff), self.n_dates)
@@ -411,14 +493,14 @@ class ReachManager(DateManager, MemoryMatrix):
         self.update(lake.outlet_comid, np.array([new_runoff, new_mass, erosion, erosion_mass]))
 
     def burn_batch(self, lakes):
-        if local_run:
+        if self.sim.local_run:
             for _, lake in lakes.iterrows():
                 self.burn(lake)
         else:
             batch = []
             for _, lake in lakes.iterrows():
-                batch.append(dask_client.submit(self.burn, lake))
-            dask_client.gather(batch)
+                batch.append(self.sim.dask_client.submit(self.burn, lake))
+            self.sim.dask_client.gather(batch)
 
     def process_local(self, reach_id, year, verbose=False):
         """  Fetch all scenarios and multiply by area. For erosion, area is adjusted. """
@@ -450,14 +532,14 @@ class ReachManager(DateManager, MemoryMatrix):
             report("No scenarios found for {}".format(reach_id))
 
     def process_local_batch(self, reach_ids, year):
-        if local_run:
+        if self.sim.local_run:
             for reach_id in reach_ids:
                 self.process_local(reach_id, year)
         else:
             batch = []
             for reach_id in reach_ids:
-                batch.append(dask_client.submit(self.process_local, reach_id, year))
-            dask_client.gather(batch)
+                batch.append(self.sim.dask_client.submit(self.process_local, reach_id, year))
+            self.sim.dask_client.gather(batch)
 
     def report(self, reach_id):
         # Get flow values for reach
@@ -473,7 +555,8 @@ class ReachManager(DateManager, MemoryMatrix):
         surface_area = self.region.flow_table(reach_id)['surface_area']
         total_flow, (concentration, runoff_conc) = \
             compute_concentration(upstream_runoff_mass, upstream_runoff, self.n_dates, flow)
-        benthic_conc = partition_benthic(local_erosion, local_erosion_mass, surface_area)
+        benthic_conc = partition_benthic(local_erosion, local_erosion_mass, surface_area,
+                                         self.sim.benthic.depth, self.sim.benthic.porosity)
 
         # Store results in output array
         self.output.update_exceedances(reach_id, concentration)
@@ -502,10 +585,9 @@ class ReachManager(DateManager, MemoryMatrix):
 
             # Stagger time series by dayshed
             for tank in range(np.max(reach_times) + 1):
-                tank_array = reach_array[reach_times == tank]
                 in_tank = reach_array[reach_times == tank].sum(axis=0)
                 if tank > 0:
-                    if hydrology_params.gamma_convolve:
+                    if self.sim.hydrology.gamma_convolve:
                         irf = self.region.irf.fetch(tank)  # Get the convolution function
                         in_tank[0] = np.convolve(in_tank[0], irf)[:self.n_dates]  # mass
                         in_tank[1] = np.convolve(in_tank[1], irf)[:self.n_dates]  # runoff
@@ -523,8 +605,8 @@ class ReachManager(DateManager, MemoryMatrix):
 
 
 class WatershedRecipes(object):
-    def __init__(self, region):
-        self.path = recipe_path.format(region)
+    def __init__(self, region, sim):
+        self.path = sim.paths.recipes.format(region)
 
         # Read shape
         with open(f"{self.path}_key.txt") as f:
@@ -559,10 +641,10 @@ class WatershedRecipes(object):
 
 
 class WeatherArray(MemoryMatrix, DateManager):
-    def __init__(self):
+    def __init__(self, sim):
         # TODO - sync this class with opp-efed-weather
-        array_path = weather_path.format('array.dat')
-        key_path = weather_path.format('key.npz')
+        array_path = sim.paths.weather.format('array.dat')
+        key_path = sim.paths.weather.format('key.npz')
 
         # Set row/column offsets
         index, header, start_date, end_date = self.load_key(key_path)

@@ -1,13 +1,14 @@
 import numpy as np
 from numba import njit, guvectorize
-from .parameters import benthic_params
+
 
 def compute_concentration(transported_mass, runoff, n_dates, q):
     """
     Calculates pesticide concentration in water column from runoff inputs, accounting for time of travel
     Need to add references: VVWM (for basics), SAM write-up on time of travel
     """
-
+    print(transported_mass.shape, runoff.shape, n_dates)
+    print(q.shape)
     mean_runoff = runoff.mean()  # m3/d
     baseflow = np.subtract(q, mean_runoff, out=np.zeros(n_dates), where=(q > mean_runoff))
     total_flow = runoff + baseflow
@@ -16,11 +17,11 @@ def compute_concentration(transported_mass, runoff, n_dates, q):
     return total_flow, map(lambda x: x * 1000000., (concentration, runoff_concentration))  # kg/m3 -> ug/L
 
 
-def partition_benthic(erosion, erosion_mass, surface_area):
+def partition_benthic(erosion, erosion_mass, surface_area, benthic_depth, benthic_porosity):
     """ Compute concentration in the benthic layer based on mass of eroded sediment """
 
-    soil_volume = benthic_params.depth * surface_area
-    pore_water_volume = soil_volume * benthic_params.porosity
+    soil_volume = benthic_depth * surface_area
+    pore_water_volume = soil_volume * benthic_porosity
     benthic_mass = benthic_loop(erosion, erosion_mass, soil_volume)
     return benthic_mass / pore_water_volume
 
@@ -35,14 +36,14 @@ def benthic_loop(eroded_soil, erosion_mass, soil_volume):
     return benthic_mass
 
 
-@guvectorize(['void(float64[:], int16[:], int16[:], int16[:], float64[:])'], '(p),(o),(o),(p)->(o)')
+@guvectorize(['void(float64[:], int16[:], float64[:], int16[:], float64[:])'], '(p),(o),(o),(p)->(o)')
 def exceedance_probability(time_series, window_sizes, thresholds, years_since_start, res):
     # Count the number of times the concentration exceeds the test threshold in each year
     n_years = years_since_start.max()
     for test_number in range(window_sizes.size):
         window_size = window_sizes[test_number]
         threshold = thresholds[test_number]
-        if threshold == 0:
+        if np.isnan(threshold):
             res[test_number] = -1
         else:
             window_sum = np.sum(time_series[:window_size])
