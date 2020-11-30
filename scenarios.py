@@ -278,7 +278,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                               dtype=np.float32, path=self.array_path, persistent_read=True, persistent_write=True)
 
         report(f"Building Stage 3 scenarios...")
-        #self.build_from_stage_two()
+        self.build_from_stage_two()
 
     def build_from_stage_two(self):
         # TODO - can the dask allocation part of this be put into a function or wrapper?
