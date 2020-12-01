@@ -56,13 +56,14 @@ class SamPostprocessor(object):
     def calc_huc_summary(self):
         path_to_csv = paths.nhd_wbd_xwalk
         try:
-            huc_comid = pd.read_csv(path_to_csv)[['FEATUREID', 'HUC_12']]\
+            huc_comid = pd.read_csv(path_to_csv, dtype=object)[['FEATUREID', 'HUC_12']]\
                 .rename(columns={"FEATURE_ID": "COMID"})
+            print("all good")
             print(huc_comid)
         except Exception as e:
+            print("999 errror")
             print(e)
 
-        print(self.sam_data.keys())
         data = pd.DataFrame(self.sam_data, dtype=object)
         data['COMID'] = data['COMID'].astype(str)
         data = data.merge(huc_comid, on="COMID")
