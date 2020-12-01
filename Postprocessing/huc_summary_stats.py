@@ -57,7 +57,7 @@ class SamPostprocessor(object):
         path_to_csv = paths.nhd_wbd_xwalk
         try:
             huc_comid = pd.read_csv(path_to_csv, dtype=object)[['FEATUREID', 'HUC_12']]\
-                .rename(columns={"FEATURE_ID": "COMID"})
+                .rename(columns={"FEATUREID": "COMID"})
             print("all good")
             print(huc_comid)
         except Exception as e:
