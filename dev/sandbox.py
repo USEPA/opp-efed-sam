@@ -135,3 +135,6 @@ d = {
 }
 
 print(d)
+
+e = str(d)
+print(e)
