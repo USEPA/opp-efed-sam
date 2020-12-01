@@ -60,15 +60,10 @@ class SamPostprocessor(object):
         except Exception as e:
             print(e)
         print(type(self.sam_data))
-        sam_properties = [x["properties"] for x in self.sam_data['features']]
-        data = pd.DataFrame(sam_properties, dtype=object)
+        print(self.sam_data.keys())
+        data = pd.DataFrame(self.sam_data, dtype=object)
         data['COMID'] = data['COMID'].astype(str)
-        huc_comid = huc_comid\
-            .astype(str)
-        huc_comid['HUC_12'] = huc_comid['HUC_12']
-        huc_comid[["HUC12", "COMID"]] = huc_comid[["HUC12", "COMID"]].astype(str)
-        huc_comid['HUC12'] = huc_comid['HUC12'].apply(replace_leading_0)
-        data = data.merge(huc_comid[["COMID", "HUC12"]], on="COMID")
+        data = data.merge(huc_comid, on="COMID")
         data["HUC8"] = data["HUC12"].str.slice(0, 8)
         self.calc_huc8(data)
         self.calc_huc12(data)
