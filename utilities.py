@@ -541,7 +541,9 @@ class ReachManager(DateManager, MemoryMatrix):
             batch = []
             for reach_id in reach_ids:
                 batch.append(self.sim.dask_client.submit(process_local, reach_id, year, self.recipes, self.s2, self.s3))
-            self.sim.dask_client.gather(batch)
+            results = self.sim.dask_client.gather(batch)
+            for reach_id, out_array in zip(reach_ids, results):
+                self.update(reach_id, out_array)
 
     def report(self, reach_id):
         # Get flow values for reach
