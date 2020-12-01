@@ -61,7 +61,7 @@ class SamPostprocessor(object):
             print(huc_comid)
         except Exception as e:
             print(e)
-        print(type(self.sam_data))
+
         print(self.sam_data.keys())
         data = pd.DataFrame(self.sam_data, dtype=object)
         data['COMID'] = data['COMID'].astype(str)

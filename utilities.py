@@ -423,7 +423,7 @@ class ModelOutputs(DateManager):
                     contribution_dict = dict(zip(labels, np.float64(contributions[i])))
                     self.json_output["COMID"][str(recipe_id)].update(contribution_dict)
 
-        self.json_output = json.dumps(dict(self.json_output), sort_keys=True, indent=4, separators=(',', ': '))
+        #self.json_output = json.dumps(dict(self.json_output), sort_keys=True, indent=4, separators=(',', ': '))
         with open(out_file, 'w') as f:
             f.write(self.json_output)
 
