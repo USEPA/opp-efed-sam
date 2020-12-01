@@ -46,8 +46,10 @@ class SamPostprocessor(object):
         mongo_db = self.connect_to_mongoDB()
         posts = mongo_db.posts
         db_record = posts.find_one({'_id': self.task_id})
+        print(123, db_record)
         print("Run status:" + self.status)
         data = json.loads(db_record["data"])
+        print(456, data)
         self.sam_data = data
         return
 
