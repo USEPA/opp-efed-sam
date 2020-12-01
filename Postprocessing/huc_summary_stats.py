@@ -3,9 +3,10 @@ import pymongo as pymongo
 import json
 import pandas as pd
 import os
-import numpy as np
 
-import requests
+from ..paths import PathManager
+
+paths = PathManager()
 
 # from flask_qed.pram_flask.tasks import sam_status
 # from pram_flask.tasks import sam_status
@@ -51,18 +52,20 @@ class SamPostprocessor(object):
         return
 
     def calc_huc_summary(self):
-        print(self.sam_data)
-        path_to_csv = os.path.join(os.path.dirname(__file__), 'HUC12_comids.csv')
-        print(path_to_csv)
+        path_to_csv = paths.nhd_wbd_xwalk
         try:
-            huc_comid = pd.read_csv(path_to_csv)
+            huc_comid = pd.read_csv(path_to_csv)[['FEATUREID', 'HUC_12']]\
+                .rename(columns={"FEATURE_ID": "COMID"})
             print(huc_comid)
         except Exception as e:
             print(e)
+        print(type(self.sam_data))
         sam_properties = [x["properties"] for x in self.sam_data['features']]
-        data = pd.DataFrame(sam_properties)
+        data = pd.DataFrame(sam_properties, dtype=object)
         data['COMID'] = data['COMID'].astype(str)
-
+        huc_comid = huc_comid\
+            .astype(str)
+        huc_comid['HUC_12'] = huc_comid['HUC_12']
         huc_comid[["HUC12", "COMID"]] = huc_comid[["HUC12", "COMID"]].astype(str)
         huc_comid['HUC12'] = huc_comid['HUC12'].apply(replace_leading_0)
         data = data.merge(huc_comid[["COMID", "HUC12"]], on="COMID")

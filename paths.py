@@ -23,6 +23,7 @@ class PathManager(object):
         self.dw_intakes = os.path.join(self.input_path, "Intakes", "intake_locations.csv")
         self.manual_intakes = os.path.join(self.input_path, "Intakes", "mtb_single_intake.csv")
         self.navigator = os.path.join(self.input_path, "NavigatorFiles", "nav{}.npz")  # region
+        self.nhd_wbd_xwalk = os.path.join(self.input_path, "NHD_HUC_Crosswalk", "CrosswalkTable_NHDplus_HU12.csv")
 
         # Intermediate data
         self.s2_scenarios = os.path.join(self.intermediate_path, "StageTwoScenarios", "r{}")  # region
@@ -34,6 +35,8 @@ class PathManager(object):
         self.sam_nhd_map = os.path.join(self.table_path, "nhd_map_sam.csv")
         self.endpoint_format = os.path.join(self.table_path, "endpoint_format.csv")
 
+
     @property
     def local_run(self):
         return any([r'C:' in p for p in sys.path])
+

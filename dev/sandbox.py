@@ -1,40 +1,10 @@
-{"csrfmiddlewaretoken": "7058a0db-d366-45d1-9f0b-01efc51248f5",
- "simulation_name": "Mark Twain Atrazine 062217",
- "chemical_name": "Custom",
- "kd_flag": "1.0",
- "koc": "75.0",
- "soil_hl": "139.0",
- "wc_metabolism_hl": "277.0",
- "ben_metabolism_hl": "277.0",
- "aq_photolysis_hl": "168.0",
- "hydrolysis_hl": "0.0",
- "napps": "1.0",
- "crop_1": "10 14 15 18",
- "event_1": "plant",
- "offset_1": "0.0",
- "dist_1": "ground",
- "window1_1": "7.0",
- "pct1_1": "100.0",
- "window2_1": "7.0",
- "pct2_1": "100.0",
- "method_1": "uniform",
- "apprate_1": "1.0",
- "effic_1": "1.0",
- "region": "Mark Twain Demo",
- "sim_type": "eco",
- "sim_date_start": "01/01/2000",
- "sim_date_end": "12/31/2015",
- "acute_human": "3.4",
- "chronic_human": "overall_human",
- "acute_fw_fish": "2650.0",
- "chronic_fw_fish": "0.5",
- "acute_fw_inv": "360.0",
- "chronic_fw_inv": "60.0",
- "acute_em_fish": "1000.0",
- "chronic_em_fish": "0.5",
- "acute_em_inv": "24.0",
- "chronic_em_inv": "80.0",
- "acute_nonvasc_plant": "1.0",
- "chronic_nonvasc_plant": "",
- "acute_vasc_plant": "4.6",
- "chronic_vasc_plant": ""}
+import pandas as pd
+
+print("loading")
+
+table = pd.read_csv(r"E:\opp-efed-data\global\NHD_HUC_Crosswalk\CrosswalkTable_NHDplus_HU12.csv")
+
+print("loaded")
+table = table.sort_values('FEATUREID')
+table['HUC_12'] = table['HUC_12'].astype(str).str.zfill(12)
+table.to_csv(r"E:\opp-efed-data\global\NHD_HUC_Crosswalk\CrosswalkTable_NHDplus_HU12.csv", index=None)
