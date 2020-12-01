@@ -533,14 +533,14 @@ class ReachManager(DateManager, MemoryMatrix):
             report("No scenarios found for {}".format(reach_id))
 
     def process_local_batch(self, reach_ids, year):
-        if True or self.sim.local_run:
+        if self.sim.local_run:
             for reach_id in reach_ids:
                 self.process_local(reach_id, year)
         else:
             # TODO - this doesn't work yet. Dask doesn't seem to like the async call on a self. function
             batch = []
             for reach_id in reach_ids:
-                batch.append(self.sim.dask_client.submit(self.process_local, reach_id, year))
+                batch.append(self.sim.dask_client.submit(process_local, reach_id, year, self.recipes, self.s2, self.s3))
             self.sim.dask_client.gather(batch)
 
     def report(self, reach_id):
@@ -674,3 +674,36 @@ class WeatherArray(MemoryMatrix, DateManager):
         data = self.fetch(station_id, copy=True, verbose=True).T
         data[:2] /= 100.  # Precip, PET  cm -> m
         return data[:, self.start_offset:self.end_offset]
+
+
+def process_local(reach_id, year, recipes, s2, s3, verbose=False):
+    """  Fetch all scenarios and multiply by area. For erosion, area is adjusted. """
+
+    def weight_and_combine(time_series, areas):
+        areas = areas.values
+        time_series = np.moveaxis(time_series, 0, 2)  # (scenarios, vars, dates) -> (vars, dates, scenarios)
+        time_series[0] *= areas
+        time_series[1] *= np.power(areas / 10000., .12)
+        return time_series.sum(axis=2)
+
+    # JCH - this pulls up a table of ['scenario_index', 'area'] index is used here to keep recipe files small
+    recipe = recipes.fetch(reach_id, year)  # recipe is indexed by scenario_index
+    if not recipe.empty:
+        # Pull runoff and erosion from Stage 2 Scenarios
+        transport, found_s2 = s2.fetch_from_recipe(recipe)
+        runoff, erosion = weight_and_combine(transport, found_s2.area)
+
+        # Pull chemical mass from Stage 3 scenarios
+        pesticide_mass, found_s3 = s3.fetch_from_recipe(recipe, verbose=False)
+        runoff_mass, erosion_mass = weight_and_combine(pesticide_mass, found_s3.area)
+        out_array = np.array([runoff, runoff_mass, erosion, erosion_mass])
+
+        # Assess the contributions to the recipe from ach source (runoff/erosion) and crop
+        # self.o.update_contributions(recipe_id, scenarios, time_series[[1, 3]].sum(axis=1))
+
+    else:
+        out_array = None
+        if verbose:
+            report("No scenarios found for {}".format(reach_id))
+
+    return out_array

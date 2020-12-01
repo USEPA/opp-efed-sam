@@ -46,24 +46,14 @@ class SamPostprocessor(object):
         mongo_db = self.connect_to_mongoDB()
         posts = mongo_db.posts
         db_record = posts.find_one({'_id': self.task_id})
-        print(123, db_record)
         print("Run status:" + self.status)
         data = json.loads(db_record["data"])
-        print(456, data)
         self.sam_data = data
         return
 
     def calc_huc_summary(self):
-        path_to_csv = paths.nhd_wbd_xwalk
-        try:
-            huc_comid = pd.read_csv(path_to_csv, dtype=object)[['FEATUREID', 'HUC_12']]\
-                .rename(columns={"FEATUREID": "COMID"})
-            print("all good")
-            print(huc_comid)
-        except Exception as e:
-            print("999 errror")
-            print(e)
-
+        huc_comid = pd.read_csv(paths.nhd_wbd_xwalk, dtype=object)[['FEATUREID', 'HUC_12']]\
+            .rename(columns={"FEATUREID": "COMID"})
         data = pd.DataFrame(self.sam_data, dtype=object)
         data['COMID'] = data['COMID'].astype(str)
         data = data.merge(huc_comid, on="COMID")
@@ -99,11 +89,3 @@ class SamPostprocessor(object):
                                                           'huc12_summary': self.huc12_summary.to_json(orient='index')}})
         return
 
-
-def replace_leading_0(huc_str):
-    if len(huc_str) == 12:
-        return huc_str
-    elif len(huc_str) == 11:
-        return '0' + huc_str
-    else:
-        raise NameError('Number that is neither 12 digits nor 11 digits!')
