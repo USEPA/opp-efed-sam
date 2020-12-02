@@ -9,7 +9,7 @@ class ReachManager(DateManager, MemoryMatrix):
     def __init__(self, sim, s3_scenarios, region, year):
         self.region = region
         self.year = year
-        self.path = os.path.join(sim.paths.scratch_path, "_reach_mgr{}".format(self.s2.region))
+        self.path = os.path.join(sim.paths.scratch_path, "_reach_mgr{}".format(s3_scenarios.region))
 
         # Initialize dates
         DateManager.__init__(self, s3_scenarios.start_date, s3_scenarios.end_date)
