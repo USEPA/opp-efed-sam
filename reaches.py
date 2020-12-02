@@ -40,7 +40,7 @@ def burn_batch(reaches, sim, region, lakes):
 
 
 def test(a, b):
-    return 4
+    return a + b
 
 
 def process_local_batch(reaches, reach_ids, recipes, s2, s3, sim, year):
