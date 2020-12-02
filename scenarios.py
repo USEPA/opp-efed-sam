@@ -265,8 +265,9 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
 class StageThreeScenarios(DateManager, MemoryMatrix):
     def __init__(self, sim, stage_two):
         self.s2 = stage_two
+        self.region = self.s2.region
         self.sim = sim
-        self.array_path = sim.paths.s3_scenarios.format(self.s2.region)
+        self.array_path = sim.paths.s3_scenarios.format(self.region)
         self.scenario_vars, self.lookup = self.select_scenarios(self.sim.crops)
 
         # Set dates
