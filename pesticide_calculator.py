@@ -29,7 +29,7 @@ def pesticide_calculator(input_data):
         region = HydroRegion(region_id, sim)
 
         # Initialize output object
-        outputs = ModelOutputs(sim, region.full_reaches, stage_two.start_date, stage_two.end_date)
+        outputs = ModelOutputs(sim, region)
 
         # Initialize objects to hold results by stream reach and reservoir
         reaches = ReachManager(sim, stage_two, stage_three, recipes, region, outputs)

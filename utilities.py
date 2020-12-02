@@ -353,13 +353,13 @@ class InputDict(dict):
 
 
 class ModelOutputs(DateManager):
-    def __init__(self, sim, partial_reaches, full_reaches, start_date, end_date):
+    def __init__(self, sim, region):
         self.sim = sim
         self.output_dir = os.path.join(sim.paths.output_path, sim.token)
-        self.partial_reaches = partial_reaches
-        self.full_reaches = full_reaches
+        self.partial_reaches = region.partial_reaches
+        self.full_reaches = region.full_reaches
         self.array_path = os.path.join(sim.paths.scratch_path, "model_out")
-        DateManager.__init__(self, start_date, end_date)
+        DateManager.__init__(self, sim.start_date, sim.end_date)
 
         # Initialize output JSON dict
         self.json_output = {}
