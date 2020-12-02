@@ -366,7 +366,7 @@ class ModelOutputs(DateManager):
 
         # Initialize time series output array
         self.output_fields = sim.fields.fetch("time_series_compact" if compact_out else "time_series")
-        self.time_series = MemoryMatrix([self.output_reaches, self.output_fields, self.n_dates],
+        self.time_series = MemoryMatrix([self.full_reaches, self.output_fields, self.n_dates],
                                         name='output time series', path=self.array_path + "_ts")
 
         # Initialize exceedances matrix: the probability that concentration exceeds endpoint thresholds
@@ -442,7 +442,7 @@ class ModelOutputs(DateManager):
             self.write_time_series()
 
     def write_time_series(self):
-        for recipe_id in self.output_reaches:
+        for recipe_id in self.full_reaches:
             out_file = os.path.join(self.output_dir, "time_series_{}.csv".format(recipe_id))
             out_data = self.time_series.fetch(recipe_id).T
             df = pd.DataFrame(data=out_data, index=self.dates, columns=self.output_fields)
