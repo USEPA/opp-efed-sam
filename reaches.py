@@ -38,8 +38,18 @@ def burn_batch(reaches, sim, region, lakes):
         for outlet_comid, out_array in zip(lakes.outlet_comid, results):
             reaches.update(outlet_comid, out_array)
 
+def test(a, b):
+    return a + b
 
 def process_local_batch(reaches, reach_ids, recipes, s2, s3, sim, year):
+    dask_client = sim.dask_client
+    batch = []
+    for i, reach_id in enumerate(reach_ids):
+        batch.append(dask_client.submit(test, i, 10))
+    results = dask_client.gather(batch)
+    print(results)
+    exit()
+def process_local_batch_actual(reaches, reach_ids, recipes, s2, s3, sim, year):
     dask_client = sim.dask_client
     if sim.local_run:
         for reach_id in reach_ids:
