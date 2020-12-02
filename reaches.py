@@ -47,14 +47,13 @@ def test(a, b, s2, s3):
 
 def process_local_batch(reaches, reach_ids, recipes, s2, s3, sim, year):
     dask_client = sim.dask_client
-
     if sim.local_run:
         print("No way!")
     else:
         batch = []
         for i, reach_id in enumerate(reach_ids):
             print(reach_id)
-            batch.append(dask_client.submit(test, i, 10))
+            batch.append(dask_client.submit(test, i, 10, s2, s3))
     print("done and now?")
     results = dask_client.gather(batch)
     print(results)
@@ -121,7 +120,7 @@ def weight_and_combine(time_series, areas):
     return time_series.sum(axis=2)
 
 
-def process_local(reach_id, year, recipes, s2, s3, verbose=False):
+def process_local(reach_id, year, recipes, s2, s3):
     """  Fetch all scenarios and multiply by area. For erosion, area is adjusted. """
 
     # JCH - this pulls up a table of ['scenario_index', 'area'] index is used here to keep recipe files small
