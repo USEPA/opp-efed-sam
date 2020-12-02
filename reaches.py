@@ -25,6 +25,7 @@ class ReachManager(DateManager, MemoryMatrix):
 
 def burn_batch(reaches, sim, region, lakes):
     convolve_runoff = sim.hydrology.convolve_runoff
+    dask_client = sim.dask_client
     if sim.local_run:
         for _, lake in lakes.iterrows():
             out_array = burn(reaches, lake, sim, region, convolve_runoff)
@@ -32,13 +33,14 @@ def burn_batch(reaches, sim, region, lakes):
     else:
         batch = []
         for _, lake in lakes.iterrows():
-            batch.append(sim.dask_client.submit(burn, reaches, lake, sim, region, convolve_runoff))
+            batch.append(dask_client.submit(burn, reaches, lake, sim, region, convolve_runoff))
         results = sim.dask_client.gather(batch)
         for outlet_comid, out_array in zip(lakes.outlet_comid, results):
             reaches.update(outlet_comid, out_array)
 
 
 def process_local_batch(reaches, reach_ids, recipes, s2, s3, sim, year):
+    dask_client = sim.dask_client
     if sim.local_run:
         for reach_id in reach_ids:
             out_array = process_local(reach_id, year, recipes, s2, s3)
@@ -46,13 +48,14 @@ def process_local_batch(reaches, reach_ids, recipes, s2, s3, sim, year):
     else:
         batch = []
         for reach_id in reach_ids:
-            batch.append(sim.dask_client.submit(process_local, reach_id, year, recipes, s2, s3))
-        results = sim.dask_client.gather(batch)
+            batch.append(dask_client.submit(process_local, reach_id, year, recipes, s2, s3))
+        results = dask_client.gather(batch)
         for reach_id, out_array in zip(reach_ids, results):
             reaches.update(reach_id, out_array)
 
 
 def process_full_batch(reaches, reach_ids, sim, region):
+    dask_client = sim.dask_client
     reach_ids &= set(region.output_reaches)
     if sim.local_run:
         for reach_id in reach_ids:
@@ -61,7 +64,7 @@ def process_full_batch(reaches, reach_ids, sim, region):
     else:
         batch = []
         for reach_id in reach_ids:
-            batch.append(sim.dask_client.submit(process_full, reaches, reach_id, sim, region))
+            batch.append(dask_client.submit(process_full, reaches, reach_id, sim, region))
         results = sim.dask_client.gather(batch)
         for reach_id, out_array in zip(reach_ids, results):
             reaches.update(reach_id, out_array)
