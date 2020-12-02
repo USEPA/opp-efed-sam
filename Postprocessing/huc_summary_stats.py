@@ -55,21 +55,16 @@ class SamPostprocessor(object):
 
     def calc_huc_summary(self):
         path_to_csv = paths.nhd_wbd_xwalk
-        try:
-            huc_comid = pd.read_csv(path_to_csv, dtype=object)[['FEATUREID', 'HUC_12']]\
-                .rename(columns={"FEATUREID": "COMID"})
-            print("all good")
-            print(huc_comid)
-        except Exception as e:
-            print("999 errror")
-            print(e)
-
+        huc_comid = pd.read_csv(path_to_csv, dtype=object)[['FEATUREID', 'HUC_12']]\
+            .rename(columns={"FEATUREID": "COMID"})
         data = pd.DataFrame(self.sam_data, dtype=object)
         data['COMID'] = data['COMID'].astype(str)
         data = data.merge(huc_comid, on="COMID")
         data["HUC_8"] = data["HUC_12"].str.slice(0, 8)
         self.calc_huc8(data)
         self.calc_huc12(data)
+        print(self.huc8_summary.head())
+        print(self.huc12_summary.head())
         return
 
     def calc_huc8(self, data):
