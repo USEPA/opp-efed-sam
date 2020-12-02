@@ -45,7 +45,9 @@ def process_local_batch(reaches, reach_ids, recipes, s2, s3, sim, year):
     dask_client = sim.dask_client
     batch = []
     for i, reach_id in enumerate(reach_ids):
+        print(reach_id)
         batch.append(dask_client.submit(test, i, 10))
+    print("done and now?")
     results = dask_client.gather(batch)
     print(results)
     exit()
