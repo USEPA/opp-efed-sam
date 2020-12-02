@@ -46,10 +46,8 @@ class SamPostprocessor(object):
         mongo_db = self.connect_to_mongoDB()
         posts = mongo_db.posts
         db_record = posts.find_one({'_id': self.task_id})
-        print(123, db_record)
         print("Run status:" + self.status)
         data = json.loads(db_record["data"])
-        print(456, data)
         self.sam_data = data
         return
 
@@ -63,8 +61,8 @@ class SamPostprocessor(object):
         data["HUC_8"] = data["HUC_12"].str.slice(0, 8)
         self.calc_huc8(data)
         self.calc_huc12(data)
-        print(self.huc8_summary.head())
-        print(self.huc12_summary.head())
+        print(789, self.huc8_summary.head())
+        print(101112, self.huc12_summary.head())
         return
 
     def calc_huc8(self, data):

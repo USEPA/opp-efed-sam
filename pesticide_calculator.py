@@ -23,13 +23,13 @@ def pesticide_calculator(input_data):
         stage_two = StageTwoScenarios(region_id, sim, stage_one, met, tag='mtb', build=False)
 
         # Initialize Stage 3 scenarios (time series of chemical transport data e.g., runoff mass, erosion mass)
-        stage_three = StageThreeScenarios(sim, stage_two)
+        stage_three = StageThreeScenarios(sim, stage_two, True)
 
         # Load watershed topology maps and account for necessary files
         region = HydroRegion(region_id, sim)
 
         # Initialize output object
-        outputs = ModelOutputs(sim, region.output_reaches, stage_two.start_date, stage_two.end_date)
+        outputs = ModelOutputs(sim, region.full_reaches, stage_two.start_date, stage_two.end_date)
 
         # Initialize objects to hold results by stream reach and reservoir
         reaches = ReachManager(sim, stage_two, stage_three, recipes, region, outputs)
@@ -49,7 +49,7 @@ def pesticide_calculator(input_data):
                 reaches.process_local_batch(reach_ids, year)
 
                 # Perform full analysis including time-of-travel and concentration for active reaches
-                for reach_id in reach_ids & set(region.output_reaches):
+                for reach_id in reach_ids & set(region.full_reaches):
                     reaches.report(reach_id)
 
                 # Pass each reach in the tier through a downstream lake

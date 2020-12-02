@@ -263,7 +263,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
 
 
 class StageThreeScenarios(DateManager, MemoryMatrix):
-    def __init__(self, sim, stage_two):
+    def __init__(self, sim, stage_two, disable_build=False):
         self.s2 = stage_two
         self.sim = sim
         self.array_path = sim.paths.s3_scenarios.format(self.s2.region)
@@ -278,7 +278,8 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                               dtype=np.float32, path=self.array_path, persistent_read=True, persistent_write=True)
 
         report(f"Building Stage 3 scenarios...")
-        self.build_from_stage_two()
+        if not disable_build:
+            self.build_from_stage_two()
 
     def build_from_stage_two(self):
         # TODO - can the dask allocation part of this be put into a function or wrapper?
@@ -317,8 +318,6 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                             soil.runoff_effic, soil.erosion_effic, soil.surface_dx, soil.cm_2, soil.soil_depth,
                             plant.deg_foliar, plant.washoff_coeff]
 
-                # HERE
-                # k so it seems like maybe you can't call a local class function with dask like this
                 batch.append(dask_client.submit(stage_two_to_three, *scenario))
                 if len(batch) == self.sim.batch_size or (count + 1) == n_scenarios:
                     arrays = dask_client.gather(batch)

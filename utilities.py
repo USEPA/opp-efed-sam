@@ -44,7 +44,7 @@ class HydroRegion(Navigator):
         self.flow_fields = [f'q_{str(month).zfill(2)}' for month in sim.month_index]
 
         # Select which stream reaches will be fully processed, partially processed, or excluded
-        self.intake_reaches, self.active_reaches, self.output_reaches, self.reservoir_outlets = \
+        self.partial_reaches, self.full_reaches, self.reservoir_outlets = \
             self.sort_reaches(sim.intake_reaches, sim.intakes_only)
 
         # Holder for reaches that have been processed
@@ -61,17 +61,17 @@ class HydroRegion(Navigator):
 
         # Confine to available reaches and assess what's missing
         if intakes is None:
-            active = output = self.reach_table.comid
+            partial = full = self.reach_table.comid
         else:
-            active = self.confine(intakes)
+            partial = self.confine(intakes)
             if intakes_only:
-                output = intakes
+                full = intakes
             else:
-                output = active
+                full = partial
         reservoir_outlets = \
-            self.lake_table.loc[np.in1d(self.lake_table.outlet_comid, active)][['outlet_comid', 'wb_comid']]
+            self.lake_table.loc[np.in1d(self.lake_table.outlet_comid, partial)][['outlet_comid', 'wb_comid']]
 
-        return intakes, active, output, reservoir_outlets
+        return partial, full, reservoir_outlets
 
     def process_nhd(self):
         self.lake_table = \
@@ -108,7 +108,7 @@ class HydroRegion(Navigator):
             lakes = self.lake_table[np.in1d(self.lake_table.outlet_comid, lake_outlets)]
             all_upstream = {reach for outlet in lake_outlets for reach in self.upstream_watershed(outlet)}
             reaches = (all_upstream - set(lake_outlets)) | upstream_outlets
-            reaches &= set(self.active_reaches)
+            reaches &= set(self.partial_reaches)
             reaches -= self.burned_reaches
             yield tier, reaches, lakes
             self.burned_reaches |= reaches
@@ -353,27 +353,28 @@ class InputDict(dict):
 
 
 class ModelOutputs(DateManager):
-    def __init__(self, sim, output_reaches, start_date, end_date):
+    def __init__(self, sim, partial_reaches, full_reaches, start_date, end_date):
         self.sim = sim
         self.output_dir = os.path.join(sim.paths.output_path, sim.token)
-        self.output_reaches = output_reaches
+        self.partial_reaches = partial_reaches
+        self.full_reaches = full_reaches
         self.array_path = os.path.join(sim.paths.scratch_path, "model_out")
         DateManager.__init__(self, start_date, end_date)
 
         # Initialize output JSON dict
         self.json_output = {}
 
-        # Initialize output matrices
+        # Initialize time series output array
         self.output_fields = sim.fields.fetch("time_series_compact" if compact_out else "time_series")
         self.time_series = MemoryMatrix([self.output_reaches, self.output_fields, self.n_dates],
                                         name='output time series', path=self.array_path + "_ts")
 
         # Initialize exceedances matrix: the probability that concentration exceeds endpoint thresholds
-        self.exceedances = MemoryMatrix([self.output_reaches, self.sim.endpoints.shape[0], 3], name='exceedance',
+        self.exceedances = MemoryMatrix([self.partial_reaches, self.sim.endpoints.shape[0], 3], name='exceedance',
                                         path=self.array_path + "_ex")
 
         # Initialize contributions matrix: loading data broken down by crop and runoff v. erosion source
-        self.contributions = MemoryMatrix([2, self.output_reaches, self.sim.crops], name='contributions',
+        self.contributions = MemoryMatrix([2, self.partial_reaches, self.sim.crops], name='contributions',
                                           path=self.array_path + "_cn")
         self.contributions.columns = self.sim.crops
         self.contributions.header = ["cls" + str(c) for c in self.contributions.columns]
@@ -409,7 +410,7 @@ class ModelOutputs(DateManager):
         json.encoder.FLOAT_REPR = lambda o: format(o, '.4f')
         out_file = os.path.join(self.output_dir, "{}_json.csv".format(self.sim.chemical_name))
         self.json_output = {"COMID": {}}
-        for recipe_id in self.output_reaches:
+        for recipe_id in self.partial_reaches:
             self.json_output["COMID"][str(recipe_id)] = {}
             if write_exceedances:
                 labels = ["{}_{}".format(species, level)
