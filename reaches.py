@@ -6,11 +6,8 @@ from .utilities import ImpulseResponseMatrix
 
 
 class ReachManager(DateManager, MemoryMatrix):
-    def __init__(self, sim, s2_scenarios, s3_scenarios, region, output, year):
-        self.s2 = s2_scenarios
-        self.s3 = s3_scenarios
+    def __init__(self, sim, s3_scenarios, region, year):
         self.region = region
-        self.output = output
         self.year = year
         self.path = os.path.join(sim.paths.scratch_path, "_reach_mgr{}".format(self.s2.region))
 
