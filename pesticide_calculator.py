@@ -36,7 +36,7 @@ def pesticide_calculator(input_data):
         for year in [2015]:  # manual years
 
             # Initialize objects to hold results by stream reach and reservoir
-            reaches = ReachManager(sim, s2_scenarios, s3_scenarios, region, output, year)
+            reaches = ReachManager(sim, stage_three, region, year)
 
             # Combine scenarios to generate data for catchments
             report("Processing recipes for {}...".format(year))
