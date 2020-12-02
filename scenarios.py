@@ -263,7 +263,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
 
 
 class StageThreeScenarios(DateManager, MemoryMatrix):
-    def __init__(self, sim, stage_two):
+    def __init__(self, sim, stage_two, disable_processing=False):
         self.s2 = stage_two
         self.region = self.s2.region
         self.sim = sim
@@ -279,7 +279,8 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                               dtype=np.float32, path=self.array_path, persistent_read=True, persistent_write=True)
 
         report(f"Building Stage 3 scenarios...")
-        self.build_from_stage_two()
+        if not disable_processing:
+            self.build_from_stage_two()
 
     def build_from_stage_two(self):
         # TODO - can the dask allocation part of this be put into a function or wrapper?
@@ -320,7 +321,6 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
                 batch.append(dask_client.submit(stage_two_to_three, *scenario))
                 if len(batch) == self.sim.batch_size or (count + 1) == n_scenarios:
-                    print("starting batch delete this line later")
                     arrays = dask_client.gather(batch)
                     start_pos = batch_count * self.sim.batch_size
                     self.writer[start_pos:start_pos + len(batch)] = arrays

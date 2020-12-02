@@ -24,7 +24,7 @@ def pesticide_calculator(input_data):
         stage_two = StageTwoScenarios(region_id, sim, stage_one, met, tag='mtb', build=False)
 
         # Initialize Stage 3 scenarios (time series of chemical transport data e.g., runoff mass, erosion mass)
-        stage_three = StageThreeScenarios(sim, stage_two)
+        stage_three = StageThreeScenarios(sim, stage_two, True)
 
         # Load watershed topology maps and account for necessary files
         region = HydroRegion(region_id, sim)

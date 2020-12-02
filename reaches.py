@@ -38,8 +38,10 @@ def burn_batch(reaches, sim, region, lakes):
         for outlet_comid, out_array in zip(lakes.outlet_comid, results):
             reaches.update(outlet_comid, out_array)
 
+
 def test(a, b):
-    return a + b
+    return 4
+
 
 def process_local_batch(reaches, reach_ids, recipes, s2, s3, sim, year):
     dask_client = sim.dask_client
@@ -51,6 +53,8 @@ def process_local_batch(reaches, reach_ids, recipes, s2, s3, sim, year):
     results = dask_client.gather(batch)
     print(results)
     exit()
+
+
 def process_local_batch_actual(reaches, reach_ids, recipes, s2, s3, sim, year):
     dask_client = sim.dask_client
     if sim.local_run:
@@ -103,15 +107,16 @@ def burn(reaches, lake, sim, region, convolve_runoff):
     return np.array([new_runoff, new_mass, erosion, erosion_mass])
 
 
+def weight_and_combine(time_series, areas):
+    areas = areas.values
+    time_series = np.moveaxis(time_series, 0, 2)  # (scenarios, vars, dates) -> (vars, dates, scenarios)
+    time_series[0] *= areas
+    time_series[1] *= np.power(areas / 10000., .12)
+    return time_series.sum(axis=2)
+
+
 def process_local(reach_id, year, recipes, s2, s3, verbose=False):
     """  Fetch all scenarios and multiply by area. For erosion, area is adjusted. """
-
-    def weight_and_combine(time_series, areas):
-        areas = areas.values
-        time_series = np.moveaxis(time_series, 0, 2)  # (scenarios, vars, dates) -> (vars, dates, scenarios)
-        time_series[0] *= areas
-        time_series[1] *= np.power(areas / 10000., .12)
-        return time_series.sum(axis=2)
 
     # JCH - this pulls up a table of ['scenario_index', 'area'] index is used here to keep recipe files small
     recipe = recipes.fetch(reach_id, year)  # recipe is indexed by scenario_index
