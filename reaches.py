@@ -39,10 +39,9 @@ def burn_batch(reaches, sim, region, lakes):
             reaches.update(outlet_comid, out_array)
 
 
-def test(a, b, s2, s3):
-    c = s2.plant_date
-    d = s3.n_dates
-    return a + b + c + d
+def test(a, b, reaches):
+    c = reaches.n_dates
+    return a + b + c
 
 
 def process_local_batch(reaches, reach_ids, recipes, s2, s3, sim, year):
