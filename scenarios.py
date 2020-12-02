@@ -321,7 +321,6 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                 # k so it seems like maybe you can't call a local class function with dask like this
                 batch.append(dask_client.submit(stage_two_to_three, *scenario))
                 if len(batch) == self.sim.batch_size or (count + 1) == n_scenarios:
-                    print("starting batch delete this line later")
                     arrays = dask_client.gather(batch)
                     start_pos = batch_count * self.sim.batch_size
                     self.writer[start_pos:start_pos + len(batch)] = arrays
