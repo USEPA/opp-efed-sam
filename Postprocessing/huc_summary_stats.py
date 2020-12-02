@@ -68,21 +68,29 @@ class SamPostprocessor(object):
     def calc_huc8(self, data):
         print("Post-processor: calculating HUC8s")
         try:
-            huc8_summary = data.groupby('HUC8').agg(['mean', 'max'])
+            huc8_summary = data.groupby('HUC_8').agg(['mean', 'max'])
+            print(111, huc8_summary.columns)
             huc8_summary.columns = ["_".join(x) for x in huc8_summary.columns.ravel()]
+            print(112, huc8_summary.columns)
             self.huc8_summary = huc8_summary
-        except:
-            self.huc8_summary = pd.DataFrame(columns=['HUC8', 'acute_human_mean', 'acute_human_max'])
+        except Exception as e:
+            print("ERRROR A")
+            print(e)
+            self.huc8_summary = pd.DataFrame(columns=['HUC_8', 'acute_human_mean', 'acute_human_max'])
             return
 
     def calc_huc12(self, data):
         print("Post-processor: calculating HUC12s")
         try:
-            huc12_summary = data.groupby('HUC12').agg(['mean', 'max'])
+            huc12_summary = data.groupby('HUC_12').agg(['mean', 'max'])
+            print(222, huc12_summary.columns)
             huc12_summary.columns = ["_".join(x) for x in huc12_summary.columns.ravel()]
+            print(223, huc12_summary.columns)
             self.huc12_summary = huc12_summary
-        except:
-            self.huc12_summary = pd.DataFrame(columns=['HUC12', 'acute_human_mean', 'acute_human_max'])
+        except Exception as e:
+            print("ERRROR B")
+            print(e)
+            self.huc12_summary = pd.DataFrame(columns=['HUC_12', 'acute_human_mean', 'acute_human_max'])
         return
 
     def append_sam_data(self):
