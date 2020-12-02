@@ -53,13 +53,13 @@ class SamPostprocessor(object):
 
     def calc_huc_summary(self):
         path_to_csv = paths.nhd_wbd_xwalk
+        data = pd.DataFrame(self.sam_data['COMID']).T
+        data.index = data.index.astype(str)
         huc_comid = pd.read_csv(path_to_csv, dtype=object)[['FEATUREID', 'HUC_12']]\
-            .rename(columns={"FEATUREID": "COMID"})
-        data = pd.DataFrame(self.sam_data, dtype=object)
-        data['COMID'] = data['COMID'].astype(str)
+            .set_index('FEATUREID')
         print(12345, data.head())
         print(67899, huc_comid.head())
-        data = data.merge(huc_comid, on="COMID")
+        data = data.join(huc_comid, how='inner')
         print(99999, data.head())
         print(999999, data.shape)
         data["HUC_8"] = data["HUC_12"].str.slice(0, 8)
