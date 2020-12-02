@@ -134,6 +134,8 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
 
         # If build is True, create the Stage 2 Scenarios by running model routines on Stage 1 scenario inputs
         if build:
+            # TODO - at this point, check and see if the stage 2 scenarios (1) exist locally, or (2) exist on s3.
+            #  if not, build them and send a copy to s3
             report("Building Stage Two Scenarios from Stage One...")
             DateManager.__init__(self, self.sim.scenario_start_date, self.sim.scenario_end_date)
             self.arrays = self.fields.fetch('s2_arrays')
@@ -145,8 +147,6 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
             # Create key
             self.create_keyfile()
 
-            # Run scenarios
-            self.build_from_stage_one()
         else:
             self.arrays, self.array_start_date, time_series_shape = self.load_key()
             self.runoff_erosion = [self.arrays.index('runoff'), self.arrays.index('erosion')]
@@ -209,7 +209,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
                             s.cn_cov, s.cn_fal, s.usle_k, s.usle_ls, s.usle_c_cov, s.usle_c_fal, s.usle_p,
                             s.irrigation_type, s.ireg, s.depletion_allowed, s.leaching_fraction, types,
                             soil.cn_min, soil.delta_x, soil.bins, soil.depth, soil.anetd, soil.n_increments,
-                            soil.sfac]
+                            soil.sfac, self.sim.fields.fetch('s2_arrays')]
                 batch.append(self.sim.dask_client.submit(stage_one_to_two, *scenario))
                 scenario_count += 1
                 scenario_vars = s[keep_fields]
@@ -317,8 +317,6 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                             soil.runoff_effic, soil.erosion_effic, soil.surface_dx, soil.cm_2, soil.soil_depth,
                             plant.deg_foliar, plant.washoff_coeff]
 
-                # HERE
-                # k so it seems like maybe you can't call a local class function with dask like this
                 batch.append(dask_client.submit(stage_two_to_three, *scenario))
                 if len(batch) == self.sim.batch_size or (count + 1) == n_scenarios:
                     print("starting batch delete this line later")
@@ -353,20 +351,20 @@ def stage_one_to_two(precip, pet, temp, new_year,  # weather params
                      cn_cov, cn_fallow, usle_k, usle_ls, usle_c_cov, usle_c_fal, usle_p,  # usle params
                      irrigation_type, ireg, depletion_allowed, leaching_fraction,  # irrigation params
                      cn_min, delta_x, bins, depth, anetd, n_increments, sfac,  # simulation soil params
-                     types):
+                     types, array_names):
     # Model the growth of plant between emergence and maturity (defined as full canopy cover)
     plant_factor = plant_growth(precip.size, new_year, plant_date, emergence_date, maxcover_date, harvest_date)
 
     # Initialize soil properties for depth
     cn, field_capacity, wilting_point, usle_klscp = \
         initialize_soil(plant_factor, cn_cov, cn_fallow, usle_c_cov, usle_c_fal, fc_5, wp_5, fc_20,
-                        wp_20, usle_k, usle_ls, usle_p, soil_params.cn_min, soil_params.delta_x, soil_params.bins)
+                        wp_20, usle_k, usle_ls, usle_p, cn_min, delta_x, bins)
 
     runoff, rain, effective_rain, soil_water, leaching = \
-        surface_hydrology(field_capacity, wilting_point, plant_factor, cn, soil_params.depth,
-                          irrigation_type, depletion_allowed, soil_params.anetd, max_root_depth, leaching_fraction,
-                          crop_intercept, precip, temp, pet, soil_params.n_increments, soil_params.delta_x,
-                          soil_params.sfac)
+        surface_hydrology(field_capacity, wilting_point, plant_factor, cn, depth,
+                          irrigation_type, depletion_allowed, anetd, max_root_depth, leaching_fraction,
+                          crop_intercept, precip, temp, pet, n_increments, delta_x,
+                          sfac)
 
     # Calculate erosion loss
     type_matrix = types[types.index == ireg].values.astype(np.float32)  # ireg parameter
@@ -374,8 +372,8 @@ def stage_one_to_two(precip, pet, temp, new_year,  # weather params
 
     # Output array order is specified in fields_and_qc.py
     arrays = []
-    for field in self.fields.fetch('s2_arrays'):
-        arrays.append(eval(field))
+    for array_name in array_names:
+        arrays.append(eval(array_name))
     return np.float32(arrays)
 
 

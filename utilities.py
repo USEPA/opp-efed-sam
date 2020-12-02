@@ -15,10 +15,6 @@ from .hydro.navigator import Navigator
 from .hydro.process_nhd import identify_waterbody_outlets, calculate_surface_area
 from .aquatic_concentration import compute_concentration, partition_benthic, exceedance_probability
 
-# If true, only return 5 time series fields, otherwise, return 13
-# TODO - there's a better way to do this
-compact_out = True
-
 
 class HydroRegion(Navigator):
     """
@@ -270,7 +266,7 @@ class Simulation(DateManager):
 class InputDict(dict):
     """ Processes the input string from the front end into a form usable by tool """
 
-    # TODO - combine this into Simulation?  clean it up
+    # TODO - combine this into Simulation?  clean it up at least
     def __init__(self, pd_obj, endpoint_format_path, fields):
 
         # Unpack JSON string into dictionary
@@ -353,7 +349,8 @@ class InputDict(dict):
 
 
 class ModelOutputs(DateManager):
-    def __init__(self, sim, output_reaches, start_date, end_date):
+    def __init__(self, sim, output_reaches, start_date, end_date, compact_out=True):
+        # TODO - I don't like compact_out. That should be specified in fields_and_qc.csv
         self.sim = sim
         self.output_dir = os.path.join(sim.paths.output_path, sim.token)
         self.output_reaches = output_reaches
@@ -423,7 +420,7 @@ class ModelOutputs(DateManager):
                     contribution_dict = dict(zip(labels, np.float64(contributions[i])))
                     self.json_output["COMID"][str(recipe_id)].update(contribution_dict)
 
-        #self.json_output = json.dumps(dict(self.json_output), sort_keys=True, indent=4, separators=(',', ': '))
+        # self.json_output = json.dumps(dict(self.json_output), sort_keys=True, indent=4, separators=(',', ': '))
         with open(out_file, 'w') as f:
             f.write(str(self.json_output))
 
@@ -446,166 +443,6 @@ class ModelOutputs(DateManager):
             out_data = self.time_series.fetch(recipe_id).T
             df = pd.DataFrame(data=out_data, index=self.dates, columns=self.output_fields)
             df.to_csv(out_file)
-
-
-class ReachManager(DateManager, MemoryMatrix):
-    def __init__(self, sim, s2_scenarios, s3_scenarios, recipes, region, output, progress_interval=10000):
-        self.output = output
-        self.sim = sim
-        self.s2 = s2_scenarios
-        self.s3 = s3_scenarios  # stage 3
-        self.recipes = recipes
-        self.region = region
-        self.progress_interval = progress_interval
-        self.array_path = os.path.join(sim.paths.scratch_path, "_reach_mgr{}".format(self.s2.region))
-        self.i = sim
-
-        # Initialize dates
-        DateManager.__init__(self, s3_scenarios.start_date, s3_scenarios.end_date)
-
-        # Initialize a matrix to store time series data for reaches (crunched scenarios)
-        # vars: runoff, runoff_mass, erosion, erosion_mass
-        MemoryMatrix.__init__(self, [region.active_reaches, 4, self.n_dates], name='reach manager',
-                              path=self.array_path)
-
-        # Keep track of which reaches have been run
-        self.burned_reaches = set()  # reaches that have been processed
-
-    def burn(self, lake):
-
-        irf = ImpulseResponseMatrix.generate(1, lake.residence_time, self.n_dates)
-
-        # Get the convolution function
-        # Get mass and runoff for the reach
-        total_mass, total_runoff = self.upstream_loading(lake.outlet_comid)
-
-        # Modify combined time series to reflect lake
-        new_mass = np.convolve(total_mass, irf)[:self.n_dates]
-        if self.sim.hydrology.convolve_runoff:  # Convolve runoff
-            new_runoff = np.convolve(total_runoff, irf)[:self.n_dates]
-        else:  # Flatten runoff
-            new_runoff = np.repeat(np.mean(total_runoff), self.n_dates)
-
-        # Retain old erosion numbers
-        _, _, erosion, erosion_mass = self.fetch(lake.outlet_comid)
-
-        # Add all lake mass and runoff to outlet
-        self.update(lake.outlet_comid, np.array([new_runoff, new_mass, erosion, erosion_mass]))
-
-    def burn_batch(self, lakes):
-        if True or self.sim.local_run:
-            for _, lake in lakes.iterrows():
-                self.burn(lake)
-        else:
-            # TODO - this doesn't work yet. Dask doesn't like async calls to class functions
-            batch = []
-            for _, lake in lakes.iterrows():
-                batch.append(self.sim.dask_client.submit(self.burn, lake))
-            self.sim.dask_client.gather(batch)
-
-    def process_local(self, reach_id, year, verbose=False):
-        """  Fetch all scenarios and multiply by area. For erosion, area is adjusted. """
-
-        def weight_and_combine(time_series, areas):
-            areas = areas.values
-            time_series = np.moveaxis(time_series, 0, 2)  # (scenarios, vars, dates) -> (vars, dates, scenarios)
-            time_series[0] *= areas
-            time_series[1] *= np.power(areas / 10000., .12)
-            return time_series.sum(axis=2)
-
-        # JCH - this pulls up a table of ['scenario_index', 'area'] index is used here to keep recipe files small
-        recipe = self.recipes.fetch(reach_id, year)  # recipe is indexed by scenario_index
-        if not recipe.empty:
-            # Pull runoff and erosion from Stage 2 Scenarios
-            transport, found_s2 = self.s2.fetch_from_recipe(recipe)
-            runoff, erosion = weight_and_combine(transport, found_s2.area)
-
-            # Pull chemical mass from Stage 3 scenarios
-            pesticide_mass, found_s3 = self.s3.fetch_from_recipe(recipe, verbose=False)
-            runoff_mass, erosion_mass = weight_and_combine(pesticide_mass, found_s3.area)
-            out_array = np.array([runoff, runoff_mass, erosion, erosion_mass])
-            self.update(reach_id, out_array)
-
-            # Assess the contributions to the recipe from ach source (runoff/erosion) and crop
-            # self.o.update_contributions(recipe_id, scenarios, time_series[[1, 3]].sum(axis=1))
-
-        elif verbose:
-            report("No scenarios found for {}".format(reach_id))
-
-    def process_local_batch(self, reach_ids, year):
-        if self.sim.local_run:
-            for reach_id in reach_ids:
-                self.process_local(reach_id, year)
-        else:
-            # TODO - this doesn't work yet. Dask doesn't seem to like the async call on a self. function
-            batch = []
-            for reach_id in reach_ids:
-                batch.append(self.sim.dask_client.submit(process_local, reach_id, year, self.recipes, self.s2, self.s3))
-            results = self.sim.dask_client.gather(batch)
-            for reach_id, out_array in zip(reach_ids, results):
-                self.update(reach_id, out_array)
-
-    def report(self, reach_id):
-        # Get flow values for reach
-        flow = self.region.daily_flows(reach_id)
-
-        # Get local runoff, erosion, and pesticide masses
-        local_runoff, local_runoff_mass, local_erosion, local_erosion_mass = self.fetch(reach_id)
-
-        # Process upstream contributions
-        upstream_runoff, upstream_runoff_mass = self.upstream_loading(reach_id)
-
-        # Compute concentrations
-        surface_area = self.region.flow_table(reach_id)['surface_area']
-        total_flow, (concentration, runoff_conc) = \
-            compute_concentration(upstream_runoff_mass, upstream_runoff, self.n_dates, flow)
-        benthic_conc = partition_benthic(local_erosion, local_erosion_mass, surface_area,
-                                         self.sim.benthic.depth, self.sim.benthic.porosity)
-
-        # Store results in output array
-        self.output.update_exceedances(reach_id, concentration)
-        self.output.update_time_series(reach_id, [total_flow, upstream_runoff, upstream_runoff_mass,
-                                                  concentration, benthic_conc])
-
-    def upstream_loading(self, reach_id):
-        """ Identify all upstream reaches, pull data and offset in time """
-
-        # Fetch all upstream reaches and corresponding travel times
-        upstream_reaches, travel_times, warning = \
-            self.region.upstream_watershed(reach_id, return_times=True, return_warning=True)
-
-        # Filter out reaches (and corresponding times) that have already been burned
-        indices = np.int16([i for i, r in enumerate(upstream_reaches) if r not in self.burned_reaches])
-        reaches, reach_times = upstream_reaches[indices], travel_times[indices]
-
-        # Don't need to do proceed if there's nothing upstream
-        if len(reaches) > 1:
-
-            # Initialize the output array
-            totals = np.zeros((4, self.n_dates))  # (mass/runoff, dates)
-
-            # Fetch time series data for each upstream reach
-            reach_array, found_reaches = self.fetch(reaches, verbose=True, return_alias=True)  # (reaches, vars, dates)
-
-            # Stagger time series by dayshed
-            for tank in range(np.max(reach_times) + 1):
-                in_tank = reach_array[reach_times == tank].sum(axis=0)
-                if tank > 0:
-                    if self.sim.hydrology.gamma_convolve:
-                        irf = self.region.irf.fetch(tank)  # Get the convolution function
-                        in_tank[0] = np.convolve(in_tank[0], irf)[:self.n_dates]  # mass
-                        in_tank[1] = np.convolve(in_tank[1], irf)[:self.n_dates]  # runoff
-                    else:
-                        in_tank = np.pad(in_tank[:, :-tank], ((0, 0), (tank, 0)), mode='constant')
-                totals += in_tank  # Add the convolved tank time series to the total for the reach
-
-            runoff, runoff_mass, erosion, erosion_mass = totals
-        else:
-            result = self.fetch(reach_id)
-            runoff, runoff_mass, erosion, erosion_mass = result
-
-        # TODO - erosion mass here?
-        return runoff, runoff_mass
 
 
 class WatershedRecipes(object):
@@ -676,36 +513,3 @@ class WeatherArray(MemoryMatrix, DateManager):
         data = self.fetch(station_id, copy=True, verbose=True).T
         data[:2] /= 100.  # Precip, PET  cm -> m
         return data[:, self.start_offset:self.end_offset]
-
-
-def process_local(reach_id, year, recipes, s2, s3, verbose=False):
-    """  Fetch all scenarios and multiply by area. For erosion, area is adjusted. """
-
-    def weight_and_combine(time_series, areas):
-        areas = areas.values
-        time_series = np.moveaxis(time_series, 0, 2)  # (scenarios, vars, dates) -> (vars, dates, scenarios)
-        time_series[0] *= areas
-        time_series[1] *= np.power(areas / 10000., .12)
-        return time_series.sum(axis=2)
-
-    # JCH - this pulls up a table of ['scenario_index', 'area'] index is used here to keep recipe files small
-    recipe = recipes.fetch(reach_id, year)  # recipe is indexed by scenario_index
-    if not recipe.empty:
-        # Pull runoff and erosion from Stage 2 Scenarios
-        transport, found_s2 = s2.fetch_from_recipe(recipe)
-        runoff, erosion = weight_and_combine(transport, found_s2.area)
-
-        # Pull chemical mass from Stage 3 scenarios
-        pesticide_mass, found_s3 = s3.fetch_from_recipe(recipe, verbose=False)
-        runoff_mass, erosion_mass = weight_and_combine(pesticide_mass, found_s3.area)
-        out_array = np.array([runoff, runoff_mass, erosion, erosion_mass])
-
-        # Assess the contributions to the recipe from ach source (runoff/erosion) and crop
-        # self.o.update_contributions(recipe_id, scenarios, time_series[[1, 3]].sum(axis=1))
-
-    else:
-        out_array = None
-        if verbose:
-            report("No scenarios found for {}".format(reach_id))
-
-    return out_array
