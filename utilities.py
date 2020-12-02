@@ -23,8 +23,6 @@ compact_out = True
 class HydroRegion(Navigator):
     """
     Contains all datasets and functions related to the NHD Plus region, including all hydrological features and links
-    outlet_reaches: reaches with an outlet (used to delineate)
-    active_reaches: reaches upstream of the outlet (or for eco, all of them)
     """
 
     def __init__(self, region, sim):
@@ -466,7 +464,7 @@ class ReachManager(DateManager, MemoryMatrix):
 
         # Initialize a matrix to store time series data for reaches (crunched scenarios)
         # vars: runoff, runoff_mass, erosion, erosion_mass
-        MemoryMatrix.__init__(self, [region.active_reaches, 4, self.n_dates], name='reach manager',
+        MemoryMatrix.__init__(self, [region.partial_reaches, 4, self.n_dates], name='reach manager',
                               path=self.array_path)
 
         # Keep track of which reaches have been run
