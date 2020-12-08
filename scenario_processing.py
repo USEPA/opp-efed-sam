@@ -12,17 +12,17 @@ class StageOneScenarios(object):
     def __init__(self, region, sim, recipes=None, subset_outlets=None, subset_year=None):
         self.region = region
         self.sim = sim
-        self.path = sim.paths.s1_scenarios
+        self.path = sim.s1_scenarios_path
         self._subset = False
         self._scenario_id = None
-        self.scratch_path = os.path.join(sim.paths.scratch_path, f"s1_subset.csv")
+        self.scratch_path = os.path.join(sim.scratch_path, f's1_subset.csv')
 
         if subset_outlets is not None:
             self.build_subset(subset_outlets, subset_year, recipes)
             self._subset = True
 
     def build_subset(self, outlets, year, recipes):
-        report(f"Subsetting Stage 1 Scenarios...", 1)
+        report(f'Subsetting Stage 1 Scenarios...', 1)
 
         # Build an index of all the scenarios in the subset
         all_scenarios = set()
@@ -39,7 +39,7 @@ class StageOneScenarios(object):
         full_table = pd.concat(full_table, axis=0)
 
         # Write the subset to a temporary csv file and update the paths value
-        report(f"Writing subset to {self.scratch_path}")
+        report(f'Writing subset to {self.scratch_path}')
         full_table.to_csv(self.scratch_path, index=None)
 
     def fetch(self, field_names, return_array=False):
@@ -57,7 +57,7 @@ class StageOneScenarios(object):
 
     def iterate(self):
         for path in self.paths:
-            report(f"Reading scenario table {path}...")
+            report(f'Reading scenario table {path}...')
             for chunk in pd.read_csv(path, chunksize=self.sim.stage_one_chunksize):
                 chunk = self.modify_array(chunk)
                 for weather_grid, scenarios in chunk.groupby('weather_grid'):
@@ -111,7 +111,7 @@ class StageOneScenarios(object):
                 else:
                     break
             if not paths:
-                raise FileNotFoundError(f"No Stage 1 scenarios found at {path}")
+                raise FileNotFoundError(f'No Stage 1 scenarios found at {path}')
             return paths
         else:
             return [self.scratch_path]
@@ -125,16 +125,16 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
         self.met = met
 
         self.fields = sim.fields
-        self.path = sim.paths.s2_scenarios.format(region)
+        self.path = sim.s2_scenarios_path.format(region)
         if tag is not None:
-            self.path += f"_{tag}"
-        self.keyfile_path = self.path + "_key.txt"
-        self.array_path = self.path + "_arrays.dat"
-        self.index_path = self.path + "_index.csv"
+            self.path += f'_{tag}'
+        self.keyfile_path = self.path + '_key.txt'
+        self.array_path = self.path + '_arrays.dat'
+        self.index_path = self.path + '_index.csv'
 
         # If build is True, create the Stage 2 Scenarios by running model routines on Stage 1 scenario inputs
         if build:
-            report("Building Stage Two Scenarios from Stage One...")
+            report('Building Stage Two Scenarios from Stage One...')
             DateManager.__init__(self, self.sim.scenario_start_date, self.sim.scenario_end_date)
             self.arrays = self.fields.fetch('s2_arrays')
             self.align_met_dates()
@@ -166,24 +166,24 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
         messages = []
         if self.sim.start_date < self.array_start_date:
             self.sim.start_date = self.array_start_date
-            messages.append("start date is earlier")
+            messages.append('start date is earlier')
         if self.array_end_date < self.sim.end_date:
             self.sim.end_date = self.array_end_date
-            messages.append("end date is later")
+            messages.append('end date is later')
         if any(messages):
-            report(f"Simulation {' and '.join(messages)} than range of available scenario data. "
-                   f"Date range has been truncated at {self.sim.start_date} to {self.sim.end_date}.")
+            report(f'Simulation {" and ".join(messages)} than range of available scenario data. '
+                   f'Date range has been truncated at {self.sim.start_date} to {self.sim.end_date}.')
 
     def align_met_dates(self):
         # TODO - this should be combined with align_sim_dates and probably put into the parent DateManager class
         messages = []
         if self.start_date < self.met.start_date:
-            messages.append("start date is earlier")
+            messages.append('start date is earlier')
             self.start_date = self.met.start_date
         else:
             self.met.start_offset = (self.start_date - self.met.start_date).astype(np.int32)
         if self.met.end_date < self.end_date:
-            messages.append("end date is later")
+            messages.append('end date is later')
             self.end_date = self.met.end_date
         else:
             self.met.end_offset = (self.end_date - self.met.end_date).astype(np.int32)
@@ -218,7 +218,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
                     results = self.sim.dask_client.gather(batch)
                     batch_count += 1
                     batch = []
-                    report(f"Processed {scenario_count} of {self.s1.n_scenarios} scenarios", 1)
+                    report(f'Processed {scenario_count} of {self.s1.n_scenarios} scenarios', 1)
                     self.write(batch_count, results)
 
         own_index = pd.DataFrame(stage_two_index, columns=keep_fields)
@@ -226,31 +226,39 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
 
     def create_keyfile(self):
         with open(self.keyfile_path, 'w') as f:
-            f.write(",".join(self.arrays) + "\n")
-            f.write(pd.to_datetime(self.start_date).strftime('%Y-%m-%d') + "\n")
-            f.write(",".join(map(str, self.shape)) + "\n")
+            f.write(','.join(self.arrays) + '\n')
+            f.write(pd.to_datetime(self.start_date).strftime('%Y-%m-%d') + '\n')
+            f.write(','.join(map(str, self.shape)) + '\n')
 
     def create_lookup(self):
+        # TODO - rename scenario_vars to s1?
         scenario_vars = pd.read_csv(self.index_path)
         scenario_vars['s2_index'] = scenario_vars.index
         lookup = scenario_vars[['scenario_index', 'scenario_id', 's2_index']].set_index('scenario_index')
         return scenario_vars, lookup
 
-    def fetch(self, index, copy=False, verbose=False, iloc=False, pop=False, return_alias=False):
-        result = super(StageTwoScenarios, self).fetch(index, copy, iloc, pop, return_alias)
+    def fetch_single(self, index, copy=False, verbose=False, iloc=False, pop=False, return_alias=False):
+        result = self.fetch(index, copy, iloc, pop, return_alias)
         return result[:, self.start_offset:-self.end_offset]
+
+    def fetch_multiple(self, index, row_index=None, copy=False, verbose=False, iloc=False, pop=False,
+                       return_alias=False):
+        result = self.fetch(index, copy, iloc, pop, return_alias)
+        if row_index is not None:
+            return result[:, row_index, self.start_offset:-self.end_offset]
+        else:
+            return result[:, :, self.start_offset:-self.end_offset]
 
     def fetch_from_recipe(self, recipe, verbose=True):
         found = recipe.join(self.lookup)
-        arrays = super(StageTwoScenarios, self).fetch(found.s2_index, verbose=verbose)
-        arrays = arrays[:, self.runoff_erosion, self.start_offset:-self.end_offset]
+        arrays = self.fetch_multiple(found.s2_index)[:, self.runoff_erosion]
         return arrays, found.dropna()
 
     def load_key(self):
         with open(self.keyfile_path) as f:
-            time_series = next(f).strip().split(",")
+            time_series = next(f).strip().split(',')
             start_date = np.datetime64(next(f).strip())
-            time_series_shape = [int(val) for val in next(f).strip().split(",")]
+            time_series_shape = [int(val) for val in next(f).strip().split(',')]
         return time_series, start_date, time_series_shape
 
     def write(self, batch_num, data):
@@ -266,9 +274,10 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
     def __init__(self, sim, stage_two, disable_build=False):
         self.s2 = stage_two
         self.sim = sim
-        self.array_path = sim.paths.s3_scenarios.format(self.s2.region)
-        self.scenario_vars, self.lookup = self.select_scenarios(self.sim.crops)
-
+        self.array_path = sim.s3_scenarios_path.format(self.s2.region)
+        self.scenario_vars, self.lookup, self.active_crops = \
+            self.select_scenarios(self.sim.selected_crops)
+        self.n_active_crops = self.active_crops.shape[0]
         # Set dates
         DateManager.__init__(self, stage_two.start_date, stage_two.end_date)
 
@@ -277,22 +286,26 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         MemoryMatrix.__init__(self, [len(self.scenario_vars.s3_index), 2, self.n_dates], name='pesticide mass',
                               dtype=np.float32, path=self.array_path, persistent_read=True, persistent_write=True)
 
-        report(f"Building Stage 3 scenarios...")
+        report(f'Building Stage 3 scenarios...')
         if not disable_build:
             self.build_from_stage_two()
 
     def build_from_stage_two(self):
         # TODO - can the dask allocation part of this be put into a function or wrapper?
         #  it's also used in s1->s2
-        soil = self.sim.soil
-        plant = self.sim.plant
-
         var_table = self.scenario_vars.set_index('s2_index')
 
         batch = []
         batch_count = 0
         n_scenarios = var_table.shape[0]
+
+        # For brevity below
         dask_client = self.sim.dask_client
+
+        # Initialize some params now
+        sim_params = [self.sim.runoff_effic, self.sim.erosion_effic, self.sim.surface_dx,
+                      self.sim.cm_2, self.sim.soil_depth, self.sim.deg_foliar, self.sim.washoff_coeff,
+                      self.sim.koc, self.sim.deg_aqueous, self.new_year, self.sim.kd_flag]
 
         # Iterate scenarios
         for count, (s2_index, s3_index) in enumerate(self.lookup[['s2_index', 's3_index']].values):
@@ -300,23 +313,25 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
             # Get the non-array values associated with the scenario
             s2 = var_table.loc[s2_index]
 
-            # Extract stored data
-            runoff, erosion, leaching, soil_water, rain = self.s2.fetch(s2_index, iloc=True)
-
             # Get application information for the active crop
             crop_applications = \
                 self.sim.applications[self.sim.applications.crop == s2[self.sim.crop_group_field]]
 
             if not crop_applications.empty:
 
-                # Get crop ID of scenario and find all associated crops in group
-                scenario = [crop_applications.values,
-                            self.new_year, self.sim.kd_flag, self.sim.koc, self.sim.deg_aqueous,
-                            leaching, runoff, erosion, soil_water, rain,
-                            s2.plant_date, s2.emergence_date, s2.maxcover_date, s2.harvest_date,
-                            s2.max_canopy, s2.orgC_5, s2.bd_5, s2.season,
-                            soil.runoff_effic, soil.erosion_effic, soil.surface_dx, soil.cm_2, soil.soil_depth,
-                            plant.deg_foliar, plant.washoff_coeff]
+                # Extract stored data
+                # runoff, erosion, leaching, soil_water, rain
+                s2_time_series = self.s2.fetch_single(s2_index, iloc=True)
+                s2_params = [s2.plant_date, s2.emergence_date, s2.maxcover_date, s2.harvest_date,
+                             s2.max_canopy, s2.orgC_5, s2.bd_5, s2.season]
+
+                scenario = [crop_applications.values] + sim_params + s2_time_series + s2_params
+                # [self.sim.runoff_effic, self.sim.erosion_effic, self.sim.surface_dx,
+                #      self.sim.cm_2, self.sim.soil_depth, self.sim.deg_foliar, self.sim.washoff_coeff,
+                #      self.sim.koc, self.sim.deg_aqueous, self.new_year, self.sim.kd_flag]
+                #      runoff, erosion, leaching, soil_water, rain,
+                #      s2.plant_date, s2.emergence_date, s2.maxcover_date, s2.harvest_date,
+                #             s2.max_canopy, s2.orgC_5, s2.bd_5, s2.season
 
                 batch.append(dask_client.submit(stage_two_to_three, *scenario))
                 if len(batch) == self.sim.batch_size or (count + 1) == n_scenarios:
@@ -325,7 +340,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                     self.writer[start_pos:start_pos + len(batch)] = arrays
                     batch_count += 1
                     batch = []
-                    report(f"Processed {count + 1} of {n_scenarios} scenarios...", 1)
+                    report(f'Processed {count + 1} of {n_scenarios} scenarios...', 1)
 
     def fetch_from_recipe(self, recipe, verbose=False):
         found = recipe.join(self.lookup, how='inner')
@@ -337,10 +352,16 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         crops = pd.DataFrame({self.sim.crop_group_field: list(crops)}, dtype=np.int32)
         selected = self.s2.scenario_vars.merge(crops, on=self.sim.crop_group_field, how='inner')
         selected['s3_index'] = np.arange(selected.shape[0])
-        scenario_vars = selected.sort_values('s3_index')
-        # JCH - for diagnostic purposes, 'scenario_id' can be added to the lookup table
-        lookup = scenario_vars[['scenario_index', 's2_index', 's3_index']].set_index('scenario_index')
-        return scenario_vars, lookup
+
+        # The 'contributions' array created in the outputs uses 'numpy.bincount' to add things up. We can reduce
+        # the size of the array by creating an alias for the CDL classes (e.g., [1, 5, 21, 143] - > [1, 2, 3, 4])
+        active_crops = pd.DataFrame({'cdl_alias': sorted(selected.cdl_alias.unique())})
+        active_crops['contribution_id'] = active_crops.index + 1
+        lookup = selected[['scenario_index', 's2_index', 's3_index', 'cdl_alias']] \
+            .sort_values('s3_index') \
+            .set_index('scenario_index') \
+            .merge(active_crops, on='cdl_alias')
+        return selected, lookup, active_crops
 
 
 def stage_one_to_two(precip, pet, temp, new_year,  # weather params
@@ -351,20 +372,20 @@ def stage_one_to_two(precip, pet, temp, new_year,  # weather params
                      cn_cov, cn_fallow, usle_k, usle_ls, usle_c_cov, usle_c_fal, usle_p,  # usle params
                      irrigation_type, ireg, depletion_allowed, leaching_fraction,  # irrigation params
                      cn_min, delta_x, bins, depth, anetd, n_increments, sfac,  # simulation soil params
-                     types):
+                     types, array_fields):
     # Model the growth of plant between emergence and maturity (defined as full canopy cover)
     plant_factor = plant_growth(precip.size, new_year, plant_date, emergence_date, maxcover_date, harvest_date)
 
     # Initialize soil properties for depth
     cn, field_capacity, wilting_point, usle_klscp = \
         initialize_soil(plant_factor, cn_cov, cn_fallow, usle_c_cov, usle_c_fal, fc_5, wp_5, fc_20,
-                        wp_20, usle_k, usle_ls, usle_p, soil_params.cn_min, soil_params.delta_x, soil_params.bins)
+                        wp_20, usle_k, usle_ls, usle_p, cn_min, delta_x, bins)
 
     runoff, rain, effective_rain, soil_water, leaching = \
-        surface_hydrology(field_capacity, wilting_point, plant_factor, cn, soil_params.depth,
-                          irrigation_type, depletion_allowed, soil_params.anetd, max_root_depth, leaching_fraction,
-                          crop_intercept, precip, temp, pet, soil_params.n_increments, soil_params.delta_x,
-                          soil_params.sfac)
+        surface_hydrology(field_capacity, wilting_point, plant_factor, cn, depth,
+                          irrigation_type, depletion_allowed, anetd, max_root_depth, leaching_fraction,
+                          crop_intercept, precip, temp, pet, n_increments, delta_x,
+                          sfac)
 
     # Calculate erosion loss
     type_matrix = types[types.index == ireg].values.astype(np.float32)  # ireg parameter
@@ -372,16 +393,18 @@ def stage_one_to_two(precip, pet, temp, new_year,  # weather params
 
     # Output array order is specified in fields_and_qc.py
     arrays = []
-    for field in self.fields.fetch('s2_arrays'):
+    # self.fields.fetch('s2_arrays')
+    for field in array_fields:
         arrays.append(eval(field))
     return np.float32(arrays)
 
 
-def stage_two_to_three(application_matrix, new_year, kd_flag, koc, deg_aqueous, leaching, runoff, erosion,
-                       soil_water, rain, plant_date, emergence_date, maxcover_date, harvest_date, covmax,
-                       org_carbon, bulk_density, season,
-                       runoff_effic, erosion_effic, surface_dx, cm_2, soil_depth,
-                       deg_foliar, washoff_coeff):
+def stage_two_to_three(application_matrix,
+                       runoff_effic, erosion_effic, surface_dx, cm_2, soil_depth, deg_foliar,
+                       washoff_coeff, koc, deg_aqueous, new_year, kd_flag,
+                       runoff, erosion, leaching, soil_water, rain,
+                       plant_date, emergence_date, maxcover_date, harvest_date, covmax, org_carbon,
+                       bulk_density, season):
     # TODO - season?
 
     # Use Kd instead of Koc if flag is on. Kd = Koc * organic C in the top layer of soil

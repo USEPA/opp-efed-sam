@@ -1,0 +1,22 @@
+level,var,dir,base,desc
+1,input,data_root,Inputs,
+1,intermediate,data_root,Intermediate,
+1,output,data_root,Results,
+1,scratch,data_root,temp,
+1,table,local_root,Tables,
+2,condensed_nhd,input_path,CondensedNHD/{}/r{}_{}.csv,"nav/sam, region, reach/waterbody"
+2,weather,input_path,Weather/weather_{},array or key
+2,recipes,input_path,RecipeFiles/r{},region
+2,s1_scenarios,input_path,SamScenarios/r{}_{}.csv,"region, block"
+2,dw_intakes,input_path,Intakes/intake_locations.csv,
+2,manual_intakes,input_path,Intakes/mtb_single_intake.csv,
+2,navigator,input_path,NavigatorFiles/nav{}.npz,region
+2,nhd_wbd_xwalk,data_root,NHD_HUC_Crosswalk/CrosswalkTable_NHDplus_HU12.csv,
+2,s2_scenarios,intermediate_path,StageTwoScenarios/r{},region
+2,s3_scenarios,scratch_path,r{},region
+2,fields_and_qc,table_path,fields_and_qc.csv,
+2,types,table_path,tr_55.csv,
+2,sam_nhd_map,table_path,nhd_map_sam.csv,
+2,endpoint_format,table_path,endpoint_format.csv,
+2,parameters,table_path,params.csv,
+2,output_selection,table_path,output_selection.csv,

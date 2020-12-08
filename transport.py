@@ -2,7 +2,7 @@ import numpy as np
 from numba import njit
 import warnings
 
-warnings.filterwarnings("error")
+warnings.filterwarnings('error')
 
 
 def pesticide_to_field(applications, new_years, event_dates, rain):

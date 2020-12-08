@@ -1,14 +1,15 @@
-from .utilities import Simulation, HydroRegion, ModelOutputs, WatershedRecipes, ReachManager, WeatherArray, report
-from .scenarios import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
+from .utilities import Simulation, HydroRegion, WatershedRecipes, WeatherArray, ModelOutputs, report
+from .reach_processing import ReachManager
+from .scenario_processing import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
 
 
 def pesticide_calculator(input_data):
-    # Initialize parameters from front end
+    # Initialize a class with all the simulation parameters (input data, field names, hardwired parameters, dates etc)
     sim = Simulation(input_data)
 
-    # Loop through all NHD regions included in selected runs
+    # Iterate through each hydroregion that encompasses the run
     for region_id in sim.run_regions:
-        report("Processing hydroregion {}...".format(region_id))
+        report('Processing hydroregion {}...'.format(region_id))
 
         # Initialize a weather file reader
         met = WeatherArray(sim)
@@ -29,33 +30,27 @@ def pesticide_calculator(input_data):
         region = HydroRegion(region_id, sim)
 
         # Initialize output object
-        outputs = ModelOutputs(sim, region)
+        outputs = ModelOutputs(sim, region, stage_three)
 
         # Initialize objects to hold results by stream reach and reservoir
-        reaches = ReachManager(sim, stage_two, stage_three, recipes, region, outputs)
+        reaches = ReachManager(sim, stage_two, stage_three, region, recipes, outputs)
 
-        # Cascade downstream processing watershed recipes and performing travel time analysis
-        for year in [2015]:  # manual years
+        # Combine scenarios to generate data for catchments
+        # Traverse downstream in the watershed
+        for tier, reach_ids, lakes in region.cascade:
+            report(f'Running tier {tier}, ({len(reach_ids)} reaches)...')
+            reaches.process_local(reach_ids)
 
-            # Combine scenarios to generate data for catchments
-            report("Processing recipes for {}...".format(year))
+            # Perform full analysis including time-of-travel and concentration for active reaches
+            reaches.process_full(reach_ids & set(region.full_reaches))
 
-            # Traverse downstream in the watershed
-            for tier, reach_ids, lakes in region.cascade:
-
-                report(f"Running tier {tier}, ({len(reach_ids)} reaches)...")
-
-                # Crunch the scenarios for each reach
-                reaches.process_local_batch(reach_ids, year)
-
-                # Perform full analysis including time-of-travel and concentration for active reaches
-                for reach_id in reach_ids & set(region.full_reaches):
-                    reaches.report(reach_id)
-
-                # Pass each reach in the tier through a downstream lake
-                reaches.burn_batch(lakes)
+            # Pass each reach in the tier through a downstream lake
+            reaches.burn(lakes)
 
         # Write output
-        report("Writing output...")
-        outputs.write_output()
-        return outputs.json_output
+        # TODO - spin up results tables on the site?
+        report('Writing output...')
+        # intake_dict = {'COMID': {4867727: {'acute_human': 1.0,
+        # reach_dict = {'comid': {'5640192': 0.0...}, 'huc_8': {'01010101': 0.0,..
+        intake_dict, reach_dict = outputs.prepare_output(write=False)
+        return intake_dict, reach_dict

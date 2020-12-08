@@ -1,0 +1,17 @@
+table,var,sel
+local,runoff,0
+local,runoff_mass,1
+local,erosion,2
+local,erosion_mass,0
+full,runoff,1
+full,runoff_mass,0
+full,erosion,0
+full,erosion_mass,1
+postprocessed,total_flow,1
+postprocessed,baseflow,0
+postprocessed,wc_conc,1
+postprocessed,benthic_conc,0
+postprocessed,runoff_conc,0
+map,reaches,wc_conc
+map,intakes,exceedance
+map,write,1
