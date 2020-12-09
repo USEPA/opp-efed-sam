@@ -244,7 +244,7 @@ def exceedance_probability(time_series, window_sizes, thresholds, years_since_st
     # Count the number of times the concentration exceeds the test threshold in each year
     n_years = years_since_start.max()
     for test_number in range(window_sizes.size):
-        print(window_sizes.size, threshold.size, test_number, n_years)
+        print(window_sizes.size, thresholds.size, test_number, n_years)
         window_size = window_sizes[test_number]
         threshold = thresholds[test_number]
         if np.isnan(threshold) or np.isnan(threshold):
