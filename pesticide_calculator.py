@@ -4,10 +4,7 @@ from .scenario_processing import StageOneScenarios, StageTwoScenarios, StageThre
 
 
 def pesticide_calculator(input_data):
-    print(input_data)
-    for k, v in input_data.items():
-        print(k, v['0'])
-    exit()
+
     # Initialize a class with all the simulation parameters (input data, field names, hardwired parameters, dates etc)
     sim = Simulation(input_data)
 

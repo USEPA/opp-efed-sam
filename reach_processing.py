@@ -105,8 +105,8 @@ class ReachManager(DateManager, MemoryMatrix):
             print(self.sim.endpoints.duration.values)
             print(self.sim.endpoints.threshold.values)
             exceedance = \
-                exceedance_probability(wc_conc, self.sim.endpoints.duration.values, self.sim.endpoints.threshold.values,
-                                       self.year_index)
+                exceedance_probability(wc_conc, self.sim.endpoints.duration.values.astype(np.int32),
+                                       self.sim.endpoints.threshold.values, self.year_index)
             self.output.update_exceedances(reach_id, exceedance)
 
     def combine_scenarios(self, reach_id):

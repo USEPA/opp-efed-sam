@@ -323,7 +323,7 @@ class ModelInputs(dict):
 
         # Populate matrix
         matrix = []
-        for app_num in range(1, int(self['napps']) + 1):
+        for app_num in np.arange(int(float(self['napps']))) + 1:
             crops = self[f'crop_{app_num}'].split(' ')
             for crop in crops:
                 row = []
