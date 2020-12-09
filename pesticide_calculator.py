@@ -7,9 +7,10 @@ def pesticide_calculator(input_data):
     print(input_data)
     for k, v in input_data.items():
         print(k, v['0'])
+    exit()
     # Initialize a class with all the simulation parameters (input data, field names, hardwired parameters, dates etc)
     sim = Simulation(input_data)
-    print(sim.local_run)
+
     # Iterate through each hydroregion that encompasses the run
     for region_id in sim.run_regions:
         report('Processing hydroregion {}...'.format(region_id))
