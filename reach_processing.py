@@ -1,9 +1,7 @@
 import os
-import re
-import pandas as pd
 import numpy as np
-from numba import njit, guvectorize
-from .tools.efed_lib import MemoryMatrix, DateManager, report
+from numba import njit
+from .tools.efed_lib import MemoryMatrix, DateManager
 from .utilities import ImpulseResponseMatrix
 
 
@@ -194,8 +192,8 @@ class ReachManager(DateManager, MemoryMatrix):
         # Get local runoff, erosion, and pesticide masses
         total_flow, baseflow, (wc_conc, runoff_conc) = \
             water_column_concentration(runoff, runoff_mass, self.n_dates, flow)
-        benthic_conc = benthic_concentration(erosion, erosion_mass, surface_area,
-                                             self.sim.benthic_depth, self.sim.benthic_porosity)
+        benthic_conc = benthic_concentration(
+            erosion, erosion_mass, surface_area, self.sim.benthic_depth, self.sim.benthic_porosity)
         # Make sure this matches the order specified in fields_and_qc.csv
         return np.array([total_flow, baseflow, wc_conc, benthic_conc, runoff_conc])
 
@@ -240,15 +238,17 @@ def benthic_loop(eroded_soil, erosion_mass, soil_volume):
     return benthic_mass
 
 
-@guvectorize(['void(float64[:], float64[:], float64[:], int16[:], float64[:])'], '(p),(o),(o),(p)->(o)')
-def exceedance_probability(time_series, window_sizes, thresholds, years_since_start, res):
+#@njit
+def exceedance_probability(time_series, window_sizes, thresholds, years_since_start):
+    result = np.zeros(window_sizes.shape)
     # Count the number of times the concentration exceeds the test threshold in each year
     n_years = years_since_start.max()
     for test_number in range(window_sizes.size):
+        print(window_sizes.size, threshold.size, test_number, n_years)
         window_size = window_sizes[test_number]
         threshold = thresholds[test_number]
         if np.isnan(threshold) or np.isnan(threshold):
-            res[test_number] = -1
+            result[test_number] = -1
         else:
             window_size = np.int32(window_size)
             window_sum = np.sum(time_series[:window_size])
@@ -259,4 +259,5 @@ def exceedance_probability(time_series, window_sizes, thresholds, years_since_st
                 avg = window_sum / window_size
                 if avg > threshold:
                     exceedances[year] = 1
-            res[test_number] = exceedances.sum() / n_years
+            result[test_number] = exceedances.sum() / n_years
+    return result
