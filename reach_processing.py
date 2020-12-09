@@ -102,6 +102,8 @@ class ReachManager(DateManager, MemoryMatrix):
             self.output.update_full_time_series(reach_id, upstream_time_series)
 
             # Calculate excedance probabilities of endpoints
+            print(self.sim.endpoints.duration.values)
+            print(self.sim.endpoints.threshold.values)
             exceedance = \
                 exceedance_probability(wc_conc, self.sim.endpoints.duration.values, self.sim.endpoints.threshold.values,
                                        self.year_index)
