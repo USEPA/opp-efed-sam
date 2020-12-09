@@ -1,41 +1,31 @@
-{'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d90e154e7ddc'},
- 'simulation_name': {'0': 'Mark Twain Atrazine 062217'},
- 'chemical_name': {'0': 'Custom'},
- 'kd_flag': {'0': '1.0'},
- 'koc': {'0': '75.0'},
- 'soil_hl': {'0': '139.0'},
- 'wc_metabolism_hl': {'0': '277.0'},
- 'ben_metabolism_hl': {'0': '277.0'},
- 'aq_photolysis_hl': {'0': '168.0'},
- 'hydrolysis_hl': {'0': '0.0'},
- 'napps': {'0': '1.0'},
- 'crop_1': {'0': '10 14 15 18'},
- 'event_1': {'0': 'plant'},
- 'offset_1': {'0': '0.0'},
- 'dist_1': {'0': 'ground'},
- 'window1_1': {'0': '7.0'},
- 'pct1_1': {'0': '100.0'},
- 'window2_1': {'0': '7.0'},
- 'pct2_1': {'0': '100.0'},
- 'method_1': {'0': 'uniform'},
- 'apprate_1': {'0': '1.0'},
- 'effic_1': {'0': '1.0'},
- 'region': {'0': 'Mark Twain Demo'},
- 'sim_type': {'0': 'eco'},
- 'sim_date_start': {'0': '01/01/2000'},
- 'sim_date_end': {'0': '12/31/2015'},
- 'acute_human': {'0': '3.4'},
- 'chronic_human': {'0': ''},
- 'overall_human': {'0': ''},
- 'acute_fw_fish': {'0': '2650.0'},
- 'chronic_fw_fish': {'0': '0.5'},
- 'acute_fw_inv': {'0': '360.0'},
- 'chronic_fw_inv': {'0': '60.0'},
- 'acute_em_fish': {'0': '1000.0'},
- 'chronic_em_fish': {'0': '0.5'},
- 'acute_em_inv': {'0': '24.0'},
- 'chronic_em_inv': {'0': '80.0'},
- 'acute_nonvasc_plant': {'0': '1.0'},
- 'chronic_nonvasc_plant': {'0': ''},
- 'acute_vasc_plant': {'0': '4.6'},
- 'chronic_vasc_plant': {'0': ''}}
+import numpy as np
+
+durations = [1, 7, 21]
+
+
+def exceedance_probability(time_series, durations, endpoints, years_since_start):
+    # Count the number of times the concentration exceeds the test threshold in each year
+
+    result = np.zeros(durations.shape)
+
+    n_years = years_since_start.max()
+
+    # Set up the test for each endpoints
+    for test_number in range(durations.size):
+        duration = durations[test_number]
+        endpoint = endpoints[test_number]
+
+        # If the duration or endpoint isn't set, set the value to 1
+        if np.isnan(endpoint) or np.isnan(duration):
+            result[test_number] = -1
+        else:
+            duration_total = np.sum(time_series[:duration])
+            exceedances = np.zeros(n_years)
+            for day in range(duration, len(time_series)):
+                year = years_since_start[day]
+                duration_total += time_series[day] - time_series[day - duration]
+                avg = duration_total / duration
+                if avg > endpoint:
+                    exceedances[year] = 1
+            result[test_number] = exceedances.sum() / n_years
+    return result

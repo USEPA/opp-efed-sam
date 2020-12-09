@@ -100,8 +100,6 @@ class ReachManager(DateManager, MemoryMatrix):
             self.output.update_full_time_series(reach_id, upstream_time_series)
 
             # Calculate excedance probabilities of endpoints
-            print(self.sim.endpoints.duration.values)
-            print(self.sim.endpoints.threshold.values)
             exceedance = \
                 exceedance_probability(wc_conc, self.sim.endpoints.duration.values.astype(np.int32),
                                        self.sim.endpoints.threshold.values, self.year_index)
@@ -219,45 +217,45 @@ def water_column_concentration(runoff, transported_mass, n_dates, q):
     return total_flow, baseflow, map(lambda x: x * 1000000., (concentration, runoff_concentration))  # kg/m3 -> ug/L
 
 
+@njit
 def benthic_concentration(erosion, erosion_mass, surface_area, benthic_depth, benthic_porosity):
     """ Compute concentration in the benthic layer based on mass of eroded sediment """
 
     soil_volume = benthic_depth * surface_area
     pore_water_volume = soil_volume * benthic_porosity
-    benthic_mass = benthic_loop(erosion, erosion_mass, soil_volume)
+    benthic_mass = np.zeros(erosion_mass.size, dtype=np.float32)
+    benthic_mass[0] = erosion_mass[0]
+    for i in range(1, erosion_mass.size):
+        influx_ratio = erosion[i] / (erosion[i] + soil_volume)
+        benthic_mass[i] = (benthic_mass[i - 1] * (1. - influx_ratio)) + (erosion_mass[i] * (1. - influx_ratio))
     return benthic_mass / pore_water_volume
 
 
 @njit
-def benthic_loop(eroded_soil, erosion_mass, soil_volume):
-    benthic_mass = np.zeros(erosion_mass.size, dtype=np.float32)
-    benthic_mass[0] = erosion_mass[0]
-    for i in range(1, erosion_mass.size):
-        influx_ratio = eroded_soil[i] / (eroded_soil[i] + soil_volume)
-        benthic_mass[i] = (benthic_mass[i - 1] * (1. - influx_ratio)) + (erosion_mass[i] * (1. - influx_ratio))
-    return benthic_mass
-
-
-#@njit
-def exceedance_probability(time_series, window_sizes, thresholds, years_since_start):
-    result = np.zeros(window_sizes.shape)
+def exceedance_probability(time_series, durations, endpoints, years_since_start):
     # Count the number of times the concentration exceeds the test threshold in each year
-    n_years = years_since_start.max()
-    for test_number in range(window_sizes.size):
-        print(window_sizes.size, thresholds.size, test_number, n_years)
-        window_size = window_sizes[test_number]
-        threshold = thresholds[test_number]
-        if np.isnan(threshold) or np.isnan(threshold):
+    result = np.zeros(durations.shape)
+
+    n_years = years_since_start.max() + 1
+
+    # Set up the test for each endpoints
+    for test_number in range(durations.size):
+        duration = durations[test_number]
+        endpoint = endpoints[test_number]
+
+        # If the duration or endpoint isn't set, set the value to 1
+        if np.isnan(endpoint) or np.isnan(duration):
             result[test_number] = -1
         else:
-            window_size = np.int32(window_size)
-            window_sum = np.sum(time_series[:window_size])
+            # Initialize an array of exceedance
             exceedances = np.zeros(n_years)
-            for day in range(window_size, len(time_series)):
+            # Add up all the daily loads for the window. This is used to calculate a daily average
+            duration_total = np.sum(time_series[:duration])
+            for day in range(duration, len(time_series)):
                 year = years_since_start[day]
-                window_sum += time_series[day] - time_series[day - window_size]
-                avg = window_sum / window_size
-                if avg > threshold:
+                duration_total += time_series[day] - time_series[day - duration]
+                avg = duration_total / duration
+                if avg > endpoint:
                     exceedances[year] = 1
             result[test_number] = exceedances.sum() / n_years
     return result
