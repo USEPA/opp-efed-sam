@@ -217,7 +217,7 @@ def water_column_concentration(runoff, transported_mass, n_dates, q):
     return total_flow, baseflow, map(lambda x: x * 1000000., (concentration, runoff_concentration))  # kg/m3 -> ug/L
 
 
-@njit
+#@njit
 def benthic_concentration(erosion, erosion_mass, surface_area, benthic_depth, benthic_porosity):
     """ Compute concentration in the benthic layer based on mass of eroded sediment """
 
@@ -231,7 +231,7 @@ def benthic_concentration(erosion, erosion_mass, surface_area, benthic_depth, be
     return benthic_mass / pore_water_volume
 
 
-@njit
+#@njit
 def exceedance_probability(time_series, durations, endpoints, years_since_start):
     # Count the number of times the concentration exceeds the test threshold in each year
     result = np.zeros(durations.shape)
