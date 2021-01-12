@@ -7,11 +7,12 @@ level,var,dir,base,desc
 2,condensed_nhd,input_path,CondensedNHD/{}/r{}_{}.csv,"nav/sam, region, reach/waterbody"
 2,weather,input_path,Weather/weather_{},array or key
 2,recipes,input_path,RecipeFiles/r{},region
-2,s1_scenarios,input_path,SamScenarios/r{}_{}.csv,"region, block"
+2,s1_scenarios_table,input_path,SamScenarios/r{}_{}.csv,"region, block"
 2,dw_intakes,input_path,Intakes/intake_locations.csv,
 2,manual_intakes,input_path,Intakes/mtb_single_intake.csv,
 2,navigator,input_path,NavigatorFiles/nav{}.npz,region
 2,nhd_wbd_xwalk,data_root,NHD_HUC_Crosswalk/CrosswalkTable_NHDplus_HU12.csv,
+2,s1_scenarios,intermediate_path,StageOneScenarios/r{},region
 2,s2_scenarios,intermediate_path,StageTwoScenarios/r{},region
 2,s3_scenarios,scratch_path,r{},region
 2,fields_and_qc,table_path,fields_and_qc.csv,

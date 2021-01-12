@@ -4,7 +4,6 @@ from .scenario_processing import StageOneScenarios, StageTwoScenarios, StageThre
 
 
 def pesticide_calculator(input_data):
-
     # Initialize a class with all the simulation parameters (input data, field names, hardwired parameters, dates etc)
     sim = Simulation(input_data)
 
@@ -15,20 +14,22 @@ def pesticide_calculator(input_data):
         # Initialize a weather file reader
         met = WeatherArray(sim)
 
+        # Load watershed topology maps and account for necessary files
+        region = HydroRegion(region_id, sim)
+
         # Load recipes for region and year
         recipes = WatershedRecipes(region_id, sim)
 
         # Initialize Stage 1 scenarios (parameters linked to a unique soil-weather-land cover combination)
-        stage_one = StageOneScenarios(region_id, sim, recipes)  # in
+        stage_one = StageOneScenarios(region, sim, recipes)
 
         # Initialize Stage 2 scenarios (time series of non-chemical data, e.g., runoff, erosion, rainfall...)
-        stage_two = StageTwoScenarios(region_id, sim, stage_one, met, tag='mtb', build=False)
+        stage_two = StageTwoScenarios(region, sim, stage_one, met)
+        if sim.build_scenarios:  # If 'build' mode is on, skip the rest of the process
+            continue
 
         # Initialize Stage 3 scenarios (time series of chemical transport data e.g., runoff mass, erosion mass)
-        stage_three = StageThreeScenarios(sim, stage_two, True)
-
-        # Load watershed topology maps and account for necessary files
-        region = HydroRegion(region_id, sim)
+        stage_three = StageThreeScenarios(sim, stage_one, stage_two)
 
         # Initialize output object
         outputs = ModelOutputs(sim, region, stage_three)
@@ -40,6 +41,7 @@ def pesticide_calculator(input_data):
         # Traverse downstream in the watershed
         for tier, reach_ids, lakes in region.cascade:
             report(f'Running tier {tier}, ({len(reach_ids)} reaches)...')
+            # TODO - parallelize
             reaches.process_local(reach_ids)
 
             # Perform full analysis including time-of-travel and concentration for active reaches

@@ -117,7 +117,7 @@ class ReachManager(DateManager, MemoryMatrix):
         for year in self.recipes.years:
             # Pull the watershed recipe for the reach and year
             recipe = self.recipes.fetch(reach_id, year)  # recipe is indexed by scenario_index
-            if not recipe.empty:
+            if recipe is not None:
                 # Pull runoff and erosion from Stage 2 Scenarios
                 transport, found_s2 = self.s2.fetch_from_recipe(recipe)
                 runoff, erosion = weight_and_combine(transport, found_s2.area)
@@ -211,13 +211,14 @@ def water_column_concentration(runoff, transported_mass, n_dates, q):
     """
     mean_runoff = runoff.mean()  # m3/d
     baseflow = np.subtract(q, mean_runoff, out=np.zeros(n_dates), where=(q > mean_runoff))
+
     total_flow = runoff + baseflow
     concentration = np.divide(transported_mass, total_flow, out=np.zeros(n_dates), where=(total_flow != 0))
     runoff_concentration = np.divide(transported_mass, runoff, out=np.zeros(n_dates), where=(runoff != 0))
     return total_flow, baseflow, map(lambda x: x * 1000000., (concentration, runoff_concentration))  # kg/m3 -> ug/L
 
 
-#@njit
+@njit
 def benthic_concentration(erosion, erosion_mass, surface_area, benthic_depth, benthic_porosity):
     """ Compute concentration in the benthic layer based on mass of eroded sediment """
 
@@ -231,7 +232,7 @@ def benthic_concentration(erosion, erosion_mass, surface_area, benthic_depth, be
     return benthic_mass / pore_water_volume
 
 
-#@njit
+@njit
 def exceedance_probability(time_series, durations, endpoints, years_since_start):
     # Count the number of times the concentration exceeds the test threshold in each year
     result = np.zeros(durations.shape)

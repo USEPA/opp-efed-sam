@@ -1,10 +1,8 @@
 # SAM Input Data Files
-bin/Intakes/*
-bin/Results/*
-bin/Scenarios/*
-bin/Tables/*
-Development/*
-old/*
+dev/*
+envs/*
+temp/*
+dask-worker-space/*
 
 .DS_Store
 

@@ -26,7 +26,7 @@ class HydroRegion(Navigator):
 
         # Assign a watershed navigator to the class
         # TODO - a path should be provided here
-        super(HydroRegion, self).__init__(self.id)
+        super(HydroRegion, self).__init__(sim.navigator_path.format(self.id))
 
         # Read hydrological input files
         self.reach_table = pd.read_csv(sim.condensed_nhd_path.format('sam', region, 'reach'))
@@ -49,18 +49,18 @@ class HydroRegion(Navigator):
     def sort_reaches(self, intakes, intakes_only):
         """
         intakes - reaches corresponding to an intake
-        active - all reaches upstream of an intake
-        output - reaches for which a full suite of outputs is computed
+        local - all reaches upstream of an intake
+        full - reaches for which a full suite of outputs is computed
         intakes_only - do we do the full monty for the intakes only, or all upstream?
         lake_outlets - reaches that correspond to the outlet of a lake
         """
 
         # Confine to available reaches and assess what's missing
         if intakes is None:
-            local = full = self.reach_table.comid
+            local = full = self.reach_table.lookup.values
         else:
             local = self.confine(intakes)
-            if intakes_only:
+            if intakes_only:  # eco mode but intakes provided - not a situation that happens yet
                 full = intakes
             else:
                 full = local
@@ -101,7 +101,7 @@ class HydroRegion(Navigator):
         for outlet in lake_outlets:
             upstream_lakes = len((set(self.upstream_watershed(outlet)) - {outlet}) & lake_outlets)
             reach_counts.append([outlet, upstream_lakes])
-        reach_counts = pd.DataFrame(reach_counts, columns=['comid', 'n_upstream']).sort_values('n_upstream')
+        reach_counts = pd.DataFrame(reach_counts, columns=['comid', 'n_upstream'])
 
         # Cascade downward through tiers
         upstream_outlets = set()  # outlets from previous tier
@@ -168,6 +168,7 @@ class Simulation(DateManager):
     """
 
     def __init__(self, input_json):
+        # TODO - confirm that everything works as intended here, esp. for eco runs
         # Determine whether the simulation is being run on a windows desktop (local for epa devs)
         self.local_run = any([r'C:' in p for p in sys.path])
 
@@ -194,11 +195,22 @@ class Simulation(DateManager):
             dask_scheduler = os.environ.get('DASK_SCHEDULER')
             self.dask_client = Client(dask_scheduler)
 
-        # Initialize dates
-        DateManager.__init__(self, np.datetime64(self.sim_date_start), np.datetime64(self.sim_date_end))
-
         # Select regions and reaches that will be run
-        self.intakes, self.run_regions, self.intake_reaches = self.processing_extent()
+        # If the parameter given for 'simulation_name' indicates a 'build mode' run, parse it from there.
+        # This will trigger a build of Stage 2 Scenarios and not a SAM run
+        self.build_scenarios, self.intakes, self.run_regions, self.intake_reaches, self.tag = \
+            self.detect_build_mode()
+
+        if not self.build_scenarios:
+            self.intakes, self.run_regions, self.intake_reaches = self.processing_extent()
+            # TODO - this is for testing on the mark twain basin. delete when scaling up
+            if self.region == 'Mark Twain Demo':
+                self.tag = 'mtb'
+
+        # Initialize dates
+        DateManager.__init__(self, *self.align_dates())
+
+        self.intakes_only = (self.sim_type != 'eco') or self.intake_reaches is None
 
         # Initialize an impulse response matrix if convolving time of travel
         self.irf = None if not self.gamma_convolve else ImpulseResponseMatrix(self.dates.size)
@@ -209,6 +221,53 @@ class Simulation(DateManager):
         # Read token
         self.token = \
             self.simulation_name if not hasattr(self, 'csrfmiddlewaretoken') else self.csrfmiddlewaretoken
+
+    def align_dates(self):
+        # If building scenarios, the simulation start/end dates should be the scenario start/end dates
+        # Check to make sure that weather data is available for all years
+        if self.build_scenarios:
+            if (self.scenario_start_date < self.weather_start_date) or (
+                    self.scenario_end_date > self.weather_end_date):
+                raise ValueError("Scenario dates must be completely within available weather dates")
+            else:
+                return self.scenario_start_date, self.scenario_end_date
+
+        # If not building scenarios, set the dates of the simulation to the period of overlap
+        # between the user-specified dates and the dates of the available input data
+        sim_start = np.datetime64(self.sim_date_start)
+        sim_end = np.datetime64(self.sim_date_end)
+
+        data_start = max((self.weather_start_date, self.scenario_start_date))
+        data_end = min((self.weather_end_date, self.scenario_end_date))
+        messages = []
+        if sim_start < data_start:
+            sim_start = data_start
+            messages.append('start date is earlier')
+        if sim_end > data_end:
+            sim_end = data_end
+            messages.append('end date is later')
+        if any(messages):
+            report(f'Simulation {" and ".join(messages)} than range of available input data. '
+                   f'Date range has been truncated at {sim_start} to {sim_end}.')
+        return sim_start, sim_end
+
+    def detect_build_mode(self):
+        params = self.simulation_name.lower().split("&")
+        if len(params) > 1:
+            build_mode = True
+            regions = params[1].split(",")
+        else:
+            build_mode = False
+            regions = None
+        if len(params) > 2:
+            intake_reaches = list(map(int, params[2].split(",")))
+        else:
+            intake_reaches = None
+        if len(params) > 3:
+            tag = params[3]
+        else:
+            tag = None
+        return build_mode, None, regions, intake_reaches, tag
 
     def check_directories(self):
         # Make sure needed subdirectories exist
@@ -247,6 +306,7 @@ class Simulation(DateManager):
             [self.surface_dx] + [self.layer_dx] * (self.n_increments - 1))
         self.depth = np.cumsum(self.delta_x)
         self.bins = np.minimum(self.depth_bins.size - 1, np.digitize(self.depth * 100., self.depth_bins))
+        self.types = pd.read_csv(self.types_path).set_index('type')
 
     def processing_extent(self):
         """ Determine which NHD regions need to be run to process the specified reacches """
@@ -259,7 +319,7 @@ class Simulation(DateManager):
         self.sim_type = 'manual'
         intake_file = {'drinking_water': self.dw_intakes_path,
                        'manual': self.manual_intakes_path}.get(self.sim_type)
-        self.intakes_only = (self.sim_type != 'eco')
+
         # Get reaches and regions to be processed if not running eco
         # Intake files must contain 'comid' and 'region' fields
         if intake_file is not None:
@@ -371,8 +431,8 @@ class ModelInputs(dict):
     def output_selection(self, table_path):
         # TODO - this is hardwired for now - move it to the input page
         t = pd.read_csv(table_path)
-        output_dict = {'local_time_series': [var for _, var, sel in t[t.table == 'local'].values if int(sel)],
-                       'full_time_series': [var for _, var, sel in t[t.table == 'full'].values if int(sel)]}
+        output_dict = {'local_time_series': [var for var, _, sel in t[t.table == 'local'].values if int(sel)],
+                       'full_time_series': [var for var, _, sel in t[t.table == 'full'].values if int(sel)]}
         map_dict = t[t.table == 'map'].set_index('var').sel.to_dict()
         output_dict['map_reaches'] = map_dict['reaches']
         output_dict['map_intakes'] = map_dict['intakes']
@@ -412,7 +472,6 @@ class ModelOutputs(DateManager):
         self.contributions = np.zeros((len(self.local_reaches), 2, s3.n_active_crops))
 
         # The probability that concentration exceeds endpoint thresholds
-        # TODO - this could probably be a dataframe too
         self.exceedances = pd.DataFrame(np.zeros((len(region.full_reaches), self.sim.endpoints.shape[0])),
                                         index=pd.Series(region.full_reaches, name='comid'),
                                         columns=self.sim.endpoints.short_name)
@@ -470,7 +529,7 @@ class ModelOutputs(DateManager):
 
         # Initialize index and headings
         index = pd.Series(np.int64(self.contributions_index).astype(str), name='comid')
-        cols = [f'cdl_{cls}' for cls in self.active_crops.cdl_alias.values]
+        cols = [f'cdl_{cls}' for cls in self.active_crops]
 
         # Get the total contributions for each crop, source, reach and hc
         by_crop = pd.DataFrame({'total_mass': self.contributions.sum(axis=(0, 1))}, cols)
@@ -526,29 +585,33 @@ class WatershedRecipes(object):
         # Get all the available years from the recipe
         self.years = sorted(self.map.year.unique())
 
-    def fetch(self, reach_id, year='all'):
-        # TODO - 'all' doesn't work yet
-        start, end = self.lookup(reach_id, year)
-        if all((start, end)):
+    def fetch(self, reach_id, year='all years'):
+        address = self.lookup(reach_id, year, verbose=True)
+        if address is not None:
+            n_blocks = address.shape[0]
+            results = []
             fp = np.memmap(f'{self.path}', dtype=np.int64, mode='r', shape=self.shape)
-            result = fp[start:end]
+            for start, end in address:
+                block = pd.DataFrame(fp[start:end], columns=['scenario_index', 'area']).set_index('scenario_index')
+                if n_blocks == 1:
+                    return block
+                else:
+                    results.append(block)
         else:
-            result = None
-        return pd.DataFrame(result, columns=['scenario_index', 'area']).set_index('scenario_index')
+            return None
+        return pd.concat(results, axis=0)
 
     def lookup(self, reach_id, year, verbose=False):
-        if year != 'all':
+        if year != 'all years':
             result = self.map[(self.map.comid == reach_id) & (self.map.year == year)]
         else:
             result = self.map[(self.map.comid == reach_id)]
         if result.shape[0] < 1:
             if verbose:
                 report(f'No recipes found for {reach_id}, {year}', 2)
-            return None, None
-        elif result.shape[0] > 1:
-            raise KeyError(f'Lookup error for {reach_id}, {year}')
+            return None
         else:
-            return result.iloc[0][['start', 'end']].values
+            return result[['start', 'end']].values
 
 
 class WeatherArray(MemoryMatrix, DateManager):
@@ -561,13 +624,12 @@ class WeatherArray(MemoryMatrix, DateManager):
         index, header, start_date, end_date = self.load_key(key_path)
 
         # Set dates
-        # TODO - this could be an intrinsic function of the date manager class
-        self.start_offset = 0
-        self.end_offset = 0
         DateManager.__init__(self, start_date, end_date)
+        self.start_offset, self.end_offset = self.date_offset(sim.start_date, sim.end_date, coerce=False)
+        self.end_offset = -self.n_dates if self.end_offset == 0 else self.end_offset
 
         # Initialize memory matrix
-        MemoryMatrix.__init__(self, [index, self.n_dates, header], np.float32, array_path, True)
+        MemoryMatrix.__init__(self, [index, self.n_dates, header], np.float32, array_path, True, name='weather')
 
     @staticmethod
     def load_key(key_path):
@@ -578,8 +640,6 @@ class WeatherArray(MemoryMatrix, DateManager):
         return points.T[0], header, start_date, end_date
 
     def fetch_station(self, station_id):
-        if self.end_offset == 0:
-            self.end_offset = self.n_dates
         data = self.fetch(station_id, copy=True, verbose=True).T
         data[:2] /= 100.  # Precip, PET  cm -> m
-        return data[:, self.start_offset:self.end_offset]
+        return data[:, self.start_offset:-self.end_offset]

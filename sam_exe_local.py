@@ -13,10 +13,13 @@ class Sam(object):
     def execute_model(self):
         self.pd_obj_out = pesticide_calculator(self.pd_obj)
 
-def main():
+def main(build=False):
     """ This is what gets run when running straight from Python """
-    from .dev.test_inputs import atrazine_json_mtb
+    if build:
+        from .dev.test_inputs import atrazine_json_mtb_build as input_dict
+    else:
+        from .dev.test_inputs import atrazine_json_mtb as input_dict
     print('Running pesticide calculator...')
-    sam = Sam(atrazine_json_mtb)
+    sam = Sam(input_dict)
     sam.execute_model()
 
