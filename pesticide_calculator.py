@@ -55,5 +55,6 @@ def pesticide_calculator(input_data):
         report('Writing output...')
         # intake_dict = {'COMID': {4867727: {'acute_human': 1.0,
         # reach_dict = {'comid': {'5640192': 0.0...}, 'huc_8': {'01010101': 0.0,..
-        intake_dict, reach_dict = outputs.prepare_output(write=False)
+        output_write = "True" == os.getenv('SAM_WRITE_OUTPUT', "False")
+        intake_dict, reach_dict = outputs.prepare_output(write=output_write)
         return {'intakes': intake_dict, 'reaches': reach_dict}
