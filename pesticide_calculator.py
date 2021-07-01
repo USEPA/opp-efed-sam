@@ -1,3 +1,4 @@
+import os
 from .utilities import Simulation, HydroRegion, WatershedRecipes, WeatherArray, ModelOutputs, report
 from .reach_processing import ReachManager
 from .scenario_processing import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
