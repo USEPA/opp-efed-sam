@@ -1,5 +1,5 @@
-from .utilities import Simulation, WeatherArray, ModelOutputs, report
 from .hydrology import HydroRegion
+from .utilities import Simulation, WeatherArray, ModelOutputs, report
 from .reach_processing import ReachManager, WatershedRecipes
 from .scenario_processing import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
 
@@ -59,5 +59,6 @@ def pesticide_calculator(input_data):
     report('Writing output...')
     # intake_dict = {'COMID': {4867727: {'acute_human': 1.0,
     # reach_dict = {'comid': {'5640192': 0.0...}, 'huc_8': {'01010101': 0.0,..
+    #output_write = "True" == os.getenv('SAM_WRITE_OUTPUT', "False")
     intake_dict, reach_dict = outputs.prepare_output(write=True)
     return {'intakes': intake_dict, 'reaches': reach_dict}

@@ -199,7 +199,7 @@ class Simulation(DateManager):
         if self.local_run:
             paths['data_root'] = r'E:/opp-efed-data/sam'
         else:
-            paths['data_root'] = r'/src/app-data/sampreprocessed'
+            paths['data_root'] = os.getenv('SAM_INPUTS_DIR', r'/src/app-data/sampreprocessed')
         paths['local_root'] = pathlib.Path(__file__).parent.absolute()
         paths_table = os.path.join(paths['local_root'], 'Tables', 'paths.csv')
         table = pd.read_csv(paths_table).sort_values('level')[['var', 'dir', 'base']]
