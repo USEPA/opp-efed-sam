@@ -1,163 +1,15 @@
 import os
 import re
-import math
 import numpy as np
 import pandas as pd
-import json
 import sys
 import pathlib
-from ast import literal_eval
+import logging
 from distributed import Client
 
-from .tools.efed_lib import FieldManager, MemoryMatrix, DateManager, report
+from .hydrology import ImpulseResponseMatrix
+from .tools.efed_lib import FieldManager, MemoryMatrix, DateManager
 from .hydro.params_nhd import nhd_regions
-from .hydro.navigator import Navigator
-from .hydro.process_nhd import identify_waterbody_outlets, calculate_surface_area
-
-
-class HydroRegion(Navigator):
-    """
-    Contains all datasets and functions related to the NHD Plus region, including all hydrological features and links
-    """
-
-    def __init__(self, region, sim):
-
-        self.id = region
-
-        # Assign a watershed navigator to the class
-        # TODO - a path should be provided here
-        super(HydroRegion, self).__init__(sim.navigator_path.format(self.id))
-
-        # Read hydrological input files
-        self.reach_table = pd.read_csv(sim.condensed_nhd_path.format('sam', region, 'reach'))
-        self.lake_table = pd.read_csv(sim.condensed_nhd_path.format('sam', region, 'waterbody'))
-        self.huc_crosswalk = pd.read_csv(sim.nhd_wbd_xwalk_path, dtype=object)[['FEATUREID', 'HUC_12']] \
-            .rename(columns={'FEATUREID': 'comid'})
-
-        self.process_nhd()
-
-        # Initialize the fields that will be used to pull flows based on month
-        self.flow_fields = [f'q_{str(month).zfill(2)}' for month in sim.month_index]
-
-        # Select which stream reaches will be fully processed, locally processed, or excluded
-        self.local_reaches, self.full_reaches, self.reservoir_outlets = \
-            self.sort_reaches(sim.intake_reaches, sim.intakes_only)
-
-        # Holder for reaches that have been processed
-        self.burned_reaches = set()
-
-    def sort_reaches(self, intakes, intakes_only):
-        """
-        intakes - reaches corresponding to an intake
-        local - all reaches upstream of an intake
-        full - reaches for which a full suite of outputs is computed
-        intakes_only - do we do the full monty for the intakes only, or all upstream?
-        lake_outlets - reaches that correspond to the outlet of a lake
-        """
-
-        # Confine to available reaches and assess what's missing
-        if intakes is None:
-            local = full = self.reach_table.lookup.values
-        else:
-            local = self.confine(intakes)
-            if intakes_only:  # eco mode but intakes provided - not a situation that happens yet
-                full = intakes
-            else:
-                full = local
-        reservoir_outlets = \
-            self.lake_table.loc[np.in1d(self.lake_table.outlet_comid, local)][['outlet_comid', 'wb_comid']]
-
-        return local, full, reservoir_outlets
-
-    def process_nhd(self):
-        self.lake_table = \
-            identify_waterbody_outlets(self.lake_table, self.reach_table)
-
-        # Add HUC ids to the reach table
-        self.huc_crosswalk.comid = self.huc_crosswalk.comid.astype(np.int32)
-        self.reach_table = self.reach_table.merge(self.huc_crosswalk, on='comid')
-        self.reach_table['HUC_8'] = self.reach_table['HUC_12'].str.slice(0, 8)
-
-        # Calculate average surface area of a reach segment
-        self.reach_table['surface_area'] = calculate_surface_area(self.reach_table)
-
-        # Calculate residence times of reservoirs
-        self.lake_table = self.lake_table.merge(self.reach_table[['comid', 'q_ma']],
-                                                left_on='outlet_comid', right_on='comid', how='left')
-        self.lake_table['residence_time'] = self.lake_table.wb_volume / self.lake_table.q_ma
-
-        # Convert units
-        self.reach_table['length'] = self.reach_table.pop('lengthkm') * 1000.  # km -> m
-        for month in list(map(lambda x: str(x).zfill(2), range(1, 13))) + ['ma']:
-            self.reach_table['q_{}'.format(month)] *= 2446.58  # cfs -> cmd
-            self.reach_table['v_{}'.format(month)] *= 26334.7  # f/s -> md
-        self.reach_table = self.reach_table.drop_duplicates().set_index('comid')
-
-    @property
-    def cascade(self):
-        # Tier the reaches by counting the number of outlets (lakes) upstream of each lake outlet
-        reach_counts = []
-        lake_outlets = set(self.reservoir_outlets.outlet_comid)
-        for outlet in lake_outlets:
-            upstream_lakes = len((set(self.upstream_watershed(outlet)) - {outlet}) & lake_outlets)
-            reach_counts.append([outlet, upstream_lakes])
-        reach_counts = pd.DataFrame(reach_counts, columns=['comid', 'n_upstream'])
-
-        # Cascade downward through tiers
-        upstream_outlets = set()  # outlets from previous tier
-        for tier, lake_outlets in reach_counts.groupby('n_upstream')['comid']:
-            lakes = self.lake_table[np.in1d(self.lake_table.outlet_comid, lake_outlets)]
-            all_upstream = {reach for outlet in lake_outlets for reach in self.upstream_watershed(outlet)}
-            reaches = (all_upstream - set(lake_outlets)) | upstream_outlets
-            reaches &= set(self.local_reaches)
-            reaches -= self.burned_reaches
-            yield tier, reaches, lakes
-            self.burned_reaches |= reaches
-            upstream_outlets = set(lake_outlets)
-        all_upstream = {reach for outlet in upstream_outlets for reach in self.upstream_watershed(outlet)}
-        yield -1, all_upstream - self.burned_reaches, pd.DataFrame([])
-
-    def confine(self, outlets):
-        """ If running a series of intakes or reaches, confine analysis to upstream areas only """
-        upstream_reaches = \
-            list({upstream for outlet in outlets for upstream in self.upstream_watershed(outlet)})
-        return pd.Series(upstream_reaches, name='comid')
-
-    def flow_table(self, reach_id):
-        return self.reach_table.loc[reach_id]
-
-    def daily_flows(self, reach_id):
-        # TODO - this is taking a little time, maybe a one-time month-to-field comprehension
-        selected = self.flow_table(reach_id)
-        return selected[self.flow_fields].values.astype(np.float32)
-
-
-class ImpulseResponseMatrix(MemoryMatrix):
-    """ A matrix designed to hold the results of an impulse response function for 50 day offsets """
-
-    def __init__(self, n_dates, size=50):
-        self.n_dates = n_dates
-        self.size = size
-        super(ImpulseResponseMatrix, self).__init__([size, n_dates], name='impulse response')
-        for i in range(size):
-            irf = self.generate(i, 1, self.n_dates)
-            self.update(i, irf)
-
-    def fetch(self, index):
-        if index <= self.size:
-            irf = super(ImpulseResponseMatrix, self).fetch(index, verbose=False)
-        else:
-            irf = self.generate(index, 1, self.n_dates)
-        return irf
-
-    @staticmethod
-    def generate(alpha, beta, length):
-        def gamma_distribution(t, a, b):
-            a, b = map(float, (a, b))
-            tau = a * b
-            return ((t ** (a - 1)) / (((tau / a) ** a) * math.gamma(a))) * math.exp(-(a / tau) * t)
-
-        return np.array([gamma_distribution(i, alpha, beta) for i in range(length)])
 
 
 class Simulation(DateManager):
@@ -185,6 +37,9 @@ class Simulation(DateManager):
         self.__dict__.update(
             ModelInputs(input_json, self.endpoint_format_path, self.fields, self.output_selection_path))
 
+        # TODO - placeholder for when running multiple regions is enabled in the frontend
+        self.run_regions = [self.region]
+
         # Initialize file structure
         self.check_directories()
 
@@ -195,17 +50,12 @@ class Simulation(DateManager):
             dask_scheduler = os.environ.get('DASK_SCHEDULER')
             self.dask_client = Client(dask_scheduler)
 
-        # Select regions and reaches that will be run
-        # If the parameter given for 'simulation_name' indicates a 'build mode' run, parse it from there.
-        # This will trigger a build of Stage 2 Scenarios and not a SAM run
-        self.build_scenarios, self.intakes, self.run_regions, self.intake_reaches, self.tag = \
-            self.detect_build_mode()
+        # Unpack the 'simulation_name' parameter to detect if a special run is called for
+        detected, self.build_scenarios, self.random, self.intake_reaches, self.tag = \
+            self.detect_special_run()
 
-        if not self.build_scenarios:
-            self.intakes, self.run_regions, self.intake_reaches = self.processing_extent()
-            # TODO - this is for testing on the mark twain basin. delete when scaling up
-            if self.region == 'Mark Twain Demo':
-                self.tag = 'mtb'
+        if not detected:
+            self.intake_reaches = self.find_intakes()
 
         # Initialize dates
         DateManager.__init__(self, *self.align_dates())
@@ -221,63 +71,6 @@ class Simulation(DateManager):
         # Read token
         self.token = \
             self.simulation_name if not hasattr(self, 'csrfmiddlewaretoken') else self.csrfmiddlewaretoken
-
-    def align_dates(self):
-        # If building scenarios, the simulation start/end dates should be the scenario start/end dates
-        # Check to make sure that weather data is available for all years
-        if self.build_scenarios:
-            if (self.scenario_start_date < self.weather_start_date) or (
-                    self.scenario_end_date > self.weather_end_date):
-                raise ValueError("Scenario dates must be completely within available weather dates")
-            else:
-                return self.scenario_start_date, self.scenario_end_date
-
-        # If not building scenarios, set the dates of the simulation to the period of overlap
-        # between the user-specified dates and the dates of the available input data
-        sim_start = np.datetime64(self.sim_date_start)
-        sim_end = np.datetime64(self.sim_date_end)
-
-        data_start = max((self.weather_start_date, self.scenario_start_date))
-        data_end = min((self.weather_end_date, self.scenario_end_date))
-        messages = []
-        if sim_start < data_start:
-            sim_start = data_start
-            messages.append('start date is earlier')
-        if sim_end > data_end:
-            sim_end = data_end
-            messages.append('end date is later')
-        if any(messages):
-            report(f'Simulation {" and ".join(messages)} than range of available input data. '
-                   f'Date range has been truncated at {sim_start} to {sim_end}.')
-        return sim_start, sim_end
-
-    def detect_build_mode(self):
-        params = self.simulation_name.lower().split("&")
-        if len(params) > 1:
-            build_mode = True
-            regions = params[1].split(",")
-        else:
-            build_mode = False
-            regions = None
-        if len(params) > 2:
-            intake_reaches = list(map(int, params[2].split(",")))
-        else:
-            intake_reaches = None
-        if len(params) > 3:
-            tag = params[3]
-        else:
-            tag = None
-        return build_mode, None, regions, intake_reaches, tag
-
-    def check_directories(self):
-        # Make sure needed subdirectories exist
-        for subdir in self.scratch_path, self.output_path:
-            if not os.path.exists(subdir):
-                os.makedirs(subdir)
-
-        # Purge temp folder
-        for f in os.listdir(self.scratch_path):
-            os.remove(os.path.join(self.scratch_path, f))
 
     def adjust_data(self):
         """ Convert half-lives to degradation rates """
@@ -308,30 +101,97 @@ class Simulation(DateManager):
         self.bins = np.minimum(self.depth_bins.size - 1, np.digitize(self.depth * 100., self.depth_bins))
         self.types = pd.read_csv(self.types_path).set_index('type')
 
-    def processing_extent(self):
-        """ Determine which NHD regions need to be run to process the specified reacches """
+    def align_dates(self):
+        # If building scenarios, the simulation start/end dates should be the scenario start/end dates
+        # Check to make sure that weather data is available for all years
+        if self.build_scenarios:
+            if (self.scenario_start_date < self.weather_start_date) or (
+                    self.scenario_end_date > self.weather_end_date):
+                raise ValueError("Scenario dates must be completely within available weather dates")
+            else:
+                return self.scenario_start_date, self.scenario_end_date
 
-        assert self.sim_type in ('eco', 'drinking_water', 'manual'), \
+        # If not building scenarios, set the dates of the simulation to the period of overlap
+        # between the user-specified dates and the dates of the available input data
+        sim_start = np.datetime64(self.sim_date_start)
+        sim_end = np.datetime64(self.sim_date_end)
+
+        data_start = max((self.weather_start_date, self.scenario_start_date))
+        data_end = min((self.weather_end_date, self.scenario_end_date))
+        messages = []
+        if sim_start < data_start:
+            sim_start = data_start
+            messages.append('start date is earlier')
+        if sim_end > data_end:
+            sim_end = data_end
+            messages.append('end date is later')
+        if any(messages):
+            report(f'Simulation {" and ".join(messages)} than range of available input data. '
+                   f'Date range has been truncated at {sim_start} to {sim_end}.')
+        return sim_start, sim_end
+
+    def check_directories(self):
+        # Make sure needed subdirectories exist
+        for subdir in self.scratch_path, self.output_path:
+            if not os.path.exists(subdir):
+                os.makedirs(subdir)
+
+        # Purge temp folder
+        for f in os.listdir(self.scratch_path):
+            os.remove(os.path.join(self.scratch_path, f))
+
+    def detect_special_run(self):
+        """
+        A special run can be triggered from the frontend under the 'Simulation Name' field
+        A special run can include the following things:
+            1. Random output will be generated, bypassing the modeling functions. This is for output testing
+            2. A Stage 1 to Stage 2 scenario build can be triggered
+            3. COMIDs can be provided to constrain the model run to an area smaller than a full region
+        The Simulation Name string has the format "[special_mode&intake_reaches&tag]
+        Random output can be triggered by entering "test" as the special mode
+        Scenario building can be triggered by entering "build" as the special mode
+        Geographical constraints can be applied by entering outlet COMIDs separated by commas as intake_reaches
+        An identifying 'tag' is used to create separate files
+
+        Example build string: 'build&4867727&mtb'
+        :return: build_scenarios, intakes, run_regions, intake_reaches, tag, random
+        """
+        detected = special_mode = random = False
+        intake_reaches = tag = None
+        params = self.simulation_name.lower().split("&")
+        if params[0] == 'test':
+            random = True
+            tag = "random"
+        elif params[0] == 'build':
+            special_mode = True
+        elif params[0] == 'confine':
+            pass
+        if len(params) > 1:
+            intake_reaches = list(map(int, params[1].split(",")))
+        if len(params) > 2:
+            tag = params[2]
+            if random:
+                tag = f"random_{tag}"
+        if any((special_mode, random, intake_reaches, tag)):
+            detected = True
+        return detected, special_mode, random, intake_reaches, tag
+
+    def find_intakes(self):
+        """ Read a hardwired intake file """
+        # TODO - The tool is currently only set up for running drinking water intakes.
+        #  This line doesn't do anything right now
+        assert self.sim_type in ('eco', 'drinking_water'), \
             'Invalid simulation type "{}"'.format(self.sim_type)
 
-        # Get the path of the table used for intakes
-        # TODO - there's an issue here. I have to manually assign 'manual' as a value for now and 'eco' isn't working
-        self.sim_type = 'manual'
-        intake_file = {'drinking_water': self.dw_intakes_path,
-                       'manual': self.manual_intakes_path}.get(self.sim_type)
+        intake_file = self.dw_intakes_path
+        intakes = pd.read_csv(intake_file)
+        intakes['region'] = [str(r).zfill(2) for r in intakes.region]
+        intakes = intakes[intakes.region == self.region]
+        return sorted(np.unique(intakes.comid))
 
-        # Get reaches and regions to be processed if not running eco
-        # Intake files must contain 'comid' and 'region' fields
-        if intake_file is not None:
-            intakes = pd.read_csv(intake_file)
-            intakes['region'] = [str(r).zfill(2) for r in intakes.region]
-            run_regions = sorted(np.unique(intakes.region))
-            intake_reaches = sorted(np.unique(intakes.comid))
-        else:  # Run everything if running eco
-            intake_reaches = None
-            run_regions = nhd_regions
-
-        return intakes, run_regions, intake_reaches
+    def initialize_parameters(self):
+        params = pd.read_csv(self.parameters_path, usecols=['parameter', 'value', 'dtype'])
+        return {k: eval(d)(v) for k, v, d in params.values}
 
     def initialize_paths(self):
         paths = {}
@@ -346,10 +206,6 @@ class Simulation(DateManager):
         for var, dirname, basename in table.values:
             paths[f'{var}_path'] = os.path.join(paths[dirname], basename)
         return paths
-
-    def initialize_parameters(self):
-        params = pd.read_csv(self.parameters_path, usecols=['parameter', 'value', 'dtype'])
-        return {k: eval(d)(v) for k, v, d in params.values}
 
 
 class ModelInputs(dict):
@@ -445,11 +301,11 @@ class ModelOutputs(DateManager):
     A class to hold SAM outputs and postprocessing functions
     """
 
-    def __init__(self, sim, region, s3):
+    def __init__(self, sim, region, active_crops):
         self.sim = sim
         self.local_reaches = region.local_reaches
         self.full_reaches = region.full_reaches
-        self.active_crops = s3.active_crops
+        self.active_crops = active_crops
         self.huc_crosswalk = region.reach_table[['HUC_8', 'HUC_12']]
         self.huc_crosswalk.index = self.huc_crosswalk.index.astype(str)
 
@@ -468,8 +324,10 @@ class ModelOutputs(DateManager):
             path=self.array_path.format('full'))
 
         # The relative contribution of pesticide mass broken down by reach, runoff/erosion and crop
+        # The reason for using an empty list as an index is so the results can get appended in the order
+        # in which they're generated, instead of spending time on indexing. Might not be worth it?
         self.contributions_index = []
-        self.contributions = np.zeros((len(self.local_reaches), 2, s3.n_active_crops))
+        self.contributions = np.zeros((len(self.local_reaches), 2, len(self.active_crops)))
 
         # The probability that concentration exceeds endpoint thresholds
         self.exceedances = pd.DataFrame(np.zeros((len(region.full_reaches), self.sim.endpoints.shape[0])),
@@ -497,22 +355,27 @@ class ModelOutputs(DateManager):
         del table['original_order']
         return table
 
-    def prepare_output(self, write=True):
+    def populate_random(self):
+        # Randomly populate the contributions array
+        self.contributions_index = self.local_reaches
+        self.contributions = np.random.rand(*self.contributions.shape) * 10.
+
+        # Randomly populate the exceedance probabilities
+        self.exceedances[:] = np.random.rand(*self.exceedances.shape)
+
+    def prepare_output(self, write_tables=True, write_ts=False):
+
+        if self.sim.random:
+            self.populate_random()
+
         # Break down terrestrial sources of pesticide mass
         full_table, summary_table, contributions_dict = self.process_contributions()
 
         # Write outputs
-        if write:
-            # Write all time series data
-            for reach_id in self.local_reaches:
-                self.write_time_series(reach_id, 'local')
-            for reach_id in self.full_reaches:
-                self.write_time_series(reach_id, 'full')
-
-            # Write summary tables
-            full_table.to_csv(os.path.join(self.sim.output_path, "full_table.csv"))
-            summary_table.to_csv(os.path.join(self.sim.output_path, "summary.csv"))
-            self.exceedances.to_csv(os.path.join(self.sim.output_path, "exceedances.csv"))
+        if write_ts:
+            self.write_time_series()
+        if write_tables:
+            self.write_summary_tables(full_table, summary_table)
 
         # Set mapping dictionaries
         self.exceedances.index = self.exceedances.index.astype(str)
@@ -522,18 +385,13 @@ class ModelOutputs(DateManager):
         return intake_dict, reach_dict
 
     def process_contributions(self):
-        # Build a DataFrame out of the finished contributions table
-        # TODO - this is temporary
-        made_it_this_far = len(self.contributions_index)
-        self.contributions_index = self.contributions_index + list(range(made_it_this_far, self.contributions.shape[0]))
 
         # Initialize index and headings
         index = pd.Series(np.int64(self.contributions_index).astype(str), name='comid')
         cols = [f'cdl_{cls}' for cls in self.active_crops]
 
         # Get the total contributions for each crop, source, reach and hc
-        by_crop = pd.DataFrame({'total_mass': self.contributions.sum(axis=(0, 1))}, cols)
-        by_source = pd.DataFrame({'total_mass': self.contributions.sum(axis=(0, 2))}, ('runoff', 'erosion'))
+        by_source_and_crop = pd.DataFrame(self.contributions.sum(axis=0), ('runoff', 'erosion'), cols)
         by_reach = pd.DataFrame({'total_mass': self.contributions.sum(axis=(1, 2))}, index)
         by_reach = self.percentiles(by_reach, 'total_mass')
         by_huc8, by_huc12 = self.contributions_by_huc(by_reach)
@@ -541,13 +399,12 @@ class ModelOutputs(DateManager):
         # Parse outputs into tables and json
         full_table = pd.DataFrame(self.contributions[:, 0], index, cols) \
             .merge(pd.DataFrame(self.contributions[:, 1], index, cols), on='comid', suffixes=("_runoff", "_erosion"))
-        summary_table = pd.concat([by_crop, by_source], axis=0)
         map_dict = {
             'comid': by_reach['percentile'].T.to_dict(),
             'huc_8': by_huc8.T.to_dict(),
             'huc_12': by_huc12.T.to_dict()
         }
-        return full_table, summary_table, map_dict
+        return full_table, by_source_and_crop, map_dict
 
     def update_contributions(self, reach_id, contributions):
         self.contributions[len(self.contributions_index)] = contributions
@@ -562,56 +419,22 @@ class ModelOutputs(DateManager):
     def update_local_time_series(self, reach_id, data):
         self.local_time_series.update(reach_id, data)
 
-    def write_time_series(self, reach_id, tag):
-        outfile_path = os.path.join(self.sim.output_path, "time_series_{}_{}.csv".format(reach_id, tag))
-        if tag == 'local':
+    def write_summary_tables(self, full_table, summary_table):
+        # Write summary tables
+        full_table.to_csv(os.path.join(self.sim.output_path, "full_table.csv"))
+        summary_table.to_csv(os.path.join(self.sim.output_path, "summary.csv"))
+        self.exceedances.to_csv(os.path.join(self.sim.output_path, "exceedances.csv"))
+
+    def write_time_series(self):
+        outfile_path = os.path.join(self.sim.output_path, "time series", "time_series_{}_{}.csv")
+        if not os.path.exists(os.path.dirname(outfile_path)):
+            os.makedirs(os.path.dirname(outfile_path))
+        for reach_id in self.local_reaches:
             data = pd.DataFrame(self.local_time_series.fetch(reach_id).T, self.sim.dates, self.sim.local_time_series)
-        elif tag == 'full':
+            data.to_csv(outfile_path.format(reach_id, 'local'))
+        for reach_id in self.full_reaches:
             data = pd.DataFrame(self.full_time_series.fetch(reach_id).T, self.sim.dates, self.sim.full_time_series)
-        data.to_csv(outfile_path)
-
-
-class WatershedRecipes(object):
-    def __init__(self, region, sim):
-        self.path = sim.recipes_path.format(region)
-
-        # Read shape
-        with open(f'{self.path}_key.txt') as f:
-            self.shape = literal_eval(next(f))
-
-        # Read lookup map
-        self.map = pd.read_csv(f'{self.path}_map.csv')
-
-        # Get all the available years from the recipe
-        self.years = sorted(self.map.year.unique())
-
-    def fetch(self, reach_id, year='all years'):
-        address = self.lookup(reach_id, year, verbose=True)
-        if address is not None:
-            n_blocks = address.shape[0]
-            results = []
-            fp = np.memmap(f'{self.path}', dtype=np.int64, mode='r', shape=self.shape)
-            for start, end in address:
-                block = pd.DataFrame(fp[start:end], columns=['scenario_index', 'area']).set_index('scenario_index')
-                if n_blocks == 1:
-                    return block
-                else:
-                    results.append(block)
-        else:
-            return None
-        return pd.concat(results, axis=0)
-
-    def lookup(self, reach_id, year, verbose=False):
-        if year != 'all years':
-            result = self.map[(self.map.comid == reach_id) & (self.map.year == year)]
-        else:
-            result = self.map[(self.map.comid == reach_id)]
-        if result.shape[0] < 1:
-            if verbose:
-                report(f'No recipes found for {reach_id}, {year}', 2)
-            return None
-        else:
-            return result[['start', 'end']].values
+            data.to_csv(outfile_path.format(reach_id, 'full'))
 
 
 class WeatherArray(MemoryMatrix, DateManager):
@@ -643,3 +466,10 @@ class WeatherArray(MemoryMatrix, DateManager):
         data = self.fetch(station_id, copy=True, verbose=True).T
         data[:2] /= 100.  # Precip, PET  cm -> m
         return data[:, self.start_offset:-self.end_offset]
+
+
+def report(message, tabs=0):
+    """ Display a message with a specified indentation """
+    tabs = "\t" * tabs
+    print(tabs + str(message))
+    logging.info(tabs + str(message))

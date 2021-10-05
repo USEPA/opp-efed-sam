@@ -1,8 +1,10 @@
 import os
 import numpy as np
+import pandas as pd
+from ast import literal_eval
 from numba import njit
 from .tools.efed_lib import MemoryMatrix, DateManager
-from .utilities import ImpulseResponseMatrix
+from .utilities import ImpulseResponseMatrix, report
 
 
 class ReachManager(DateManager, MemoryMatrix):
@@ -194,6 +196,49 @@ class ReachManager(DateManager, MemoryMatrix):
             erosion, erosion_mass, surface_area, self.sim.benthic_depth, self.sim.benthic_porosity)
         # Make sure this matches the order specified in fields_and_qc.csv
         return np.array([total_flow, baseflow, wc_conc, benthic_conc, runoff_conc])
+
+
+class WatershedRecipes(object):
+    def __init__(self, region, sim):
+        self.path = sim.recipes_path.format(region)
+
+        # Read shape
+        with open(f'{self.path}_key.txt') as f:
+            self.shape = literal_eval(next(f))
+
+        # Read lookup map
+        self.map = pd.read_csv(f'{self.path}_map.csv')
+
+        # Get all the available years from the recipe
+        self.years = sorted(self.map.year.unique())
+
+    def fetch(self, reach_id, year='all years'):
+        address = self.lookup(reach_id, year, verbose=True)
+        if address is not None:
+            n_blocks = address.shape[0]
+            results = []
+            fp = np.memmap(f'{self.path}', dtype=np.int64, mode='r', shape=self.shape)
+            for start, end in address:
+                block = pd.DataFrame(fp[start:end], columns=['scenario_index', 'area']).set_index('scenario_index')
+                if n_blocks == 1:
+                    return block
+                else:
+                    results.append(block)
+        else:
+            return None
+        return pd.concat(results, axis=0)
+
+    def lookup(self, reach_id, year, verbose=False):
+        if year != 'all years':
+            result = self.map[(self.map.comid == reach_id) & (self.map.year == year)]
+        else:
+            result = self.map[(self.map.comid == reach_id)]
+        if result.shape[0] < 1:
+            if verbose:
+                report(f'No recipes found for {reach_id}, {year}', 2)
+            return None
+        else:
+            return result[['start', 'end']].values
 
 
 def weight_and_combine(time_series, areas):

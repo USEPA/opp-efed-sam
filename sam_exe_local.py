@@ -15,11 +15,10 @@ class Sam(object):
 
 def main(build=False):
     """ This is what gets run when running straight from Python """
-    if build:
-        from .dev.test_inputs import atrazine_json_mtb_build as input_dict
-    else:
-        from .dev.test_inputs import atrazine_json_mtb as input_dict
+    from .dev.test_inputs import atrazine_json_test as input_dict
+
     print('Running pesticide calculator...')
     sam = Sam(input_dict)
     sam.execute_model()
+    print(sam.pd_obj_out)
 

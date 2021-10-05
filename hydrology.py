@@ -1,11 +1,160 @@
+import pandas as pd
 import numpy as np
+import math
 from numba import njit
+
+from .hydro.navigator import Navigator
+from .hydro.process_nhd import identify_waterbody_outlets, calculate_surface_area
+from .tools.efed_lib import MemoryMatrix
+
+class HydroRegion(Navigator):
+    """
+    Contains all datasets and functions related to the NHD Plus region, including all hydrological features and links
+    """
+
+    def __init__(self, region, sim):
+
+        self.id = region
+
+        # Assign a watershed navigator to the class
+        # TODO - a path should be provided here
+        super(HydroRegion, self).__init__(sim.navigator_path.format(self.id))
+
+        # Read hydrological input files
+        self.reach_table = pd.read_csv(sim.condensed_nhd_path.format('sam', region, 'reach'))
+        self.lake_table = pd.read_csv(sim.condensed_nhd_path.format('sam', region, 'waterbody'))
+        self.huc_crosswalk = pd.read_csv(sim.nhd_wbd_xwalk_path, dtype=object)[['FEATUREID', 'HUC_12']] \
+            .rename(columns={'FEATUREID': 'comid'})
+
+        self.process_nhd()
+
+        # Initialize the fields that will be used to pull flows based on month
+        self.flow_fields = [f'q_{str(month).zfill(2)}' for month in sim.month_index]
+
+        # Select which stream reaches will be fully processed, locally processed, or excluded
+        self.local_reaches, self.full_reaches, self.reservoir_outlets = \
+            self.sort_reaches(sim.intake_reaches, sim.intakes_only)
+
+        # Holder for reaches that have been processed
+        self.burned_reaches = set()
+
+    def sort_reaches(self, intakes, intakes_only):
+        """
+        intakes - reaches corresponding to an intake
+        local - all reaches upstream of an intake
+        full - reaches for which a full suite of outputs is computed
+        intakes_only - do we do the full monty for the intakes only, or all upstream?
+        lake_outlets - reaches that correspond to the outlet of a lake
+        """
+
+        # Confine to available reaches and assess what's missing
+        if intakes is None:
+            local = full = self.reach_table.lookup.values
+        else:
+            local = self.confine(intakes)
+            if intakes_only:  # eco mode but intakes provided - not a situation that happens yet
+                full = intakes
+            else:
+                full = local
+        reservoir_outlets = \
+            self.lake_table.loc[np.in1d(self.lake_table.outlet_comid, local)][['outlet_comid', 'wb_comid']]
+
+        return local, full, reservoir_outlets
+
+    def process_nhd(self):
+        self.lake_table = \
+            identify_waterbody_outlets(self.lake_table, self.reach_table)
+
+        # Add HUC ids to the reach table
+        self.huc_crosswalk.comid = self.huc_crosswalk.comid.astype(np.int32)
+        self.reach_table = self.reach_table.merge(self.huc_crosswalk, on='comid')
+        self.reach_table['HUC_8'] = self.reach_table['HUC_12'].str.slice(0, 8)
+
+        # Calculate average surface area of a reach segment
+        self.reach_table['surface_area'] = calculate_surface_area(self.reach_table)
+
+        # Calculate residence times of reservoirs
+        self.lake_table = self.lake_table.merge(self.reach_table[['comid', 'q_ma']],
+                                                left_on='outlet_comid', right_on='comid', how='left')
+        self.lake_table['residence_time'] = self.lake_table.wb_volume / self.lake_table.q_ma
+
+        # Convert units
+        self.reach_table['length'] = self.reach_table.pop('lengthkm') * 1000.  # km -> m
+        for month in list(map(lambda x: str(x).zfill(2), range(1, 13))) + ['ma']:
+            self.reach_table['q_{}'.format(month)] *= 2446.58  # cfs -> cmd
+            self.reach_table['v_{}'.format(month)] *= 26334.7  # f/s -> md
+        self.reach_table = self.reach_table.drop_duplicates().set_index('comid')
+
+    @property
+    def cascade(self):
+        # Tier the reaches by counting the number of outlets (lakes) upstream of each lake outlet
+        reach_counts = []
+        lake_outlets = set(self.reservoir_outlets.outlet_comid)
+        for outlet in lake_outlets:
+            upstream_lakes = len((set(self.upstream_watershed(outlet)) - {outlet}) & lake_outlets)
+            reach_counts.append([outlet, upstream_lakes])
+        reach_counts = pd.DataFrame(reach_counts, columns=['comid', 'n_upstream'])
+
+        # Cascade downward through tiers
+        upstream_outlets = set()  # outlets from previous tier
+        for tier, lake_outlets in reach_counts.groupby('n_upstream')['comid']:
+            lakes = self.lake_table[np.in1d(self.lake_table.outlet_comid, lake_outlets)]
+            all_upstream = {reach for outlet in lake_outlets for reach in self.upstream_watershed(outlet)}
+            reaches = (all_upstream - set(lake_outlets)) | upstream_outlets
+            reaches &= set(self.local_reaches)
+            reaches -= self.burned_reaches
+            yield tier, reaches, lakes
+            self.burned_reaches |= reaches
+            upstream_outlets = set(lake_outlets)
+        all_upstream = {reach for outlet in upstream_outlets for reach in self.upstream_watershed(outlet)}
+        yield -1, all_upstream - self.burned_reaches, pd.DataFrame([])
+
+    def confine(self, outlets):
+        """ If running a series of intakes or reaches, confine analysis to upstream areas only """
+        upstream_reaches = \
+            list({upstream for outlet in outlets for upstream in self.upstream_watershed(outlet)})
+        return pd.Series(upstream_reaches, name='comid')
+
+    def flow_table(self, reach_id):
+        return self.reach_table.loc[reach_id]
+
+    def daily_flows(self, reach_id):
+        # TODO - this is taking a little time, maybe a one-time month-to-field comprehension
+        selected = self.flow_table(reach_id)
+        return selected[self.flow_fields].values.astype(np.float32)
+
+
+class ImpulseResponseMatrix(MemoryMatrix):
+    """ A matrix designed to hold the results of an impulse response function for 50 day offsets """
+
+    def __init__(self, n_dates, size=50):
+        self.n_dates = n_dates
+        self.size = size
+        super(ImpulseResponseMatrix, self).__init__([size, n_dates], name='impulse response')
+        for i in range(size):
+            irf = self.generate(i, 1, self.n_dates)
+            self.update(i, irf)
+
+    def fetch(self, index):
+        if index <= self.size:
+            irf = super(ImpulseResponseMatrix, self).fetch(index, verbose=False)
+        else:
+            irf = self.generate(index, 1, self.n_dates)
+        return irf
+
+    @staticmethod
+    def generate(alpha, beta, length):
+        def gamma_distribution(t, a, b):
+            a, b = map(float, (a, b))
+            tau = a * b
+            return ((t ** (a - 1)) / (((tau / a) ** a) * math.gamma(a))) * math.exp(-(a / tau) * t)
+
+        return np.array([gamma_distribution(i, alpha, beta) for i in range(length)])
 
 
 @njit
 def evapotranspiration_daily(plant_factor, available_soil_et, evaporation_node, root_max, anetd,
                              n_soil_increments, depth, soil_water, wilting_point, available_water, delta_x):
-
     soil_layer_loss = np.zeros(n_soil_increments, dtype=np.float32)
     et_factor = np.zeros(n_soil_increments, dtype=np.float32)
 
@@ -169,7 +318,8 @@ def surface_hydrology(field_capacity, wilting_point, plant_factor, cn, depth,  #
                                    irrigation_node, usle_s_factor[day], target_dryness, total_fc, leaching_factor)
 
         runoff, leaching, canopy_water, available_soil_et = \
-            runoff_and_interception_daily(rain, effective_rain, usle_s_factor[day], plant_factor[day], cintcp, canopy_water,
+            runoff_and_interception_daily(rain, effective_rain, usle_s_factor[day], plant_factor[day], cintcp,
+                                          canopy_water,
                                           potential_et[day])
 
         soil_layer_loss, et_node = \

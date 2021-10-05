@@ -2,10 +2,11 @@ import os
 import numpy as np
 import pandas as pd
 
-from .tools.efed_lib import report, DateManager, MemoryMatrix
+from .tools.efed_lib import DateManager, MemoryMatrix
 from .field import plant_growth, initialize_soil, process_erosion
 from .hydrology import surface_hydrology
 from .transport import pesticide_to_field, field_to_soil, soil_to_water
+from .utilities import report
 
 # For QAQC or debugging purposes - write the nth scenario from each batch to file (turn off with None)
 sample_row = 17  # None
@@ -17,24 +18,45 @@ class StageOneScenarios(MemoryMatrix):
         self.region_id = region.id
         self.sim = sim
         self.table_path = sim.s1_scenarios_table_path
-        self.array_path = sim.s1_scenarios_path
+        self.array_path = sim.s1_scenarios_path.format(self.region_id)
+
+        # Objects that are generated on-the-fly by the @property methods.
+        # TODO - is this necessary?
         self._paths = None
         self._index = None
         self._columns = None
+        self._active_crops = None
 
         """
         If the simulation is in s2 scenario building mode, and the s2 scenarios are subset as indicated by a 'tag',
          (e.g., Mark Twain Basin), create a confined s1 scenario table for more limited iteration.
         """
-        if self.sim.tag is not None:
-            self._paths = self.confine(recipes, region.local_reaches, self.sim.tag, overwrite_subset)
 
-        MemoryMatrix.__init__(self, [self.lookup.index, self.columns], name='s1 scenario',
-                              dtype=np.float32, path=self.table_path, persistent_read=True)
-        self.csv_to_mem()
+        # The lookup table for s1 scenarios is needed for generating random output, but nothing else
+        if not self.sim.random:
+
+            if self.sim.tag is not None:
+                self._paths = self.confine(recipes, region.local_reaches, self.sim.tag, overwrite_subset)
+
+            MemoryMatrix.__init__(self, [self.lookup.index, self.columns], name='s1 scenario',
+                                  dtype=np.float32, path=self.array_path, persistent_read=True)
+            self.csv_to_mem()
 
     def column_index(self, indices):
         return [self.columns.index(f) for f in indices]
+
+    @property
+    def active_crops(self):
+        if self._active_crops is None:
+            crops = pd.DataFrame({self.sim.crop_group_field: list(self.sim.selected_crops)}, dtype=np.int32)
+            selected = self.lookup[[self.sim.crop_group_field, 'cdl_alias']] \
+                .reset_index().merge(crops, on=self.sim.crop_group_field, how='inner')
+            self._active_crops = sorted(selected.cdl_alias.unique())
+        return self._active_crops
+
+    @property
+    def n_active_crops(self):
+        return len(self._active_crops)
 
     @property
     def columns(self):
@@ -63,7 +85,7 @@ class StageOneScenarios(MemoryMatrix):
             for reach in reaches:
                 scenarios = recipes.fetch(reach)
                 if scenarios is not None:
-                    scenario_indices |= set(scenarios.lookup)
+                    scenario_indices |= set(scenarios.index.values)
             confiner = pd.DataFrame({'scenario_index': sorted(scenario_indices)})
 
             # Read all the old tables and filter out all scenario ids not in the confiner
@@ -96,7 +118,7 @@ class StageOneScenarios(MemoryMatrix):
         del writer
 
     def modify_array(self, array):
-        del array['scenario_id']
+
         # TODO - can we clean this up? what needs to be here vs in scenarios project?
         for var in ('orgC_5', 'crop_intercept', 'slope', 'max_canopy', 'root_depth'):
             array[var] /= 100.  # cm -> m
@@ -250,22 +272,20 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
 
 
 class StageThreeScenarios(DateManager, MemoryMatrix):
-    def __init__(self, sim, stage_one, stage_two, disable_build=False):
+    def __init__(self, sim, stage_one, stage_two, disable_build=False, retain=None):
         self.s1 = stage_one
         self.s2 = stage_two
         self.sim = sim
         self.array_path = sim.s3_scenarios_path.format(self.s2.region_id)
         self.lookup = self.select_scenarios(self.sim.selected_crops)
         self.n_scenarios = self.lookup.shape[0]
-        self.active_crops = sorted(self.lookup.cdl_alias.unique())
-        self.n_active_crops = len(self.active_crops)
 
         # Set dates
         DateManager.__init__(self, stage_two.start_date, stage_two.end_date)
 
         # Initialize memory matrix
         # arrays - runoff_mass, erosion_mass
-        MemoryMatrix.__init__(self, [len(self.lookup.s3_index), 2, self.n_dates], name='pesticide mass',
+        MemoryMatrix.__init__(self, [self.lookup.s3_index, 2, self.n_dates], name='pesticide mass',
                               dtype=np.float32, path=self.array_path, persistent_read=True, persistent_write=True)
 
         report(f'Building Stage 3 scenarios...')
@@ -418,4 +438,5 @@ def stage_two_to_three(application_matrix,
     except Exception as e:
         print(e)
         aquatic_pesticide_mass = np.zeros((2, rain.shape[0]))
+
     return aquatic_pesticide_mass
