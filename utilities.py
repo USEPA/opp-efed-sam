@@ -1,5 +1,4 @@
 import os
-import re
 import numpy as np
 import pandas as pd
 import sys
@@ -9,7 +8,6 @@ from distributed import Client
 
 from .hydrology import ImpulseResponseMatrix
 from .tools.efed_lib import FieldManager, MemoryMatrix, DateManager
-from .hydro.params_nhd import nhd_regions
 
 
 class Simulation(DateManager):
