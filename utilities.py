@@ -50,6 +50,7 @@ class Simulation(DateManager):
             dask_scheduler = os.environ.get('DASK_SCHEDULER')
             self.dask_client = Client(dask_scheduler)
 
+        # TODO - get rid of MTB at the frontend?
         # Unpack the 'simulation_name' parameter to detect if a special run is called for
         detected, self.build_scenarios, self.random, self.intake_reaches, self.tag = \
             self.detect_special_run()
@@ -156,14 +157,14 @@ class Simulation(DateManager):
         Example build string: 'build&4867727&mtb'
         :return: build_scenarios, intakes, run_regions, intake_reaches, tag, random
         """
-        detected = special_mode = random = False
+        detected = build = random = False
         intake_reaches = tag = None
         params = self.simulation_name.lower().split("&")
         if params[0] == 'test':
             random = True
             tag = "random"
         elif params[0] == 'build':
-            special_mode = True
+            build = True
         elif params[0] == 'confine':
             pass
         if len(params) > 1:
@@ -172,9 +173,16 @@ class Simulation(DateManager):
             tag = params[2]
             if random:
                 tag = f"random_{tag}"
-        if any((special_mode, random, intake_reaches, tag)):
+        if any((build, random, intake_reaches, tag)):
             detected = True
-        return detected, special_mode, random, intake_reaches, tag
+
+        if self.region == 'Mark Twain Demo':
+            self.region == '07'
+            if not detected:
+                intake_reaches = [4867727]
+                tag = 'mtb'
+
+        return detected, build, random, intake_reaches, tag
 
     def find_intakes(self):
         """ Read a hardwired intake file """
