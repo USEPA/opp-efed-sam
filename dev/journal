@@ -1,0 +1,9 @@
+* Added 'random' mode to Simulation object (detect_build_mode)
+* Rearranged ModelOutputs call to occur earlier, uses 'active crops' from ?
+
+* hydroregion, impulseresponse to hydrology
+* recipes, region to reach manager
+* report to utilities
+
+
+-> Remove 'Mark Twain Basin' from region options

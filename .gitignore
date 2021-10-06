@@ -1,5 +1,4 @@
 # SAM Input Data Files
-dev/*
 envs/*
 temp/*
 dask-worker-space/*
