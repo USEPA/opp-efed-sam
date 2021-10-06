@@ -37,9 +37,6 @@ class Simulation(DateManager):
         self.__dict__.update(
             ModelInputs(input_json, self.endpoint_format_path, self.fields, self.output_selection_path))
 
-        # TODO - placeholder for when running multiple regions is enabled in the frontend
-        self.run_regions = [self.region]
-
         # Initialize file structure
         self.check_directories()
 
@@ -54,6 +51,9 @@ class Simulation(DateManager):
         # Unpack the 'simulation_name' parameter to detect if a special run is called for
         detected, self.build_scenarios, self.random, self.intake_reaches, self.tag = \
             self.detect_special_run()
+
+        # TODO - placeholder for when running multiple regions is enabled in the frontend
+        self.run_regions = [self.region]
 
         if not detected:
             self.intake_reaches = self.find_intakes()
