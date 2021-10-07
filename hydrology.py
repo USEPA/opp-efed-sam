@@ -7,6 +7,7 @@ from .hydro.navigator import Navigator
 from .hydro.process_nhd import identify_waterbody_outlets, calculate_surface_area
 from .tools.efed_lib import MemoryMatrix
 
+
 class HydroRegion(Navigator):
     """
     Contains all datasets and functions related to the NHD Plus region, including all hydrological features and links
@@ -15,6 +16,7 @@ class HydroRegion(Navigator):
     def __init__(self, region, sim):
 
         self.id = region
+        self.sim = sim
 
         # Assign a watershed navigator to the class
         # TODO - a path should be provided here
@@ -31,14 +33,29 @@ class HydroRegion(Navigator):
         # Initialize the fields that will be used to pull flows based on month
         self.flow_fields = [f'q_{str(month).zfill(2)}' for month in sim.month_index]
 
+        # Read intakes from file
+        self.intakes, self.intake_reaches = self.find_intakes()
+
         # Select which stream reaches will be fully processed, locally processed, or excluded
-        self.local_reaches, self.full_reaches, self.reservoir_outlets = \
-            self.sort_reaches(sim.intake_reaches, sim.intakes_only)
+        self.local_reaches, self.full_reaches, self.reservoir_outlets = self.sort_reaches()
 
         # Holder for reaches that have been processed
         self.burned_reaches = set()
 
-    def sort_reaches(self, intakes, intakes_only):
+    def find_intakes(self):
+        """ Read a hardwired intake file """
+        if self.sim.custom_intakes is None:
+            intake_file = self.sim.dw_intakes_path.format(self.id)
+            intakes_table = pd.read_csv(intake_file)
+        else:
+            intakes_table = pd.DataFrame({
+                'site_num': np.arange(1, len(self.sim.custom_intakes + 1)),
+                'site_name': [f"site_{comid}" for comid in self.sim.intake_reaches],
+                'comid': self.sim.intake_reaches})
+        intakes_reaches = sorted(intakes_table.comid.unique())
+        return intakes_table, intakes_reaches
+
+    def sort_reaches(self):
         """
         intakes - reaches corresponding to an intake
         local - all reaches upstream of an intake
@@ -47,15 +64,17 @@ class HydroRegion(Navigator):
         lake_outlets - reaches that correspond to the outlet of a lake
         """
 
-        # Confine to available reaches and assess what's missing
-        if intakes is None:
-            local = full = self.reach_table.lookup.values
-        else:
-            local = self.confine(intakes)
-            if intakes_only:  # eco mode but intakes provided - not a situation that happens yet
-                full = intakes
-            else:
-                full = local
+        # If running 'eco' mode, all reaches are treated the same
+        local = self.reach_table.index.unique().values
+        if self.sim.sim_type == 'eco':
+            full = local
+        elif self.sim.sim_type == 'dwr':
+            full = self.intake_reaches
+
+        # If 'custom' intakes were provided in a special run mode, confine to those reaches and upstream
+        if self.sim.custom_intakes is not None:
+            local = self.confine(self.intake_reaches)
+
         reservoir_outlets = \
             self.lake_table.loc[np.in1d(self.lake_table.outlet_comid, local)][['outlet_comid', 'wb_comid']]
 

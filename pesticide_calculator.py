@@ -27,7 +27,7 @@ def pesticide_calculator(input_data):
         # Initialize output object
         outputs = ModelOutputs(sim, region, stage_one.active_crops)
         if sim.random:
-            print("It's random alright")
+            # No need to do any scenarios processing if generating random output
             continue
 
         # Initialize Stage 2 scenarios (time series of non-chemical data, e.g., runoff, erosion, rainfall...)

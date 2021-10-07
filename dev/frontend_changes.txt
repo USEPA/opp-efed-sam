@@ -1,1 +1,2 @@
 * Disable 'eco', or at least make it non-default
+* Do we run 'local' for everything or just upstream of intakes in dw mode?

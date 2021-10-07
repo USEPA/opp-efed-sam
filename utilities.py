@@ -48,16 +48,16 @@ class Simulation(DateManager):
 
         # TODO - get rid of MTB at the frontend?
         # Unpack the 'simulation_name' parameter to detect if a special run is called for
-        detected, self.build_scenarios, self.random, self.intake_reaches, self.tag = \
+        detected, self.build_scenarios, self.random, self.custom_intakes, self.tag = \
             self.detect_special_run()
 
-        if not self.intake_reaches:
-            self.intake_reaches = self.find_intakes()
+        assert self.sim_type in ('eco', 'dwr'), \
+            'Invalid simulation type "{}"'.format(self.sim_type)
+        # TODO - this is temporary until eco mode is ready
+        assert self.sim_type == 'dwr', "'eco' mode is not ready yet"
 
         # Initialize dates
         DateManager.__init__(self, *self.align_dates())
-
-        self.intakes_only = (self.sim_type != 'eco') or self.intake_reaches is None
 
         # Initialize an impulse response matrix if convolving time of travel
         self.irf = None if not self.gamma_convolve else ImpulseResponseMatrix(self.dates.size)
@@ -163,7 +163,7 @@ class Simulation(DateManager):
         :return: build_scenarios, intakes, run_regions, intake_reaches, tag, random
         """
         detected = build = random = False
-        intake_reaches = tag = None
+        custom_intakes = tag = None
         params = self.simulation_name.lower().split("&")
         if params[0] == 'test':
             random = True
@@ -177,35 +177,19 @@ class Simulation(DateManager):
         # Using the 'Mark Twain Demo' selection for region precludes all settings except 'test'
         if self.region == 'Mark Twain Demo':
             self.region = '07'
-            intake_reaches = [4867727]
+            custom_intakes = [4867727]
             tag = 'mtb'
         else:
             if len(params) > 1:
-                intake_reaches = list(map(int, params[1].split(",")))
+                custom_intakes = list(map(int, params[1].split(",")))
             if len(params) > 2:
                 tag = params[2]
                 if random:
                     tag = f"random_{tag}"
-            if any((build, random, intake_reaches, tag)):
+            if any((build, random, custom_intakes, tag)):
                 detected = True
 
-        return detected, build, random, intake_reaches, tag
-
-    def find_intakes(self):
-        """ Read a hardwired intake file """
-        # TODO - The tool is currently only set up for running drinking water intakes.
-        #  This line doesn't do anything right now
-        assert self.sim_type in ('eco', 'dwr'), \
-            'Invalid simulation type "{}"'.format(self.sim_type)
-
-        # TODO - this is temporary until eco mode is ready
-        assert self.sim_type == 'dwr', "'eco' mode is not ready yet"
-
-        intake_file = self.dw_intakes_path
-        intakes = pd.read_csv(intake_file)
-        intakes['region'] = [str(r).zfill(2) for r in intakes.region]
-        intakes = intakes[intakes.region == self.region]
-        return sorted(np.unique(intakes.comid))
+        return detected, build, random, custom_intakes, tag
 
     def initialize_parameters(self):
         params = pd.read_csv(self.parameters_path, usecols=['parameter', 'value', 'dtype'])
