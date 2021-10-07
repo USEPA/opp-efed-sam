@@ -36,8 +36,6 @@ class Simulation(DateManager):
         self.__dict__.update(
             ModelInputs(input_json, self.endpoint_format_path, self.fields, self.output_selection_path))
 
-        print(1234, self.region)
-
         # Initialize file structure
         self.check_directories()
 
@@ -48,13 +46,12 @@ class Simulation(DateManager):
             dask_scheduler = os.environ.get('DASK_SCHEDULER')
             self.dask_client = Client(dask_scheduler)
 
-        self.region = '7.0'
         # TODO - get rid of MTB at the frontend?
         # Unpack the 'simulation_name' parameter to detect if a special run is called for
         detected, self.build_scenarios, self.random, self.intake_reaches, self.tag = \
             self.detect_special_run()
 
-        if not detected:
+        if not self.intake_reaches:
             self.intake_reaches = self.find_intakes()
 
         # Initialize dates
@@ -173,22 +170,24 @@ class Simulation(DateManager):
             tag = "random"
         elif params[0] == 'build':
             build = True
+        # 'confine' is the preferred keyword but anything will work
         elif params[0] == 'confine':
             pass
-        if len(params) > 1:
-            intake_reaches = list(map(int, params[1].split(",")))
-        if len(params) > 2:
-            tag = params[2]
-            if random:
-                tag = f"random_{tag}"
-        if any((build, random, intake_reaches, tag)):
-            detected = True
 
+        # Using the 'Mark Twain Demo' selection for region precludes all settings except 'test'
         if self.region == 'Mark Twain Demo':
             self.region = '07'
-            if not detected:
-                intake_reaches = [4867727]
-                tag = 'mtb'
+            intake_reaches = [4867727]
+            tag = 'mtb'
+        else:
+            if len(params) > 1:
+                intake_reaches = list(map(int, params[1].split(",")))
+            if len(params) > 2:
+                tag = params[2]
+                if random:
+                    tag = f"random_{tag}"
+            if any((build, random, intake_reaches, tag)):
+                detected = True
 
         return detected, build, random, intake_reaches, tag
 
@@ -198,6 +197,9 @@ class Simulation(DateManager):
         #  This line doesn't do anything right now
         assert self.sim_type in ('eco', 'drinking_water'), \
             'Invalid simulation type "{}"'.format(self.sim_type)
+
+        # TODO - this is temporary until eco mode is ready
+        assert self.sim_type == 'drinking_water', "'eco' mode is not ready yet"
 
         intake_file = self.dw_intakes_path
         intakes = pd.read_csv(intake_file)
