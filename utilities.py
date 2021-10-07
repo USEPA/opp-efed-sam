@@ -29,6 +29,8 @@ class Simulation(DateManager):
         # Read the hardwired parameters
         self.__dict__.update(self.initialize_parameters())
 
+        print(1234, self.region)
+
         # Initialize field manager
         self.fields = FieldManager(self.fields_and_qc_path)
 
@@ -175,11 +177,13 @@ class Simulation(DateManager):
         if any((build, random, intake_reaches, tag)):
             detected = True
 
+        print(111, self.region)
         if self.region == 'Mark Twain Demo':
             self.region == '07'
             if not detected:
                 intake_reaches = [4867727]
                 tag = 'mtb'
+        print(222, self.region)
 
         return detected, build, random, intake_reaches, tag
 
