@@ -195,11 +195,11 @@ class Simulation(DateManager):
         """ Read a hardwired intake file """
         # TODO - The tool is currently only set up for running drinking water intakes.
         #  This line doesn't do anything right now
-        assert self.sim_type in ('eco', 'drinking_water'), \
+        assert self.sim_type in ('eco', 'dwr'), \
             'Invalid simulation type "{}"'.format(self.sim_type)
 
         # TODO - this is temporary until eco mode is ready
-        assert self.sim_type == 'drinking_water', "'eco' mode is not ready yet"
+        assert self.sim_type == 'dwr', "'eco' mode is not ready yet"
 
         intake_file = self.dw_intakes_path
         intakes = pd.read_csv(intake_file)
