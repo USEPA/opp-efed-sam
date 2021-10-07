@@ -97,7 +97,10 @@ class Simulation(DateManager):
             setattr(self, 'deg_{}'.format(old), adjust(getattr(self, f'{new}_hl')))
 
         # Make sure that 'region' wasn't read as a numeral
-        self.region = str(self.region).zfill(2)
+        try:
+            self.region = str(int(float(self.region))).zfill(2)
+        except ValueError:
+            pass
 
         self.applications.apprate *= 0.0001  # convert kg/ha -> kg/m2 (1 ha = 10,000 m2)
         # Build a soil profile
