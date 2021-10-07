@@ -48,16 +48,12 @@ class Simulation(DateManager):
             dask_scheduler = os.environ.get('DASK_SCHEDULER')
             self.dask_client = Client(dask_scheduler)
 
+        self.region = '7.0'
         # TODO - get rid of MTB at the frontend?
         # Unpack the 'simulation_name' parameter to detect if a special run is called for
-        print(111, self.region)
         detected, self.build_scenarios, self.random, self.intake_reaches, self.tag = \
             self.detect_special_run()
-        print(222, self.region)
 
-        # TODO - placeholder for when running multiple regions is enabled in the frontend
-        self.run_regions = [self.region]
-        print(333, self.run_regions)
         if not detected:
             self.intake_reaches = self.find_intakes()
 
@@ -71,7 +67,10 @@ class Simulation(DateManager):
 
         # Make numerical adjustments (units etc)
         self.adjust_data()
-        print(444, self.region)
+
+        # TODO - placeholder for when running multiple regions is enabled in the frontend
+        self.run_regions = [self.region]
+
         # Read token
         self.token = \
             self.simulation_name if not hasattr(self, 'csrfmiddlewaretoken') else self.csrfmiddlewaretoken
