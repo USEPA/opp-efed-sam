@@ -29,14 +29,14 @@ class Simulation(DateManager):
         # Read the hardwired parameters
         self.__dict__.update(self.initialize_parameters())
 
-        print(1234, self.region)
-
         # Initialize field manager
         self.fields = FieldManager(self.fields_and_qc_path)
 
         # Read the inputs supplied by the user in the GUI
         self.__dict__.update(
             ModelInputs(input_json, self.endpoint_format_path, self.fields, self.output_selection_path))
+
+        print(1234, self.region)
 
         # Initialize file structure
         self.check_directories()
@@ -93,6 +93,9 @@ class Simulation(DateManager):
         for old, new in [('aqueous', 'soil'), ('photolysis', 'aq_photolysis'),
                          ('hydrolysis', 'hydrolysis'), ('wc', 'wc_metabolism')]:
             setattr(self, 'deg_{}'.format(old), adjust(getattr(self, f'{new}_hl')))
+
+        # Make sure that 'region' wasn't read as a numeral
+        self.region = str(self.region).zfill(2)
 
         self.applications.apprate *= 0.0001  # convert kg/ha -> kg/m2 (1 ha = 10,000 m2)
         # Build a soil profile
@@ -177,13 +180,11 @@ class Simulation(DateManager):
         if any((build, random, intake_reaches, tag)):
             detected = True
 
-        print(111, self.region)
         if self.region == 'Mark Twain Demo':
-            self.region == '07'
+            self.region = '07'
             if not detected:
                 intake_reaches = [4867727]
                 tag = 'mtb'
-        print(222, self.region)
 
         return detected, build, random, intake_reaches, tag
 
