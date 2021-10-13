@@ -87,7 +87,7 @@ atrazine_json_test_a = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d9
 
 
 atrazine_json_mtb_build = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d90e154e7ddc'},
-                           'simulation_name': {'0': 'build&07'},
+                           'simulation_name': {'0': 'build&4867727&mtb'},
                            'chemical_name': {'0': 'BUILDS2'},
                            'kd_flag': {'0': '1.0'},
                            'koc': {'0': '75.0'},
@@ -109,7 +109,7 @@ atrazine_json_mtb_build = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026
                            'apprate_1': {'0': '1.0'},
                            'effic_1': {'0': '1.0'},
                            'region': {'0': '07'},
-                           'sim_type': {'0': 'eco'},
+                           'sim_type': {'0': 'dwr'},
                            'sim_date_start': {'0': '01/01/2000'},
                            'sim_date_end': {'0': '12/31/2015'},
                            'acute_human': {'0': '3.4'},

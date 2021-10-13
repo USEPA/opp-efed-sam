@@ -165,14 +165,17 @@ class Simulation(DateManager):
         detected = build = random = False
         custom_intakes = tag = None
         params = self.simulation_name.lower().split("&")
+
+        message = None
         if params[0] == 'test':
             random = True
             tag = "random"
+            message = f"Generating randomized output"
         elif params[0] == 'build':
             build = True
-        # 'confine' is the preferred keyword but anything will work
-        elif params[0] == 'confine':
-            pass
+            message = f"Building new Stage 2 Scenarios"
+        elif params[0] == 'confine':  # Any keyword will work if simply providing custom intakes
+            message = f"Special run for custom intakes"
 
         # Using the 'Mark Twain Demo' selection for region precludes all settings except 'test'
         if self.region == 'Mark Twain Demo':
@@ -182,12 +185,21 @@ class Simulation(DateManager):
         else:
             if len(params) > 1:
                 custom_intakes = list(map(int, params[1].split(",")))
+                tag = "_custom"  # default tag so full regional data isn't overwritten
             if len(params) > 2:
                 tag = params[2]
                 if random:
                     tag = f"random_{tag}"
             if any((build, random, custom_intakes, tag)):
                 detected = True
+
+        if message is not None:
+            message += f" for Region {self.region}"
+        if custom_intakes is not None:
+            message += f", subset to comid(s) {', '.join(map(str, custom_intakes))}"
+        if tag is not None:
+            message += f". Files generated will end with tag \"_{tag}\""
+        report(message)
 
         return detected, build, random, custom_intakes, tag
 
@@ -303,13 +315,12 @@ class ModelOutputs(DateManager):
     A class to hold SAM outputs and postprocessing functions
     """
 
-    def __init__(self, sim, region, active_crops):
+    def __init__(self, sim, region):
         self.sim = sim
+        self.intakes = region.intakes
         self.local_reaches = region.local_reaches
         self.full_reaches = region.full_reaches
-        self.active_crops = active_crops
         self.huc_crosswalk = region.reach_table[['HUC_8', 'HUC_12']]
-        self.huc_crosswalk.index = self.huc_crosswalk.index.astype(str)
 
         # Initialize dates
         DateManager.__init__(self, sim.start_date, sim.end_date)
@@ -329,7 +340,7 @@ class ModelOutputs(DateManager):
         # The reason for using an empty list as an index is so the results can get appended in the order
         # in which they're generated, instead of spending time on indexing. Might not be worth it?
         self.contributions_index = []
-        self.contributions = np.zeros((len(self.local_reaches), 2, len(self.active_crops)))
+        self.contributions = np.zeros((len(self.local_reaches), 2, len(self.sim.active_crops)))
 
         # The probability that concentration exceeds endpoint thresholds
         self.exceedances = pd.DataFrame(np.zeros((len(region.full_reaches), self.sim.endpoints.shape[0])),
@@ -389,7 +400,7 @@ class ModelOutputs(DateManager):
     def process_contributions(self):
 
         # Initialize index and headings
-        index = pd.Series(np.int64(self.contributions_index).astype(str), name='comid')
+        index = pd.Series(self.contributions_index, name='comid')
         cols = [f'cdl_{cls}' for cls in self.active_crops]
 
         # Get the total contributions for each crop, source, reach and hc
@@ -400,7 +411,9 @@ class ModelOutputs(DateManager):
 
         # Parse outputs into tables and json
         full_table = pd.DataFrame(self.contributions[:, 0], index, cols) \
-            .merge(pd.DataFrame(self.contributions[:, 1], index, cols), on='comid', suffixes=("_runoff", "_erosion"))
+            .merge(pd.DataFrame(self.contributions[:, 1], index, cols),
+                   on='comid', suffixes=("_runoff", "_erosion"))
+
         map_dict = {
             'comid': by_reach['percentile'].T.to_dict(),
             'huc_8': by_huc8.T.to_dict(),
@@ -422,8 +435,11 @@ class ModelOutputs(DateManager):
         self.local_time_series.update(reach_id, data)
 
     def write_summary_tables(self, full_table, summary_table):
+        # Join output data with intake descriptors
+        self.exceedances = self.intakes.merge(self.exceedances, on='comid', how='right')
+
         # Write summary tables
-        full_table.to_csv(os.path.join(self.sim.output_path, "full_table.csv"))
+        full_table.to_csv(os.path.join(self.sim.output_path, "full_table.csv"), index=None)
         summary_table.to_csv(os.path.join(self.sim.output_path, "summary.csv"))
         self.exceedances.to_csv(os.path.join(self.sim.output_path, "exceedances.csv"))
 

@@ -9,7 +9,7 @@ from .utilities import ImpulseResponseMatrix, report
 
 class ReachManager(DateManager, MemoryMatrix):
     """
-    A class to hold runoff and runoff mass for each reach as its processed
+    A class to hold runoff and runoff mass for each reach as it's processed
     """
 
     def __init__(self, sim, s2, s3, region, recipes, output):
@@ -118,7 +118,7 @@ class ReachManager(DateManager, MemoryMatrix):
         contributions = np.zeros((2, self.s3.n_active_crops))
         for year in self.recipes.years:
             # Pull the watershed recipe for the reach and year
-            recipe = self.recipes.fetch(reach_id, year)  # recipe is indexed by scenario_index
+            recipe = self.recipes.fetch(reach_id, year)  # scenarios are indexed by recipe_index
             if recipe is not None:
                 # Pull runoff and erosion from Stage 2 Scenarios
                 transport, found_s2 = self.s2.fetch_from_recipe(recipe)
@@ -219,7 +219,7 @@ class WatershedRecipes(object):
             results = []
             fp = np.memmap(f'{self.path}', dtype=np.int64, mode='r', shape=self.shape)
             for start, end in address:
-                block = pd.DataFrame(fp[start:end], columns=['scenario_index', 'area']).set_index('scenario_index')
+                block = pd.DataFrame(fp[start:end], columns=['recipe_index', 'area']).set_index('recipe_index')
                 if n_blocks == 1:
                     return block
                 else:

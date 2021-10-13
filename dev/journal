@@ -7,3 +7,5 @@
 
 
 -> Remove 'Mark Twain Basin' from region options
+
+what to do with missing bd values?  currently filling with 10000

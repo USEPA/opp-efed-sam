@@ -22,10 +22,10 @@ def pesticide_calculator(input_data):
         recipes = WatershedRecipes(region_id, sim)
 
         # Initialize Stage 1 scenarios (parameters linked to a unique soil-weather-land cover combination)
-        stage_one = StageOneScenarios(region, sim, recipes)
+        stage_one = StageOneScenarios(region, sim, recipes, overwrite_subset=False)
 
         # Initialize output object
-        outputs = ModelOutputs(sim, region, stage_one.active_crops)
+        outputs = ModelOutputs(sim, region)
         if sim.random:
             # No need to do any scenarios processing if generating random output
             continue
@@ -33,6 +33,7 @@ def pesticide_calculator(input_data):
         # Initialize Stage 2 scenarios (time series of non-chemical data, e.g., runoff, erosion, rainfall...)
         stage_two = StageTwoScenarios(region, sim, stage_one, met)
         if sim.build_scenarios:  # If 'build' mode is on, skip the rest of the process
+            report("Successfully finished building Stage Two Scenarios.")
             return
 
         # Initialize Stage 3 scenarios (time series of chemical transport data e.g., runoff mass, erosion mass)
@@ -43,7 +44,7 @@ def pesticide_calculator(input_data):
 
         # Combine scenarios to generate data for catchments
         # Traverse downstream in the watershed
-        for tier, reach_ids, lakes in region.cascade:
+        for tier, reach_ids, lakes in region.cascade():
 
             report(f'Running tier {tier}, ({len(reach_ids)} reaches)...')
             # TODO - parallelize

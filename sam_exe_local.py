@@ -15,7 +15,7 @@ class Sam(object):
 
 def main(build=False):
     """ This is what gets run when running straight from Python """
-    from .dev.test_inputs import atrazine_json_test_b as input_dict
+    from .dev.test_inputs import atrazine_json_mtb_build as input_dict
 
     print('Running pesticide calculator...')
     sam = Sam(input_dict)

@@ -55,8 +55,8 @@ runoff,Runoff(m3),np.float32,,,10,10,,,,,,,
 runoff,,np.float32,,,,,,,,,10,,
 runoff_conc,RunoffConc(ug/L),np.float32,,,,90,,,,,,,
 runoff_mass,RunoffMass(kg),np.float32,,,20,20,,,,,,10,
-scenario_id,,np.float32,,,,,,,,,,,30
-scenario_index,,np.float32,,,,,,,,,,,20
+scenario_id,,object,,,,,,,,,,,30
+recipe_index,,np.float32,,,,,,,,,,,20
 sim_date_end,,object,,,,,,1,,,,,
 sim_date_start,,object,,,,,,1,,,,,
 soil_hl,,np.float32,,,,,,1,,,,,

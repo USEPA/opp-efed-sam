@@ -42,69 +42,6 @@ class HydroRegion(Navigator):
         # Holder for reaches that have been processed
         self.burned_reaches = set()
 
-    def find_intakes(self):
-        """ Read a hardwired intake file """
-        if self.sim.custom_intakes is None:
-            intake_file = self.sim.dw_intakes_path.format(self.id)
-            intakes_table = pd.read_csv(intake_file)
-        else:
-            intakes_table = pd.DataFrame({
-                'site_num': np.arange(1, len(self.sim.custom_intakes + 1)),
-                'site_name': [f"site_{comid}" for comid in self.sim.intake_reaches],
-                'comid': self.sim.intake_reaches})
-        intakes_reaches = sorted(intakes_table.comid.unique())
-        return intakes_table, intakes_reaches
-
-    def sort_reaches(self):
-        """
-        intakes - reaches corresponding to an intake
-        local - all reaches upstream of an intake
-        full - reaches for which a full suite of outputs is computed
-        intakes_only - do we do the full monty for the intakes only, or all upstream?
-        lake_outlets - reaches that correspond to the outlet of a lake
-        """
-
-        # If running 'eco' mode, all reaches are treated the same
-        local = self.reach_table.index.unique().values
-        if self.sim.sim_type == 'eco':
-            full = local
-        elif self.sim.sim_type == 'dwr':
-            full = self.intake_reaches
-
-        # If 'custom' intakes were provided in a special run mode, confine to those reaches and upstream
-        if self.sim.custom_intakes is not None:
-            local = self.confine(self.intake_reaches)
-
-        reservoir_outlets = \
-            self.lake_table.loc[np.in1d(self.lake_table.outlet_comid, local)][['outlet_comid', 'wb_comid']]
-
-        return local, full, reservoir_outlets
-
-    def process_nhd(self):
-        self.lake_table = \
-            identify_waterbody_outlets(self.lake_table, self.reach_table)
-
-        # Add HUC ids to the reach table
-        self.huc_crosswalk.comid = self.huc_crosswalk.comid.astype(np.int32)
-        self.reach_table = self.reach_table.merge(self.huc_crosswalk, on='comid')
-        self.reach_table['HUC_8'] = self.reach_table['HUC_12'].str.slice(0, 8)
-
-        # Calculate average surface area of a reach segment
-        self.reach_table['surface_area'] = calculate_surface_area(self.reach_table)
-
-        # Calculate residence times of reservoirs
-        self.lake_table = self.lake_table.merge(self.reach_table[['comid', 'q_ma']],
-                                                left_on='outlet_comid', right_on='comid', how='left')
-        self.lake_table['residence_time'] = self.lake_table.wb_volume / self.lake_table.q_ma
-
-        # Convert units
-        self.reach_table['length'] = self.reach_table.pop('lengthkm') * 1000.  # km -> m
-        for month in list(map(lambda x: str(x).zfill(2), range(1, 13))) + ['ma']:
-            self.reach_table['q_{}'.format(month)] *= 2446.58  # cfs -> cmd
-            self.reach_table['v_{}'.format(month)] *= 26334.7  # f/s -> md
-        self.reach_table = self.reach_table.drop_duplicates().set_index('comid')
-
-    @property
     def cascade(self):
         # Tier the reaches by counting the number of outlets (lakes) upstream of each lake outlet
         reach_counts = []
@@ -134,13 +71,75 @@ class HydroRegion(Navigator):
             list({upstream for outlet in outlets for upstream in self.upstream_watershed(outlet)})
         return pd.Series(upstream_reaches, name='comid')
 
-    def flow_table(self, reach_id):
-        return self.reach_table.loc[reach_id]
-
     def daily_flows(self, reach_id):
         # TODO - this is taking a little time, maybe a one-time month-to-field comprehension
         selected = self.flow_table(reach_id)
         return selected[self.flow_fields].values.astype(np.float32)
+
+    def find_intakes(self):
+        """ Read a hardwired intake file """
+        if self.sim.custom_intakes is None:
+            intake_file = self.sim.dw_intakes_path.format(self.id)
+            intakes_table = pd.read_csv(intake_file)
+        else:
+            intakes_table = pd.DataFrame({
+                'site_num': np.arange(1, len(self.sim.custom_intakes) + 1),
+                'site_name': [f"site_{comid}" for comid in self.sim.custom_intakes],
+                'comid': self.sim.custom_intakes})
+        intakes_reaches = sorted(intakes_table.comid.unique())
+        return intakes_table, intakes_reaches
+
+    def flow_table(self, reach_id):
+        return self.reach_table.loc[reach_id]
+
+    def process_nhd(self):
+        self.lake_table = \
+            identify_waterbody_outlets(self.lake_table, self.reach_table)
+
+        # Add HUC ids to the reach table
+        self.huc_crosswalk.comid = self.huc_crosswalk.comid.astype(np.int32)
+        self.reach_table = self.reach_table.merge(self.huc_crosswalk, on='comid')
+        self.reach_table['HUC_8'] = self.reach_table['HUC_12'].str.slice(0, 8)
+
+        # Calculate average surface area of a reach segment
+        self.reach_table['surface_area'] = calculate_surface_area(self.reach_table)
+
+        # Calculate residence times of reservoirs
+        self.lake_table = self.lake_table.merge(self.reach_table[['comid', 'q_ma']],
+                                                left_on='outlet_comid', right_on='comid', how='left')
+        self.lake_table['residence_time'] = self.lake_table.wb_volume / self.lake_table.q_ma
+
+        # Convert units
+        self.reach_table['length'] = self.reach_table.pop('lengthkm') * 1000.  # km -> m
+        for month in list(map(lambda x: str(x).zfill(2), range(1, 13))) + ['ma']:
+            self.reach_table['q_{}'.format(month)] *= 2446.58  # cfs -> cmd
+            self.reach_table['v_{}'.format(month)] *= 26334.7  # f/s -> md
+        self.reach_table = self.reach_table.drop_duplicates().set_index('comid')
+
+    def sort_reaches(self):
+        """
+        intakes - reaches corresponding to an intake
+        local - all reaches upstream of an intake
+        full - reaches for which a full suite of outputs is computed
+        intakes_only - do we do the full monty for the intakes only, or all upstream?
+        lake_outlets - reaches that correspond to the outlet of a lake
+        """
+
+        # If running 'eco' mode, all reaches are treated the same
+        local = self.reach_table.index.unique().values
+        if self.sim.sim_type == 'eco':
+            full = local
+        elif self.sim.sim_type == 'dwr':
+            full = self.intake_reaches
+
+        # If 'custom' intakes were provided in a special run mode, confine to those reaches and upstream
+        if self.sim.custom_intakes is not None:
+            local = self.confine(self.intake_reaches)
+
+        reservoir_outlets = \
+            self.lake_table.loc[np.in1d(self.lake_table.outlet_comid, local)][['outlet_comid', 'wb_comid']]
+
+        return local, full, reservoir_outlets
 
 
 class ImpulseResponseMatrix(MemoryMatrix):

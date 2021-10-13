@@ -11,95 +11,100 @@ from .utilities import report
 # For QAQC or debugging purposes - write the nth scenario from each batch to file (turn off with None)
 sample_row = 17  # None
 
+"""
+Scenario indexing:
+* recipe_index (int, iloc=True?) - Unique integer alias for s1 scenarios, generated in scenarios_and_recipes.py
+* scenario_id (str, iloc=False) - Name for each s1 scenario, same as used in PWC
+* s1_index (int, iloc=True for s1) - a unique integer alias for s1 scenarios
+
+"""
+
 
 class StageOneScenarios(MemoryMatrix):
+    """
+    This class exists primarily to read a table of Stage 1 Scenarios (tabular, same as used for PWC) into
+    a MemoryMatrix class object for faster recall of indexed data without holding in memory
+
+    If 'build scenarios' mode is on and custom intakes are provided, this class will also create a smaller
+    subset of scenarios that are used only in the affected reaches. This will limit the scope of Stage 2
+    Scenario processing for faster testing of the model.
+    """
+
+    # TODO - I used to have this set up to read in chunks, but taken out for now. Worth looking into
+    #  whether it's worth putting back in. scenarios_and_recipes.py should be adjusted to turn this off
 
     def __init__(self, region, sim, recipes=None, overwrite_subset=False):
         self.region_id = region.id
         self.sim = sim
-        self.table_path = sim.s1_scenarios_table_path
+        self.input_table_path = sim.s1_scenarios_table_path
         self.array_path = sim.s1_scenarios_path.format(self.region_id)
 
-        # Objects that are generated on-the-fly by the @property methods.
-        # TODO - is this necessary?
-        self._paths = None
-        self._index = None
-        self._columns = None
-        self._active_crops = None
+        # Designate the fields that carry through to higher-level scenarios
+        self.s2_fields = self.sim.fields.fetch('s1_to_s2')
+        self.s3_fields = [self.sim.crop_group_field] + list(self.sim.fields.fetch('s1_to_s3'))
 
-        """
-        If the simulation is in s2 scenario building mode, and the s2 scenarios are subset as indicated by a 'tag',
-         (e.g., Mark Twain Basin), create a confined s1 scenario table for more limited iteration.
-        """
+        # If building scenarios and a subset of reaches is specified, confine to a subset of scenarios
+        if self.sim.build_scenarios and self.sim.custom_intakes is not None:
+            self.path = self.confine(recipes, region.local_reaches, self.sim.tag, overwrite_subset)
+        else:
+            self.path = self.input_table_path.format(self.region_id, 1)
 
-        # The lookup table for s1 scenarios is needed for generating random output, but nothing else
+        # Create a tabular index of core scenario identifiers
+        self.lookup, self.array_fields = self.build_index()
+
+        # Find the cdl aliases for all the crops that will have pesticide applications based on user input
+        self.sim.active_crops = self.get_active_crops()
+
+        # No need to allocate memory if just generating random output
         if not self.sim.random:
-
-            if self.sim.tag is not None:
-                self._paths = self.confine(recipes, region.local_reaches, self.sim.tag, overwrite_subset)
-
-            MemoryMatrix.__init__(self, [self.lookup.index, self.columns], name='s1 scenario',
+            MemoryMatrix.__init__(self, [self.lookup.s1_index, self.array_fields], name='s1 scenario',
                                   dtype=np.float32, path=self.array_path, persistent_read=True)
             self.csv_to_mem()
 
-    def column_index(self, indices):
-        return [self.columns.index(f) for f in indices]
+    def build_index(self):
+        # Get all the column headings from the input table
+        columns = pd.read_csv(self.path, nrows=1).columns.values
 
-    @property
-    def active_crops(self):
-        if self._active_crops is None:
-            crops = pd.DataFrame({self.sim.crop_group_field: list(self.sim.selected_crops)}, dtype=np.int32)
-            selected = self.lookup[[self.sim.crop_group_field, 'cdl_alias']] \
-                .reset_index().merge(crops, on=self.sim.crop_group_field, how='inner')
-            self._active_crops = sorted(selected.cdl_alias.unique())
-        return self._active_crops
+        # Sort columns into those that go in the lookup table, and those that go in the memory array
+        lookup_fields = list(self.sim.fields.fetch('s1_lookup'))
+        array_fields = [c for c in columns if c not in lookup_fields]
 
-    @property
-    def n_active_crops(self):
-        return len(self._active_crops)
-
-    @property
-    def columns(self):
-        if self._columns is None:
-            self._columns = [c for c in pd.read_csv(self.paths[0], nrows=1).columns if c != 'scenario_id']
-        return self._columns
-
-    @property
-    def lookup(self):
-        if self._index is None:
-            index = []
-            keep_cols = list(self.sim.fields.fetch('s1_lookup')) + [self.sim.crop_group_field]
-            for path in self.paths:
-                for chunk in pd.read_csv(path, usecols=keep_cols, chunksize=self.sim.stage_one_chunksize):
-                    for _, scenarios in chunk.groupby('weather_grid'):
-                        index.append(scenarios)
-            self._index = pd.concat(index).set_index('scenario_index')
-            self._index['s1_index'] = np.arange(self._index.shape[0])
-        return self._index
+        # Read the lookup table and add a unique 's1_index'
+        # Temporary add crop_group_field to the lookup table for get_active_crops()
+        lookup = pd.read_csv(self.path, usecols=lookup_fields + [self.sim.crop_group_field])
+        lookup['s1_index'] = np.arange(lookup.shape[0])
+        return lookup, array_fields
 
     def confine(self, recipes, reaches, tag, overwrite=False):
-        temp_path = self.sim.s1_scenarios_table_path.format(self.region_id, self.sim.tag)
-        if overwrite or not os.path.exists(temp_path):
-            # Select only the Stage 1 scenarios that are components in the local reaches
+        full_path = self.input_table_path.format(self.region_id, 1)
+        confined_path = self.input_table_path.format(self.region_id, tag)
+        if overwrite or not os.path.exists(confined_path):
+            report(f"Confining Stage One Scenarios...")
+            # Loop through the watershed recipes for the region and
+            # select only the Stage 1 scenarios that exist in the local reaches
             scenario_indices = set()
             for reach in reaches:
                 scenarios = recipes.fetch(reach)
                 if scenarios is not None:
                     scenario_indices |= set(scenarios.index.values)
-            confiner = pd.DataFrame({'scenario_index': sorted(scenario_indices)})
+            selected = pd.DataFrame({'recipe_index': sorted(scenario_indices)})
 
-            # Read all the old tables and filter out all scenario ids not in the confiner
-            new_table = []
-            old_rows = 0
-            for p in self.paths:
-                old_table = pd.read_csv(p)
-                old_rows += old_table.shape[0]
-                new_table.append(confiner.merge(old_table, on='scenario_index', how='inner'))
-            new_table = pd.concat(new_table, axis=0)
-            new_table.to_csv(temp_path, index=None)
-            report(f'Confined Stage One Scenarios table for "{tag}" from {old_rows} to {new_table.shape[0]}')
-            report(f'Confined table written to {temp_path}')
-        return [temp_path]
+            # Read all the s1 tables and extract the selected scenarios
+            selected_rows = []
+            full_size = 0
+            for chunk in pd.read_csv(full_path, chunksize=100000):
+                full_size += chunk.shape[0]
+                chunk = chunk.merge(selected, on='recipe_index', how='inner')
+                if not chunk.empty:
+                    selected_rows.append(chunk)
+            selected = pd.concat(selected_rows, axis=0)
+            selected.to_csv(confined_path, index=None)
+
+            report(f'Confined Stage One Scenarios table for "{tag}" from {full_size} to {selected.shape[0]}')
+            report(f'Confined table written to {confined_path}')
+        else:
+            report(f'Reading confined Stage One Scenarios from {confined_path}')
+        return confined_path
 
     def csv_to_mem(self):
         """
@@ -109,51 +114,25 @@ class StageOneScenarios(MemoryMatrix):
         """
         cursor = 0
         writer = self.writer
-        for path in self.paths:
-            report(f'Reading scenario table {path}...')
-            for chunk in pd.read_csv(path, chunksize=self.sim.stage_one_chunksize):
-                chunk = self.modify_array(chunk)
-                writer[cursor:cursor + chunk.shape[0]] = chunk
-                cursor += chunk.shape[0]
+        report(f'Reading Stage One Scenarios into memory...')
+        for chunk in pd.read_csv(self.path, usecols=self.array_fields, chunksize=self.sim.stage_one_chunksize):
+            writer[cursor:cursor + chunk.shape[0]] = chunk
+            cursor += chunk.shape[0]
         del writer
 
-    def modify_array(self, array):
+    def fetch(self, index, fields=None, iloc=True):
+        fields = {'s2': self.s2_fields, 's3': self.s3_fields}.get(fields, self.array_fields)
+        field_index = [self.array_fields.index(f) for f in fields]
+        row = super(StageOneScenarios, self).fetch(index, iloc=iloc)
+        return list(row[field_index])
 
-        # TODO - can we clean this up? what needs to be here vs in scenarios project?
-        for var in ('orgC_5', 'crop_intercept', 'slope', 'max_canopy', 'root_depth'):
-            array[var] /= 100.  # cm -> m
-        # TODO - confirm that this still jibes with the updates
-        # for var in ('anetd', 'amxdr'):
-        #    array[var] = np.min((array[var], array['root_zone_max'] / 100.))
-        for var in ['bd_5', 'bd_20']:
-            array[var] *= 1000  # kg/m3
-        for var, min_val in (('usle_k', 0.2), ('usle_p', 0.25), ('usle_ls', 1.0)):
-            array.loc[array[var] == 0, var] = min_val  # TODO - Why are so many zeros?
-        # TODO - do I still need to fix dates?
-        array.loc[array.ireg == 0, 'ireg'] = 1
-        array.slope = np.minimum(array.slope, 0.01)
-
-        # TODO - move this to the qc part of fields and qc.
-        #  Also, this probably isn't right
-        for var in ['bd_5', 'bd_20']:
-            array.loc[array[var] <= 0, var] = 1000000.
-
-        return array.sort_values(['weather_grid', 'scenario_index'])
-
-    @property
-    def n_scenarios(self):
-        return self._index.shape[0]
-
-    @property
-    def paths(self):
-        if self._paths is None:
-            max_chunks = 10  # this will rarely if ever be more than 10
-            paths = list(filter(os.path.exists, [self.table_path.format(self.region_id, i) for i in range(max_chunks)]))
-            if not paths:
-                raise FileNotFoundError(f'No Stage 1 scenarios found at {self.table_path}')
-            return paths
-        else:
-            return self._paths
+    def get_active_crops(self):
+        user_selected_crops = \
+            pd.DataFrame({self.sim.crop_group_field: list(self.sim.selected_crops)}, dtype=np.int32)
+        selected = self.lookup[[self.sim.crop_group_field, 'cdl_alias']] \
+            .reset_index().merge(user_selected_crops, on=self.sim.crop_group_field, how='inner')
+        del self.lookup[self.sim.crop_group_field]
+        return sorted(selected.cdl_alias.unique())
 
 
 class StageTwoScenarios(DateManager, MemoryMatrix):
@@ -161,20 +140,12 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
         self.sim = sim
         self.s1 = stage_one
         self.met = met
-        self.region_id = region.id
-        self.path = sim.s2_scenarios_path.format(region.id)
         self.fields = sim.fields
-        if sim.tag is not None:
-            self.path += f'_{sim.tag}'
-        self.keyfile_path = self.path + '_key.txt'
-        self.array_path = self.path + '_arrays.dat'
-        self.index_path = self.path + '_index.csv'
+        self.keyfile_path, self.array_path, self.index_path = self.set_paths(region.id)
 
         # If build is True, create the Stage 2 Scenarios by running model routines on Stage 1 scenario inputs
         if sim.build_scenarios:
             report('Building Stage Two Scenarios from Stage One...')
-            # Getting rid of this, replace with what?
-            # DateManager.__init__(self, self.sim.scenario_start_date, self.sim.scenario_end_date)
             self.arrays = self.fields.fetch('s2_arrays')
             DateManager.__init__(self, self.sim.scenario_start_date, self.sim.scenario_end_date)
             MemoryMatrix.__init__(self, [self.s1.lookup.index, self.arrays, self.n_dates],
@@ -185,6 +156,8 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
 
             # Run scenarios
             self.build_from_stage_one()
+
+        # If build is False, load the saved Stage 2 Scenario array
         else:
             # The key contains a list of array names, a start date, and the shape of the array
             self.arrays, array_start_date, time_series_shape = self.load_key()
@@ -199,17 +172,20 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
             MemoryMatrix.__init__(self, time_series_shape, path=self.array_path, existing=True, name='s2 scenario')
 
     def build_from_stage_one(self):
-        batch = []
-        batch_index = []
-        batch_count = 0
+        """
+        Stage 2 Scenarios (s2) are built by running plant growth, hydrology, and erosion simulations
+        on each Stage 1 Scenario (s1), using a combination of global parameters and parameters unique to each
+        s1. None of these parameters are specified by the user, so these scenarios can be generated ahead of time.
+        Because it's a time-consuming process, Dask is used to parallelize the runs. Dask processes the runs in
+        batches, and batch_size is set in params.csv
+        """
+        batch = []  # This will hold all the dask calls for each batch
+        batch_index = []  # This is only used to retain the scenario id for writing sample csv outputs
+        batch_count = 0  # Num of batches processed - used for identifying position in array
 
         # Initialize a list of the simulation parameters used to process Stage 1 Scenarios
         sim_params = [self.sim.cn_min, self.sim.delta_x, self.sim.bins, self.sim.depth, self.sim.anetd,
                       self.sim.n_increments, self.sim.sfac, self.sim.types, self.fields.fetch('s2_arrays')]
-
-        # Check fields_and_qc.py to ensure that the field order matches the order of the input parameters
-        s1_fields = self.sim.fields.fetch('s1_to_s2')
-        s1_field_map = self.s1.column_index(s1_fields)
 
         # Group by weather grid to reduce the overhead from fetching met data
         weather_grid = None
@@ -221,7 +197,8 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
                 time_series_data = [precip, pet, temp, self.new_year]
 
             # Unpack the needed parameters from the Stage 1 scenario
-            s1_params = list(self.s1.fetch(row.s1_index, iloc=True)[s1_field_map])
+            # The parameters that are fetched here can be found in fields_and_qc.csv by sorting by 's1_to_s2'
+            s1_params = self.s1.fetch(row.s1_index, 's2')
 
             # Combine needed input parameters and add a call to the processing function (stage_one_to_two)
             s2_input = time_series_data + s1_params + sim_params
@@ -230,12 +207,13 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
 
             # Submit the batch for asynchronous processing
             # TODO - how do the weather and scenario arrays match up?
-            if len(batch) == self.sim.batch_size or row.s1_index == self.s1.n_scenarios:
+            n_scenarios = self.s1.lookup.shape[0]
+            if len(batch) == self.sim.batch_size or row.s1_index == n_scenarios:
                 results = np.float32(self.sim.dask_client.gather(batch))
                 batch_count += 1
                 start_pos = (batch_count - 1) * self.sim.batch_size
                 self.writer[start_pos:start_pos + results.shape[0]] = np.array(results)
-                report(f'Processed {row.s1_index + 1} of {self.s1.n_scenarios} scenarios', 1)
+                report(f'Processed {row.s1_index + 1} of {n_scenarios} scenarios', 1)
                 write_sample(self.dates, self.sim, results, batch_index)
                 batch = []
                 batch_index = []
@@ -270,6 +248,15 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
             time_series_shape = [int(val) for val in next(f).strip().split(',')]
         return time_series, start_date, time_series_shape
 
+    def set_paths(self, region):
+        root_path = self.sim.s2_scenarios_path.format(region)
+        if self.sim.tag is not None:
+            root_path += f'_{self.sim.tag}'
+        keyfile_path = root_path + '_key.txt'
+        array_path = root_path + '_arrays.dat'
+        index_path = root_path + '_index.csv'
+        return keyfile_path, array_path, index_path
+
 
 class StageThreeScenarios(DateManager, MemoryMatrix):
     def __init__(self, sim, stage_one, stage_two, disable_build=False, retain=None):
@@ -293,19 +280,14 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
             self.build_from_stage_two()
 
     def build_from_stage_two(self):
-        batch = []
-        batch_index = []
-        batch_count = 0
+        batch = []  # This will hold all the dask calls for each batch
+        batch_index = []  # This is only used to retain the scenario id for writing sample csv outputs
+        batch_count = 0  # Num of batches processed - used for identifying position in array
 
         # Initialize some params now
         sim_params = [self.sim.runoff_effic, self.sim.erosion_effic, self.sim.surface_dx,
                       self.sim.cm_2, self.sim.soil_depth, self.sim.deg_foliar, self.sim.washoff_coeff,
                       self.sim.koc, self.sim.deg_aqueous, self.new_year, self.sim.kd_flag]
-
-        # These fields should match the order of the parameters used by stage_two_to_three
-        # Currently: [plant_date, emergence_date, maxcover_date, harvest_date, max_canopy, orgC_5, bd_5, season]
-        s1_fields = [self.sim.crop_group_field] + list(self.sim.fields.fetch('s1_to_s3'))
-        s1_field_map = self.s1.column_index(s1_fields)
 
         # Iterate scenarios
         for count, (s1_index, s3_index, scenario_id) in \
@@ -314,7 +296,9 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
             # Stage 1 params, specified in fields_and_qc
             # Currently plant_date, emergence_date, maxcover_date, harvest_date, max_canopy, orgC_5, bd_5, season
 
-            crop_group, *s1_params = self.s1.fetch(s1_index, iloc=True)[s1_field_map]
+            # These fields should match the order of the parameters used by stage_two_to_three
+            # Currently: [plant_date, emergence_date, maxcover_date, harvest_date, max_canopy, orgC_5, bd_5, season]
+            crop_group, *s1_params = self.s1.fetch(s1_index, 's3')
 
             # Get application information for the active crop
             crop_applications = self.sim.applications[self.sim.applications.crop == crop_group]
@@ -345,7 +329,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
     def select_scenarios(self, crops):
         crops = pd.DataFrame({self.sim.crop_group_field: list(crops)}, dtype=np.int32)
-        selected = self.s1.lookup.reset_index().merge(crops, on=self.sim.crop_group_field, how='inner')
+        selected = self.s1.lookup.merge(crops, on=self.sim.crop_group_field, how='inner')
         selected['s3_index'] = np.arange(selected.shape[0])
 
         # The 'contributions' array created in the outputs uses 'numpy.bincount' to add things up. We can reduce
@@ -353,9 +337,9 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         # This alias is called 'contribution_id' to avoid re-using 'cdl_alias'
         active_crops = pd.DataFrame({'cdl_alias': sorted(selected.cdl_alias.unique())})
         active_crops['contribution_id'] = active_crops.index + 1
-        lookup = selected[['scenario_index', 'scenario_id', 's1_index', 's3_index', 'cdl_alias']] \
+        lookup = selected[['recipe_index', 'scenario_id', 's1_index', 's3_index', 'cdl_alias']] \
             .sort_values('s3_index') \
-            .set_index('scenario_index') \
+            .set_index('recipe_index') \
             .merge(active_crops, on='cdl_alias')
         return lookup
 
