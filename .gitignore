@@ -2,6 +2,7 @@
 envs/*
 temp/*
 dask-worker-space/*
+Staging
 
 .DS_Store
 
