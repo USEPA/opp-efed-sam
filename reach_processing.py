@@ -104,6 +104,13 @@ class ReachManager(DateManager, MemoryMatrix):
             self.output.update_exceedances(reach_id, exceedance)
 
     def combine_scenarios(self, reach_id):
+        def weight_and_combine(time_series, areas):
+            areas = areas.values
+            time_series = np.moveaxis(time_series, 0, 2)  # (scenarios, vars, dates) -> (vars, dates, scenarios)
+            time_series[0] *= areas
+            time_series[1] *= np.power(areas / 10000., .12)
+            return time_series.sum(axis=2)
+
         """
         Combines all the scenarios comprising a given reach and updates the ReachManager matrix
         :param reach_id:
@@ -239,14 +246,6 @@ class WatershedRecipes(object):
             return None
         else:
             return result[['start', 'end']].values
-
-
-def weight_and_combine(time_series, areas):
-    areas = areas.values
-    time_series = np.moveaxis(time_series, 0, 2)  # (scenarios, vars, dates) -> (vars, dates, scenarios)
-    time_series[0] *= areas
-    time_series[1] *= np.power(areas / 10000., .12)
-    return time_series.sum(axis=2)
 
 
 @njit
