@@ -18,10 +18,11 @@ class Simulation(DateManager):
     run including Endpoints, Crops, Dates, Intake reaches, and Impulse Response Functions
     """
 
-    def __init__(self, input_json):
+    def __init__(self, input_json, retain_s3=False):
         # TODO - confirm that everything works as intended here, esp. for eco runs
         # Determine whether the simulation is being run on a windows desktop (local for epa devs)
         self.local_run = any([r'C:' in p for p in sys.path])
+        self.retain_s3 = retain_s3
 
         # Add paths
         self.__dict__.update(self.initialize_paths())
@@ -144,7 +145,8 @@ class Simulation(DateManager):
 
         # Purge temp folder
         for f in os.listdir(self.scratch_path):
-            os.remove(os.path.join(self.scratch_path, f))
+            if not self.retain_s3 or "_s3" not in f:
+                os.remove(os.path.join(self.scratch_path, f))
 
     def detect_special_run(self):
         """
@@ -339,8 +341,9 @@ class ModelOutputs(DateManager):
         # The relative contribution of pesticide mass broken down by reach, runoff/erosion and crop
         # The reason for using an empty list as an index is so the results can get appended in the order
         # in which they're generated, instead of spending time on indexing. Might not be worth it?
+        # (len(self.local_reaches), 2, len(self.sim.active_crops)))
+        self.contributions = []
         self.contributions_index = []
-        self.contributions = np.zeros((len(self.local_reaches), 2, len(self.sim.active_crops)))
 
         # The probability that concentration exceeds endpoint thresholds
         self.exceedances = pd.DataFrame(np.zeros((len(region.full_reaches), self.sim.endpoints.shape[0])),
@@ -401,7 +404,9 @@ class ModelOutputs(DateManager):
 
         # Initialize index and headings
         index = pd.Series(self.contributions_index, name='comid')
-        cols = [f'cdl_{cls}' for cls in self.active_crops]
+        cols = [f'cdl_{cls}' for cls in self.sim.active_crops]
+        self.contributions = np.array(self.contributions)
+        print(self.contributions.shape)
 
         # Get the total contributions for each crop, source, reach and hc
         by_source_and_crop = pd.DataFrame(self.contributions.sum(axis=0), ('runoff', 'erosion'), cols)
@@ -422,7 +427,7 @@ class ModelOutputs(DateManager):
         return full_table, by_source_and_crop, map_dict
 
     def update_contributions(self, reach_id, contributions):
-        self.contributions[len(self.contributions_index)] = contributions
+        self.contributions.append(contributions)
         self.contributions_index.append(reach_id)
 
     def update_exceedances(self, reach_id, data):

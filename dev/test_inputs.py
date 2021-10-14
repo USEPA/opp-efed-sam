@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 atrazine_json_test_b = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d90e154e7ddc'},
-                           'simulation_name': {'0': 'test'},
+                           'simulation_name': {'0': 'build'},
                            'chemical_name': {'0': 'atrazine_test'},
                            'kd_flag': {'0': '1.0'},
                            'koc': {'0': '75.0'},
@@ -44,7 +44,7 @@ atrazine_json_test_b = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d9
                            'chronic_vasc_plant': {'0': ''}}
 
 atrazine_json_test_a = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d90e154e7ddc'},
-                           'simulation_name': {'0': 'test&4867727&mtb'},
+                           'simulation_name': {'0': 'confine&4867727&mtb'},
                            'chemical_name': {'0': 'atrazine_test'},
                            'kd_flag': {'0': '1.0'},
                            'koc': {'0': '75.0'},
@@ -84,7 +84,6 @@ atrazine_json_test_a = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d9
                            'chronic_nonvasc_plant': {'0': ''},
                            'acute_vasc_plant': {'0': '4.6'},
                            'chronic_vasc_plant': {'0': ''}}
-
 
 atrazine_json_mtb_build = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d90e154e7ddc'},
                            'simulation_name': {'0': 'build&4867727&mtb'},

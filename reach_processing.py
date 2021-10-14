@@ -65,7 +65,7 @@ class ReachManager(DateManager, MemoryMatrix):
             # Add all lake mass and runoff to outlet
             self.update(lake.outlet_comid, np.array([new_runoff, new_mass, erosion, erosion_mass]))
 
-    def process_local(self, reach_ids, stop_early=100):
+    def process_local(self, reach_ids):
         for i, reach_id in enumerate(reach_ids):
             # Add up the time series for all the combinations in the reach, weighted by area
             time_series, contributions = self.combine_scenarios(reach_id)
@@ -78,11 +78,6 @@ class ReachManager(DateManager, MemoryMatrix):
 
             # Pick out the data selected for output and send it to
             self.output.update_local_time_series(reach_id, time_series[self.local_index])
-
-            # TODO - delete this eventually. Just using it to get to the map quicker
-            if stop_early is not None:
-                if i > stop_early:
-                    break
 
     def process_full(self, reach_ids):
         for reach_id in reach_ids:
@@ -114,8 +109,9 @@ class ReachManager(DateManager, MemoryMatrix):
         :return:
         """
         # Initialize a new array to hold runoff, runoff mass, erosion, and erosion mass
+        n_active_crops = len(self.sim.active_crops)
         new_array = np.zeros((self.n_dates, 4))
-        contributions = np.zeros((2, self.s3.n_active_crops))
+        contributions = np.zeros((2, n_active_crops))
         for year in self.recipes.years:
             # Pull the watershed recipe for the reach and year
             recipe = self.recipes.fetch(reach_id, year)  # scenarios are indexed by recipe_index
@@ -126,6 +122,10 @@ class ReachManager(DateManager, MemoryMatrix):
 
                 # Pull chemical mass from Stage 3 scenarios
                 pesticide_mass, found_s3 = self.s3.fetch_from_recipe(recipe)
+
+                if found_s3 is None:
+                    continue
+
                 runoff_mass, erosion_mass = weight_and_combine(pesticide_mass, found_s3.area)
 
                 # Assign the pieces of the time series to the new array based on year
@@ -136,9 +136,8 @@ class ReachManager(DateManager, MemoryMatrix):
                 # Assign contributions
                 annual_masses = pesticide_mass[:, :, year_index].sum(axis=2).T
                 for i in range(2):
-                    contributions[i] += np.bincount(found_s3.contribution_id, weights=annual_masses[i],
-                                                    minlength=self.s3.n_active_crops)
-
+                    contributions[i] += np.bincount(found_s3.contribution_index, weights=annual_masses[i],
+                                                    minlength=n_active_crops)
         return new_array.T, contributions
 
     def upstream_loading(self, reach_id):
