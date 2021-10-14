@@ -5,6 +5,7 @@ from ast import literal_eval
 from numba import njit
 from .tools.efed_lib import MemoryMatrix, DateManager
 from .utilities import ImpulseResponseMatrix, report
+from .hydrology import benthic_concentration, water_column_concentration
 
 
 class ReachManager(DateManager, MemoryMatrix):
@@ -246,34 +247,6 @@ def weight_and_combine(time_series, areas):
     time_series[0] *= areas
     time_series[1] *= np.power(areas / 10000., .12)
     return time_series.sum(axis=2)
-
-
-def water_column_concentration(runoff, transported_mass, n_dates, q):
-    """
-    Calculates pesticide concentration in water column from runoff inputs, accounting for time of travel
-    Need to add references: VVWM (for basics), SAM write-up on time of travel
-    """
-    mean_runoff = runoff.mean()  # m3/d
-    baseflow = np.subtract(q, mean_runoff, out=np.zeros(n_dates), where=(q > mean_runoff))
-
-    total_flow = runoff + baseflow
-    concentration = np.divide(transported_mass, total_flow, out=np.zeros(n_dates), where=(total_flow != 0))
-    runoff_concentration = np.divide(transported_mass, runoff, out=np.zeros(n_dates), where=(runoff != 0))
-    return total_flow, baseflow, map(lambda x: x * 1000000., (concentration, runoff_concentration))  # kg/m3 -> ug/L
-
-
-@njit
-def benthic_concentration(erosion, erosion_mass, surface_area, benthic_depth, benthic_porosity):
-    """ Compute concentration in the benthic layer based on mass of eroded sediment """
-
-    soil_volume = benthic_depth * surface_area
-    pore_water_volume = soil_volume * benthic_porosity
-    benthic_mass = np.zeros(erosion_mass.size, dtype=np.float32)
-    benthic_mass[0] = erosion_mass[0]
-    for i in range(1, erosion_mass.size):
-        influx_ratio = erosion[i] / (erosion[i] + soil_volume)
-        benthic_mass[i] = (benthic_mass[i - 1] * (1. - influx_ratio)) + (erosion_mass[i] * (1. - influx_ratio))
-    return benthic_mass / pore_water_volume
 
 
 @njit
