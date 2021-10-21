@@ -374,9 +374,9 @@ class ModelOutputs(DateManager):
     def populate_random(self):
         # Randomly populate the contributions array
         self.contributions_index = self.local_reaches
-        self.contributions = np.random.rand(*self.contributions.shape) * 10.
+        self.contributions = np.random.rand(len(self.local_reaches), 2, len(self.sim.active_crops)) * 10.
 
-        # Randomly populate the exceedance probabilities
+        # Randomly populate the exceedance probabilitiesself
         self.exceedances[:] = np.random.rand(*self.exceedances.shape)
 
     def prepare_output(self, write_tables=True, write_ts=False):
@@ -405,8 +405,7 @@ class ModelOutputs(DateManager):
         # Initialize index and headings
         index = pd.Series(self.contributions_index, name='comid')
         cols = [f'cdl_{cls}' for cls in self.sim.active_crops]
-        self.contributions = np.array(self.contributions)
-        print(self.contributions.shape)
+        self.contributions = np.array(self.contributions)  # (reach, source, crop)
 
         # Get the total contributions for each crop, source, reach and hc
         by_source_and_crop = pd.DataFrame(self.contributions.sum(axis=0), ('runoff', 'erosion'), cols)
@@ -427,6 +426,7 @@ class ModelOutputs(DateManager):
         return full_table, by_source_and_crop, map_dict
 
     def update_contributions(self, reach_id, contributions):
+        # contributions: (2, n_crops)
         self.contributions.append(contributions)
         self.contributions_index.append(reach_id)
 

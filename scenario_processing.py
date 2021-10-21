@@ -45,7 +45,7 @@ class StageOneScenarios(MemoryMatrix):
         self.s3_fields = [self.sim.crop_group_field] + list(self.sim.fields.fetch('s1_to_s3'))
 
         # If building scenarios and a subset of reaches is specified, confine to a subset of scenarios
-        if self.sim.custom_intakes is not None:
+        if self.sim.custom_intakes is not None and not self.sim.random:
             self.path = self.confine(recipes, region.local_reaches, self.sim.tag, self.sim.build_scenarios)
         else:
             self.path = self.input_table_path.format(self.region_id, 1)
