@@ -37,8 +37,8 @@ class StageOneScenarios(MemoryMatrix):
     def __init__(self, region, sim, recipes=None, overwrite_subset=False):
         self.region_id = region.id
         self.sim = sim
-        self.input_table_path = sim.s1_scenarios_table_path
-        self.array_path = sim.s1_scenarios_path.format(self.region_id)
+        self.table_root = self.sim.s1_scenarios_table_path
+        self.array_root = self.sim.s1_scenarios_path
 
         # Designate the fields that carry through to higher-level scenarios
         self.s2_fields = self.sim.fields.fetch('s1_to_s2')
@@ -46,9 +46,11 @@ class StageOneScenarios(MemoryMatrix):
 
         # If building scenarios and a subset of reaches is specified, confine to a subset of scenarios
         if self.sim.custom_intakes is not None and not self.sim.random:
-            self.path = self.confine(recipes, region.local_reaches, self.sim.tag, self.sim.build_scenarios)
+            self.array_path, self.table_path = \
+                self.confine(recipes, region.local_reaches, self.sim.tag, self.sim.build_scenarios)
         else:
-            self.path = self.input_table_path.format(self.region_id, 1)
+            self.array_path = self.array_root.format(self.region_id)
+            self.table_path = self.table_root.format(self.region_id, 1)
 
         # Create a tabular index of core scenario identifiers
         self.lookup, self.array_fields = self.build_index()
@@ -64,14 +66,14 @@ class StageOneScenarios(MemoryMatrix):
 
     def build_index(self):
         # Get all the column headings from the input table
-        columns = pd.read_csv(self.path, nrows=1).columns.values
+        columns = pd.read_csv(self.table_path, nrows=1).columns.values
 
         # Sort columns into those that go in the lookup table, and those that go in the memory array
         lookup_fields = list(self.sim.fields.fetch('s1_lookup'))
         array_fields = [c for c in columns if c not in lookup_fields]
 
         # Read the lookup table and add a unique 's1_index'
-        lookup = pd.read_csv(self.path, usecols=lookup_fields + [self.sim.crop_group_field])
+        lookup = pd.read_csv(self.table_path, usecols=lookup_fields + [self.sim.crop_group_field])
         lookup['s1_index'] = np.arange(lookup.shape[0])
 
         # Set recipe_index as the index field, it makes processing the reaches faster
@@ -79,9 +81,10 @@ class StageOneScenarios(MemoryMatrix):
         return lookup, array_fields
 
     def confine(self, recipes, reaches, tag, overwrite=False):
-        full_path = self.input_table_path.format(self.region_id, 1)
-        confined_path = self.input_table_path.format(self.region_id, tag)
-        if overwrite or not os.path.exists(confined_path):
+        region_table_path = self.table_root.format(self.region_id, 1)
+        confined_table_path = self.table_root.format(self.region_id, tag)
+        confined_array_path = self.array_root.format(self.region_id, tag)
+        if overwrite or not os.path.exists(confined_table_path):
             report(f"Confining Stage One Scenarios...")
             # Loop through the watershed recipes for the region and
             # select only the Stage 1 scenarios that exist in the local reaches
@@ -95,19 +98,19 @@ class StageOneScenarios(MemoryMatrix):
             # Read all the s1 tables and extract the selected scenarios
             selected_rows = []
             full_size = 0
-            for chunk in pd.read_csv(full_path, chunksize=100000):
+            for chunk in pd.read_csv(region_table_path, chunksize=100000):
                 full_size += chunk.shape[0]
                 chunk = chunk.merge(selected, on='recipe_index', how='inner')
                 if not chunk.empty:
                     selected_rows.append(chunk)
             selected = pd.concat(selected_rows, axis=0)
-            selected.to_csv(confined_path, index=None)
+            selected.to_csv(confined_table_path, index=None)
 
             report(f'Confined Stage One Scenarios table for "{tag}" from {full_size} to {selected.shape[0]}')
-            report(f'Confined table written to {confined_path}')
+            report(f'Confined table written to {confined_table_path}')
         else:
-            report(f'Reading confined Stage One Scenarios from {confined_path}')
-        return confined_path
+            report(f'Reading confined Stage One Scenarios from {confined_table_path}')
+        return confined_array_path, confined_table_path
 
     def csv_to_mem(self):
         """
@@ -118,7 +121,7 @@ class StageOneScenarios(MemoryMatrix):
         cursor = 0
         writer = self.writer
         report(f'Reading Stage One Scenarios into memory...')
-        for chunk in pd.read_csv(self.path, usecols=self.array_fields, chunksize=self.sim.stage_one_chunksize):
+        for chunk in pd.read_csv(self.table_path, usecols=self.array_fields, chunksize=self.sim.stage_one_chunksize):
             writer[cursor:cursor + chunk.shape[0]] = chunk
             cursor += chunk.shape[0]
         del writer
