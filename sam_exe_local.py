@@ -13,9 +13,9 @@ class Sam(object):
     def execute_model(self):
         self.pd_obj_out = pesticide_calculator(self.pd_obj)
 
-def main(build=False):
+def main():
     """ This is what gets run when running straight from Python """
-    from .dev.test_inputs import build_mtb as input_dict
+    from .dev.test_inputs import confine_mtb as input_dict
 
     print('Running pesticide calculator...')
     sam = Sam(input_dict)

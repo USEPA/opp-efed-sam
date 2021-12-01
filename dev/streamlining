@@ -1,0 +1,3 @@
+The most expensive part of SAM is fetching the scenarios from the recipes, which is called from ReachManager.combine_scenarios(), which is called by process_local().
+
+Does process_full() not take as much time?

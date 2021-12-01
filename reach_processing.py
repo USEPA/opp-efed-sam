@@ -37,12 +37,6 @@ class ReachManager(DateManager, MemoryMatrix):
         reps, remain = divmod(self.n_dates, len(self.recipes.years))
         self.index_array = np.concatenate((np.tile(self.recipes.years, reps), self.recipes.years[:remain]))
 
-        # Find the numerical indices for the variables that get carried through to the output
-        self.local_index = \
-            [list(sim.fields.fetch('local_time_series')).index(f) for f in sim.local_time_series]
-        self.full_index = \
-            [list(sim.fields.fetch('full_time_series')).index(f) for f in sim.full_time_series]
-
     def burn(self, lakes):
 
         for _, lake in lakes.iterrows():
@@ -78,7 +72,7 @@ class ReachManager(DateManager, MemoryMatrix):
             self.output.update_contributions(reach_id, contributions)
 
             # Pick out the data selected for output and send it to
-            self.output.update_local_time_series(reach_id, time_series[self.local_index])
+            self.output.update_time_series(reach_id, time_series, 'local')
 
     def process_full(self, reach_ids):
         for reach_id in reach_ids:
@@ -92,23 +86,24 @@ class ReachManager(DateManager, MemoryMatrix):
             # Pick out the time series that will be retained in the output
             upstream_time_series = \
                 np.array([runoff, runoff_mass, erosion, erosion_mass,
-                          total_flow, baseflow, wc_conc, benthic_conc, runoff_conc])[self.full_index]
+                          total_flow, baseflow, wc_conc, benthic_conc, runoff_conc])
 
             # Store the selected output in the full time series output matrix
-            self.output.update_full_time_series(reach_id, upstream_time_series)
+            self.output.update_time_series(reach_id, upstream_time_series, 'full')
 
             # Calculate excedance probabilities of endpoints
             exceedance = \
                 exceedance_probability(wc_conc, self.sim.endpoints.duration.values.astype(np.int32),
                                        self.sim.endpoints.threshold.values, self.year_index)
+
             self.output.update_exceedances(reach_id, exceedance)
 
     def combine_scenarios(self, reach_id):
         def weight_and_combine(time_series, areas):
             areas = areas.values
             time_series = np.moveaxis(time_series, 0, 2)  # (scenarios, vars, dates) -> (vars, dates, scenarios)
-            time_series[0] *= areas
-            time_series[1] *= np.power(areas / 10000., .12)
+            time_series[0] *= areas  # runoff
+            time_series[1] *= np.power(areas / 10000., .12)  # erosion
             return time_series.sum(axis=2)
 
         """
@@ -130,10 +125,8 @@ class ReachManager(DateManager, MemoryMatrix):
 
                 # Pull chemical mass from Stage 3 scenarios
                 pesticide_mass, found_s3 = self.s3.fetch_from_recipe(recipe)
-
                 if found_s3 is None:
                     continue
-
                 runoff_mass, erosion_mass = weight_and_combine(pesticide_mass, found_s3.area)
 
                 # Assign the pieces of the time series to the new array based on year

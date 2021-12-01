@@ -240,7 +240,7 @@ class ModelInputs(dict):
         self['sim_date_start'], self['sim_date_end'] = self.process_dates()
         self['selected_crops'] = set(self['applications'].crop)
         self.coerce_data_type()
-        self.update(self.output_selection(output_selection_path))
+        self['selected_output'] = self.output_selection(output_selection_path)
 
     def coerce_data_type(self):
         _, data_types = self.fields.fetch('input_param', dtypes=True)
@@ -305,10 +305,6 @@ class ModelInputs(dict):
         t = pd.read_csv(table_path)
         output_dict = {'local_time_series': [var for var, _, sel in t[t.table == 'local'].values if int(sel)],
                        'full_time_series': [var for var, _, sel in t[t.table == 'full'].values if int(sel)]}
-        map_dict = t[t.table == 'map'].set_index('var').sel.to_dict()
-        output_dict['map_reaches'] = map_dict['reaches']
-        output_dict['map_intakes'] = map_dict['intakes']
-        output_dict['write_map'] = bool(int(map_dict['write']))
         return output_dict
 
 
@@ -323,20 +319,15 @@ class ModelOutputs(DateManager):
         self.local_reaches = region.local_reaches
         self.full_reaches = region.full_reaches
         self.huc_crosswalk = region.reach_table[['HUC_8', 'HUC_12']]
+        self.sel = self.sim.selected_output  # output selection from frontend
 
         # Initialize dates
         DateManager.__init__(self, sim.start_date, sim.end_date)
         self.array_path = os.path.join(sim.scratch_path, 'r{}_{{}}_out'.format(region.id))
 
         # Time series data for a single catchment (run everywhere)
-        self.local_time_series = MemoryMatrix(
-            [region.local_reaches, sim.local_time_series, self.n_dates], name='local',
-            path=self.array_path.format('local'))
-
-        # Time series data for full watersheds (run at intakes)
-        self.full_time_series = MemoryMatrix(
-            [region.full_reaches, sim.full_time_series, self.n_dates], name='full',
-            path=self.array_path.format('full'))
+        self.local_time_series, self.full_time_series, self.local_index, self.full_index = \
+            self.initialize_time_series()
 
         # The relative contribution of pesticide mass broken down by reach, runoff/erosion and crop
         # The reason for using an empty list as an index is so the results can get appended in the order
@@ -361,6 +352,29 @@ class ModelOutputs(DateManager):
             tables.append(table)
         return tables
 
+    def initialize_time_series(self):
+        # Find the numerical indices for the variables that get carried through to the output
+        if any(self.sel['local_time_series']):
+            local_time_series = MemoryMatrix(
+                [self.region.local_reaches, self.sel['local_time_series'], self.n_dates], name='local',
+                path=self.array_path.format('local'))
+            local_index = \
+                [list(self.sim.fields.fetch('local_time_series')).index(f) for f in self.sel['local_time_series']]
+        else:
+            local_time_series = local_index = None
+
+        # Time series data for full watersheds (run at intakes)
+        if any(self.sel['full_time_series']):
+            full_time_series = MemoryMatrix(
+                [self.full_reaches, self.sel['full_time_series'], self.n_dates], name='full',
+                path=self.array_path.format('full'))
+            full_index = \
+                [list(self.sim.fields.fetch('full_time_series')).index(f) for f in self.sel['full_time_series']]
+        else:
+            full_time_series = full_index = None
+
+        return local_time_series, full_time_series, local_index, full_index
+
     def percentiles(self, table, sort_col):
         table_index = np.arange(table.shape[0])
         # Assign a percentile rank to each stream reach
@@ -379,7 +393,14 @@ class ModelOutputs(DateManager):
         # Randomly populate the exceedance probabilitiesself
         self.exceedances[:] = np.random.rand(*self.exceedances.shape)
 
-    def prepare_output(self, write_tables=True, write_ts=False):
+    def prepare_output(self):
+
+        """
+        self.sel =
+            {'local_time_series': [],
+            'full_time_series': ['runoff', 'runoff_mass', 'erosion', 'erosion_mass', 'total_flow', 'baseflow', 'wc_conc'],
+            'write_map': True}
+        """
 
         if self.sim.random:
             self.populate_random()
@@ -387,13 +408,13 @@ class ModelOutputs(DateManager):
         # Break down terrestrial sources of pesticide mass
         full_table, summary_table, contributions_dict = self.process_contributions()
 
-        # Write outputs
-        if write_ts:
-            self.write_time_series()
-        if write_tables:
-            self.write_summary_tables(full_table, summary_table)
+        # Write time series output
+        self.write_time_series()
 
-        # Set mapping dictionaries
+        # Write output summary tables
+        self.write_summary_tables(full_table, summary_table)
+
+        # Write output dictionaries for mapping
         self.exceedances.index = self.exceedances.index.astype(str)
         intake_dict = {'COMID': self.exceedances.T.to_dict()}
         reach_dict = contributions_dict
@@ -410,8 +431,8 @@ class ModelOutputs(DateManager):
         # Get the total contributions for each crop, source, reach and hc
         by_source_and_crop = pd.DataFrame(self.contributions.sum(axis=0), ('runoff', 'erosion'), cols)
         by_reach = pd.DataFrame({'total_mass': self.contributions.sum(axis=(1, 2))}, index)
-        by_reach = self.percentiles(by_reach, 'total_mass')
-        by_huc8, by_huc12 = self.contributions_by_huc(by_reach)
+        reach_pct = self.percentiles(by_reach, 'total_mass')
+        huc8_pct, huc12_pct = self.contributions_by_huc(by_reach)
 
         # Parse outputs into tables and json
         full_table = pd.DataFrame(self.contributions[:, 0], index, cols) \
@@ -419,9 +440,9 @@ class ModelOutputs(DateManager):
                    on='comid', suffixes=("_runoff", "_erosion"))
 
         map_dict = {
-            'comid': by_reach['percentile'].T.to_dict(),
-            'huc_8': by_huc8.T.to_dict(),
-            'huc_12': by_huc12.T.to_dict()
+            'comid': reach_pct['percentile'].T.to_dict(),
+            'huc_8': huc8_pct.T.to_dict(),
+            'huc_12': huc12_pct.T.to_dict()
         }
         return full_table, by_source_and_crop, map_dict
 
@@ -433,11 +454,12 @@ class ModelOutputs(DateManager):
     def update_exceedances(self, reach_id, data):
         self.exceedances.loc[reach_id] = data
 
-    def update_full_time_series(self, reach_id, data):
-        self.full_time_series.update(reach_id, data)
-
-    def update_local_time_series(self, reach_id, data):
-        self.local_time_series.update(reach_id, data)
+    def update_time_series(self, reach_id, data, mode):
+        assert mode in ('local', 'full'), f"Invalid mode {mode}, must be 'local' or 'full"
+        time_series = {'local': self.local_time_series, 'full': self.full_time_series}[mode]
+        index = {'local': self.local_index, 'full': self.full_index}[mode]
+        if time_series is not None:
+            time_series.update(reach_id, data[index])
 
     def write_summary_tables(self, full_table, summary_table):
         # Join output data with intake descriptors
@@ -449,15 +471,18 @@ class ModelOutputs(DateManager):
         self.exceedances.to_csv(os.path.join(self.sim.output_path, "exceedances.csv"))
 
     def write_time_series(self):
+        local, full = self.sel['local_time_series'], self.sel['full_time_series']
         outfile_path = os.path.join(self.sim.output_path, "time series", "time_series_{}_{}.csv")
         if not os.path.exists(os.path.dirname(outfile_path)):
             os.makedirs(os.path.dirname(outfile_path))
-        for reach_id in self.local_reaches:
-            data = pd.DataFrame(self.local_time_series.fetch(reach_id).T, self.sim.dates, self.sim.local_time_series)
-            data.to_csv(outfile_path.format(reach_id, 'local'))
-        for reach_id in self.full_reaches:
-            data = pd.DataFrame(self.full_time_series.fetch(reach_id).T, self.sim.dates, self.sim.full_time_series)
-            data.to_csv(outfile_path.format(reach_id, 'full'))
+        if any(local):
+            for reach_id in self.local_reaches:
+                data = pd.DataFrame(self.local_time_series.fetch(reach_id).T, self.sim.dates, local)
+                data.to_csv(outfile_path.format(reach_id, 'local'))
+        if any(full):
+            for reach_id in self.full_reaches:
+                data = pd.DataFrame(self.full_time_series.fetch(reach_id).T, self.sim.dates, full)
+                data.to_csv(outfile_path.format(reach_id, 'full'))
 
 
 class WeatherArray(MemoryMatrix, DateManager):
@@ -489,6 +514,53 @@ class WeatherArray(MemoryMatrix, DateManager):
         data = self.fetch(station_id, copy=True, verbose=True).T
         data[:2] /= 100.  # Precip, PET  cm -> m
         return data[:, self.start_offset:-self.end_offset]
+
+
+def scenario_qaqc(s2, s3, recipes):
+    # TODO - QAQC questions
+    #   * Should leaching and runoff add up to 1?
+    #   * We've got weather files with zero rain. That needs fixing
+    #
+
+    erosion_benchmark = 1 * 0.000112085  # lbs/acre -> kg/m2
+    rainfall_benchmark = 35.9 / 39.37  # inches -> m  (Des Moines, IA)
+    """
+                    scenario_id  cdl_alias  weather_grid  pwc_class  s1_index
+    recipe_index                                                                   
+    43230939       CDo1r1a1l1-18071-1          1         18071         10         0
+    43241414       CDo2r1a1l1-18071-1          1         18071         10         1
+    """
+    s2_index = s2.s1.lookup
+    """
+                    scenario_id  s1_index  ...  s3_index  contribution_index
+    recipe_index                                  ...                              
+    43230939        CDo1r1a1l1-18071-1         0  ...         0                   0
+    43241414        CDo2r1a1l1-18071-1         1  ...         1                   0
+    """
+    s3_index = s3.lookup
+    """
+            year      comid     start       end
+    0       2015    -203752         0       103
+    1       2015    -203751       103       438
+    2       2015    -203750       438       535
+    """
+    recipe_map = recipes.map
+
+    # Check the values in the s2 matrix
+    values = []
+    for i, scenario_id in enumerate(s2_index.scenario_id):
+        # runoff, erosion, leaching, soil_water, rain
+        scenario = s2.fetch_single(i, iloc=True)
+        annual_averages = scenario.mean(axis=1) * 365.25
+        values.append([scenario_id] + list(annual_averages))
+    all_averages = pd.DataFrame(values, columns=['scenario_id'] + list(s2.arrays))
+    runoff, erosion, leaching, soil_water, rain = all_averages.mean(axis=0)
+    print(f"Annual average rain: {rain} ({int((rain / rainfall_benchmark) * 100.)}%)")
+    print(f"Annual average erosion: {erosion} ({int((erosion / erosion_benchmark) * 100.)}%)")
+    runoff_fraction = int((runoff / rain) * 100.)
+    leaching_fraction = int((leaching / rain) * 100.)
+    print(f"Runoff/leaching: {runoff_fraction}/{leaching_fraction}")
+    all_averages.to_csv("s2_report.csv")
 
 
 def report(message, tabs=0):

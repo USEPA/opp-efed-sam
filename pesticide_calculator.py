@@ -1,9 +1,10 @@
 from .hydrology import HydroRegion
-from .utilities import Simulation, WeatherArray, ModelOutputs, report
+from .utilities import Simulation, WeatherArray, ModelOutputs, report, scenario_qaqc
 from .reach_processing import ReachManager, WatershedRecipes
 from .scenario_processing import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
 
 retain_s3 = True
+qaqc_scenarios = False
 
 
 def pesticide_calculator(input_data):
@@ -41,6 +42,10 @@ def pesticide_calculator(input_data):
         # Initialize Stage 3 scenarios (time series of chemical transport data e.g., runoff mass, erosion mass)
         stage_three = StageThreeScenarios(sim, stage_one, stage_two)
 
+        # Examine the scenarios if QAQC is turned on
+        if qaqc_scenarios:
+            scenario_qaqc(stage_two, stage_three, recipes)
+
         # Initialize objects to hold results by stream reach and reservoir
         reaches = ReachManager(sim, stage_two, stage_three, region, recipes, outputs)
 
@@ -49,7 +54,6 @@ def pesticide_calculator(input_data):
         for tier, reach_ids, lakes in region.cascade():
             report(f'Running tier {tier}, ({len(reach_ids)} reaches)...')
             # TODO - parallelize
-
             reaches.process_local(reach_ids)
 
             # Perform full analysis including time-of-travel and concentration for active reaches

@@ -18,6 +18,15 @@ Scenario indexing:
 * s1_index (int, iloc=True for s1) - a unique integer alias for s1 scenarios
 * s3_index (int, iloc=True for s3) - a unique integer alias for s3 scenarios
 
+Scenario shapes:
+* s1: (scenarios, vars)
+* s2: (scenarios, [runoff, erosion, leaching, soil_water, rain], dates)
+* s3: (scenarios, [runoff_mass, erosion_mass], dates)
+
+
+Most expensive functionality in SAM is fetching s2 and s3 scenarios from the matrix. Can this be sped up?
+* Changing the array shapes probably won't help. I think the costly part is creating a copy. 
+* Can we avoid making a copy? Create an intermediate memory map?
 """
 
 
@@ -244,6 +253,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
 
     def fetch_multiple(self, index, row_index=None, copy=False, verbose=False, iloc=False, pop=False,
                        return_alias=False):
+        # TODO - most expensive function in SAM
         result = self.fetch(index, copy, verbose, iloc, pop, return_alias)
         if row_index is not None:
             return result[:, row_index, self.start_offset:-self.end_offset]
@@ -254,6 +264,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
         found = recipe.join(self.s1.lookup)
         if found.empty:
             raise ValueError("Mismatch between s2 and s1 scenarios")
+
         arrays = self.fetch_multiple(found.s1_index)[:, self.runoff_erosion]
         return arrays, found.dropna()
 
@@ -379,6 +390,7 @@ def stage_one_to_two(precip, pet, temp, new_year,  # weather params
                      irrigation_type, ireg, depletion_allowed, leaching_fraction,  # irrigation params
                      cn_min, delta_x, bins, depth, anetd, n_increments, sfac,  # simulation soil params
                      types, array_fields, debug=False):
+
     # Model the growth of plant between emergence and maturity (defined as full canopy cover)
     plant_factor = plant_growth(precip.size, new_year, plant_date, emergence_date, maxcover_date, harvest_date)
 
