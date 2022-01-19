@@ -413,13 +413,16 @@ class ModelOutputs(DateManager):
 
         # Write output summary tables
         self.write_summary_tables(full_table, summary_table)
+        
+        # Get intake time series data to return
+        intake_time_series = self.get_time_series()
 
         # Write output dictionaries for mapping
         self.exceedances.index = self.exceedances.index.astype(str)
         intake_dict = {'COMID': self.exceedances.T.to_dict()}
         reach_dict = contributions_dict
 
-        return intake_dict, reach_dict
+        return intake_dict, reach_dict, intake_time_series
 
     def process_contributions(self):
 
@@ -483,7 +486,15 @@ class ModelOutputs(DateManager):
             for reach_id in self.full_reaches:
                 data = pd.DataFrame(self.full_time_series.fetch(reach_id).T, self.sim.dates, full)
                 data.to_csv(outfile_path.format(reach_id, 'full'))
-
+                
+    def get_time_series(self): 
+        local, full = self.sel['local_time_series'], self.sel['full_time_series']
+        full_time_series_dict = {}
+        if any(full):
+            for reach_id in self.full_reaches:
+                data = pd.DataFrame(self.full_time_series.fetch(reach_id).T, self.sim.dates, full)
+                full_time_series_dict{reach_id} = data.to_dict(orient='split')
+        return full_time_series_dict
 
 class WeatherArray(MemoryMatrix, DateManager):
     def __init__(self, sim):
