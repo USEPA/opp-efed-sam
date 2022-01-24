@@ -492,9 +492,9 @@ class ModelOutputs(DateManager):
         full_time_series_dict = {}
         if any(full):
             for reach_id in self.full_reaches:
-                data = pd.DataFrame(self.full_time_series.fetch(reach_id).T, self.sim.dates, full)
-                print('\n\n'+ str(reach_id))
-                print(data)
+                data = pd.DataFrame(self.full_time_series.fetch(reach_id).T, self.sim.dates.astype(str), full)
+                #print('\n\n'+ str(reach_id))
+                #print(data)
                 full_time_series_dict[str(reach_id)] = data.to_dict(orient='split')
         return full_time_series_dict
 
