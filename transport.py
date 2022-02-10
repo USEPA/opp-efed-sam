@@ -65,7 +65,8 @@ def soil_to_water(pesticide_mass_soil, runoff, erosion, leaching, bulk_density, 
     # TODO - this is by far the most expensive transport function. See what we can do. njit at least
 
     # Initialize running variables
-    transported_mass = np.zeros((2, pesticide_mass_soil.size), dtype=np.float32)  # runoff, erosion
+    runoff_mass = np.zeros(pesticide_mass_soil.size, dtype=np.float32)
+    erosion_mass = np.zeros(pesticide_mass_soil.size, dtype=np.float32)
     total_mass, degradation_rate = 0, 0
 
     # Initialize erosion intensity
@@ -83,9 +84,9 @@ def soil_to_water(pesticide_mass_soil, runoff, erosion, leaching, bulk_density, 
             degradation_rate = np.exp(-deg_soil)
         average_conc = ((total_mass / retardation / delta_x) / deg_total) * (1 - degradation_rate)
         if runoff[day] > 0:
-            transported_mass[0, day] = average_conc * daily_runoff  # runoff
+            runoff_mass[day] = average_conc * daily_runoff  # runoff
         if erosion[day] > 0:
             enrich = np.exp(2.0 - (0.2 * np.log10(erosion[day])))
             enriched_eroded_mass = erosion[day] * enrich * kd * erosion_intensity * 0.1
-            transported_mass[1, day] = average_conc * enriched_eroded_mass
-    return transported_mass
+            erosion_mass[day] = average_conc * enriched_eroded_mass
+    return runoff_mass, erosion_mass

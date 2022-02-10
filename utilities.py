@@ -18,10 +18,11 @@ class Simulation(DateManager):
     run including Endpoints, Crops, Dates, Intake reaches, and Impulse Response Functions
     """
 
-    def __init__(self, input_json, retain_s3=False):
+    def __init__(self, input_json, retain_s1=False, retain_s3=False):
         # TODO - confirm that everything works as intended here, esp. for eco runs
         # Determine whether the simulation is being run on a windows desktop (local for epa devs)
         self.local_run = any([r'C:' in p for p in sys.path])
+        self.retain_s1 = retain_s1
         self.retain_s3 = retain_s3
 
         # Add paths
@@ -49,13 +50,11 @@ class Simulation(DateManager):
 
         # TODO - get rid of MTB at the frontend?
         # Unpack the 'simulation_name' parameter to detect if a special run is called for
-        detected, self.build_scenarios, self.random, self.custom_intakes, self.tag = \
+        detected, self.build_scenarios, self.random, self.confine, self.confined_intakes, self.tag = \
             self.detect_special_run()
 
         assert self.sim_type in ('eco', 'dwr'), \
             'Invalid simulation type "{}"'.format(self.sim_type)
-        # TODO - this is temporary until eco mode is ready
-        assert self.sim_type == 'dwr', "'eco' mode is not ready yet"
 
         # Initialize dates
         DateManager.__init__(self, *self.align_dates())
@@ -149,6 +148,7 @@ class Simulation(DateManager):
                 os.remove(os.path.join(self.scratch_path, f))
 
     def detect_special_run(self):
+        # TODO - update this so scenarios can't be built for a subset
         """
         A special run can be triggered from the frontend under the 'Simulation Name' field
         A special run can include the following things:
@@ -165,10 +165,10 @@ class Simulation(DateManager):
         :return: build_scenarios, intakes, run_regions, intake_reaches, tag, random
         """
         detected = build = random = False
-        custom_intakes = tag = None
+        confined_intakes = tag = None
         params = self.simulation_name.lower().split("&")
-
         message = None
+
         if params[0] == 'test':
             random = True
             tag = "random"
@@ -182,28 +182,34 @@ class Simulation(DateManager):
         # Using the 'Mark Twain Demo' selection for region precludes all settings except 'test'
         if self.region == 'Mark Twain Demo':
             self.region = '07'
-            custom_intakes = [4867727]
+            confined_intakes = [4867727]
             tag = 'mtb'
         else:
             if len(params) > 1:
-                custom_intakes = list(map(int, params[1].split(",")))
+                confined_intakes = list(map(int, params[1].split(",")))
                 tag = "_custom"  # default tag so full regional data isn't overwritten
             if len(params) > 2:
                 tag = params[2]
                 if random:
                     tag = f"random_{tag}"
-            if any((build, random, custom_intakes, tag)):
+            if any((build, random, confined_intakes, tag)):
                 detected = True
+
+        # A flag to indicate that confined scenarios and recipes should be constructed
+        if confined_intakes is not None and not random:
+            confine = True
+        else:
+            confine = False
 
         if message is not None:
             message += f" for Region {self.region}"
-        if custom_intakes is not None:
-            message += f", subset to comid(s) {', '.join(map(str, custom_intakes))}"
+        if confined_intakes is not None:
+            message += f", subset to comid(s) {', '.join(map(str, confined_intakes))}"
         if tag is not None:
             message += f". Files generated will end with tag \"_{tag}\""
         report(message)
 
-        return detected, build, random, custom_intakes, tag
+        return detected, build, random, confine, confined_intakes, tag
 
     def initialize_parameters(self):
         params = pd.read_csv(self.parameters_path, usecols=['parameter', 'value', 'dtype'])
@@ -222,6 +228,10 @@ class Simulation(DateManager):
         for var, dirname, basename in table.values:
             paths[f'{var}_path'] = os.path.join(paths[dirname], basename)
         return paths
+
+    @property
+    def n_active_crops(self):
+        return len(self.active_crops)
 
 
 class ModelInputs(dict):
@@ -304,7 +314,7 @@ class ModelInputs(dict):
         # TODO - this is hardwired for now - move it to the input page
         t = pd.read_csv(table_path)
         output_dict = {'local_time_series': [var for var, _, sel in t[t.table == 'local'].values if int(sel)],
-                       'full_time_series': [var for var, _, sel in t[t.table == 'full'].values if int(sel)]}
+                       'upstream_time_series': [var for var, _, sel in t[t.table == 'upstream'].values if int(sel)]}
         return output_dict
 
 
@@ -317,29 +327,28 @@ class ModelOutputs(DateManager):
         self.sim = sim
         self.intakes = region.intakes
         self.local_reaches = region.local_reaches
-        self.full_reaches = region.full_reaches
+        self.upstream_reaches = region.upstream_reaches
+        self.output_reaches = region.intake_reaches
         self.huc_crosswalk = region.reach_table[['HUC_8', 'HUC_12']]
-        self.sel = self.sim.selected_output  # output selection from frontend
-
+        self.local_time_series = self.sim.selected_output['local_time_series']  # output selection from frontend
+        self.upstream_time_series = self.sim.selected_output['upstream_time_series']
+        self.all_time_series = self.local_time_series + self.upstream_time_series
+        self.lookup = pd.Series(np.arange(len(self.output_reaches)), self.output_reaches)
+        self.n_reaches = len(self.local_reaches)
         # Initialize dates
         DateManager.__init__(self, sim.start_date, sim.end_date)
         self.array_path = os.path.join(sim.scratch_path, 'r{}_{{}}_out'.format(region.id))
 
         # Time series data for a single catchment (run everywhere)
-        self.local_time_series, self.full_time_series, self.local_index, self.full_index = \
-            self.initialize_time_series()
+        self.local_index, self.upstream_index, self.time_series_out = self.initialize_time_series()
 
         # The relative contribution of pesticide mass broken down by reach, runoff/erosion and crop
-        # The reason for using an empty list as an index is so the results can get appended in the order
-        # in which they're generated, instead of spending time on indexing. Might not be worth it?
-        # (len(self.local_reaches), 2, len(self.sim.active_crops)))
-        self.contributions = []
-        self.contributions_index = []
+        header = [f"{lbl}_{crop}" for lbl in ('runoff', 'erosion') for crop in self.sim.active_crops]
+        self.contributions = pd.DataFrame(np.zeros((self.n_reaches, len(header))), self.local_reaches, header)
 
         # The probability that concentration exceeds endpoint thresholds
-        self.exceedances = pd.DataFrame(np.zeros((len(region.full_reaches), self.sim.endpoints.shape[0])),
-                                        index=pd.Series(region.full_reaches, name='comid'),
-                                        columns=self.sim.endpoints.short_name)
+        self.exceedances = pd.DataFrame(np.zeros((self.n_reaches, self.sim.endpoints.shape[0])),
+                                        self.local_reaches, self.sim.endpoints.short_name)
 
     def contributions_by_huc(self, df, by_percentile=True):
         # Build a dictionary to hold contributions by reach
@@ -354,26 +363,14 @@ class ModelOutputs(DateManager):
 
     def initialize_time_series(self):
         # Find the numerical indices for the variables that get carried through to the output
-        if any(self.sel['local_time_series']):
-            local_time_series = MemoryMatrix(
-                [self.region.local_reaches, self.sel['local_time_series'], self.n_dates], name='local',
-                path=self.array_path.format('local'))
-            local_index = \
-                [list(self.sim.fields.fetch('local_time_series')).index(f) for f in self.sel['local_time_series']]
-        else:
-            local_time_series = local_index = None
-
-        # Time series data for full watersheds (run at intakes)
-        if any(self.sel['full_time_series']):
-            full_time_series = MemoryMatrix(
-                [self.full_reaches, self.sel['full_time_series'], self.n_dates], name='full',
-                path=self.array_path.format('full'))
-            full_index = \
-                [list(self.sim.fields.fetch('full_time_series')).index(f) for f in self.sel['full_time_series']]
-        else:
-            full_time_series = full_index = None
-
-        return local_time_series, full_time_series, local_index, full_index
+        local_index = \
+            [list(self.sim.fields.fetch('local_time_series')).index(f) for f in self.local_time_series]
+        upstream_index = \
+            [list(self.sim.fields.fetch('upstream_time_series')).index(f) for f in self.upstream_time_series]
+        time_series = MemoryMatrix(
+            [self.output_reaches, local_index + upstream_index, self.n_dates], name='output time series',
+            path=self.array_path.format('all'))
+        return local_index, upstream_index, time_series
 
     def percentiles(self, table, sort_col):
         table_index = np.arange(table.shape[0])
@@ -386,11 +383,8 @@ class ModelOutputs(DateManager):
         return table
 
     def populate_random(self):
-        # Randomly populate the contributions array
-        self.contributions_index = self.local_reaches
-        self.contributions = np.random.rand(len(self.local_reaches), 2, len(self.sim.active_crops)) * 10.
-
-        # Randomly populate the exceedance probabilitiesself
+        self.time_series_out.writer[:] = np.random.rand(*self.time_series_out.shape) * 10.
+        self.contributions[:] = np.random.rand(*self.contributions.shape) * 10.
         self.exceedances[:] = np.random.rand(*self.exceedances.shape)
 
     def prepare_output(self):
@@ -398,105 +392,83 @@ class ModelOutputs(DateManager):
         """
         self.sel =
             {'local_time_series': [],
-            'full_time_series': ['runoff', 'runoff_mass', 'erosion', 'erosion_mass', 'total_flow', 'baseflow', 'wc_conc'],
+            'upstream_time_series': ['runoff', 'runoff_mass', 'erosion', 'erosion_mass', 'total_flow', 'baseflow', 'wc_conc'],
             'write_map': True}
         """
-
         if self.sim.random:
             self.populate_random()
 
         # Break down terrestrial sources of pesticide mass
-        full_table, summary_table, contributions_dict = self.process_contributions()
+        summary_table, contributions_dict = self.process_contributions()
 
         # Write time series output
         self.write_time_series()
 
         # Write output summary tables
-        self.write_summary_tables(full_table, summary_table)
-        
+        self.write_summary_tables(self.contributions, summary_table, self.exceedances)
+
         # Get intake time series data to return
         intake_time_series = self.get_time_series()
 
         # Write output dictionaries for mapping
-        self.exceedances.index = self.exceedances.index.astype(str)
         intake_dict = {'COMID': self.exceedances.T.to_dict()}
         reach_dict = contributions_dict
 
         return intake_dict, reach_dict, intake_time_series
 
     def process_contributions(self):
-
-        # Initialize index and headings
-        index = pd.Series(self.contributions_index, name='comid')
-        cols = [f'cdl_{cls}' for cls in self.sim.active_crops]
-        self.contributions = np.array(self.contributions)  # (reach, source, crop)
-
-        # Get the total contributions for each crop, source, reach and hc
-        by_source_and_crop = pd.DataFrame(self.contributions.sum(axis=0), ('runoff', 'erosion'), cols)
-        by_reach = pd.DataFrame({'total_mass': self.contributions.sum(axis=(1, 2))}, index)
-        reach_pct = self.percentiles(by_reach, 'total_mass')
+        by_source_and_crop = self.contributions.sum(axis=0)
+        by_reach = self.contributions.sum(axis=1)
+        by_reach = by_reach.to_frame("total_mass")
+        reach_pct = self.percentiles(by_reach.copy(), "total_mass")
         huc8_pct, huc12_pct = self.contributions_by_huc(by_reach)
 
         # Parse outputs into tables and json
-        full_table = pd.DataFrame(self.contributions[:, 0], index, cols) \
-            .merge(pd.DataFrame(self.contributions[:, 1], index, cols),
-                   on='comid', suffixes=("_runoff", "_erosion"))
-
         map_dict = {
             'comid': reach_pct['percentile'].T.to_dict(),
             'huc_8': huc8_pct.T.to_dict(),
             'huc_12': huc12_pct.T.to_dict()
         }
-        return full_table, by_source_and_crop, map_dict
-
-    def update_contributions(self, reach_id, contributions):
-        # contributions: (2, n_crops)
-        self.contributions.append(contributions)
-        self.contributions_index.append(reach_id)
-
-    def update_exceedances(self, reach_id, data):
-        self.exceedances.loc[reach_id] = data
+        return by_source_and_crop, map_dict
 
     def update_time_series(self, reach_id, data, mode):
-        assert mode in ('local', 'full'), f"Invalid mode {mode}, must be 'local' or 'full"
-        time_series = {'local': self.local_time_series, 'full': self.full_time_series}[mode]
-        index = {'local': self.local_index, 'full': self.full_index}[mode]
-        if time_series is not None:
-            time_series.update(reach_id, data[index])
+        output_index = self.lookup[reach_id]
+        writer = self.time_series_out.writer
+        if mode == 'local':
+            if any(self.local_index):
+                writer[output_index, :len(self.local_index)] = data[self.local_index]
+        elif mode == 'upstream':
+            if any(self.upstream_index):
+                writer[output_index, len(self.local_index):] = data[self.upstream_index]
+        else:
+            raise ValueError(f"Invalid mode {mode}, must be 'local' or 'upstream")
 
-    def write_summary_tables(self, full_table, summary_table):
+    def write_summary_tables(self, full_table, summary_table, exceedances):
         # Join output data with intake descriptors
-        self.exceedances = self.intakes.merge(self.exceedances, on='comid', how='right')
+        exceedances = self.intakes.merge(self.exceedances, on='comid', how='right')
 
         # Write summary tables
-        full_table.to_csv(os.path.join(self.sim.output_path, "full_table.csv"), index=None)
+        full_table.to_csv(os.path.join(self.sim.output_path, "upstream_table.csv"), index=None)
         summary_table.to_csv(os.path.join(self.sim.output_path, "summary.csv"))
-        self.exceedances.to_csv(os.path.join(self.sim.output_path, "exceedances.csv"))
+        exceedances.to_csv(os.path.join(self.sim.output_path, "exceedances.csv"))
 
     def write_time_series(self):
-        local, full = self.sel['local_time_series'], self.sel['full_time_series']
         outfile_path = os.path.join(self.sim.output_path, "time series", "time_series_{}_{}.csv")
         if not os.path.exists(os.path.dirname(outfile_path)):
             os.makedirs(os.path.dirname(outfile_path))
-        if any(local):
-            for reach_id in self.local_reaches:
-                data = pd.DataFrame(self.local_time_series.fetch(reach_id).T, self.sim.dates, local)
-                data.to_csv(outfile_path.format(reach_id, 'local'))
-        if any(full):
-            for reach_id in self.full_reaches:
-                data = pd.DataFrame(self.full_time_series.fetch(reach_id).T, self.sim.dates, full)
-                data.to_csv(outfile_path.format(reach_id, 'full'))
-                
-    def get_time_series(self): 
-        local, full = self.sel['local_time_series'], self.sel['full_time_series']
-        full_time_series_dict = {}
-        if any(full):
-            for reach_id in self.full_reaches:
-                data = pd.DataFrame(self.full_time_series.fetch(reach_id).T, self.sim.dates.astype(str), full)
-                #print('\n\n'+ str(reach_id))
-                #print(data)
-                full_time_series_dict[str(reach_id)] = data.to_dict(orient='split')
-        return full_time_series_dict
+        for reach_id in self.output_reaches:
+            data = pd.DataFrame(self.time_series_out.fetch(reach_id).T, self.sim.dates, self.all_time_series)
+            data.to_csv(outfile_path.format(reach_id, 'all'))
+
+    def get_time_series(self):
+        upstream_time_series_dict = {}
+        if any(self.all_time_series):
+            for reach_id in self.output_reaches:
+                data = pd.DataFrame(self.time_series_out.fetch(reach_id).T,
+                                    self.sim.dates.astype(str), self.all_time_series)
+                upstream_time_series_dict[str(reach_id)] = data.to_dict(orient='split')
+        return upstream_time_series_dict
+
 
 class WeatherArray(MemoryMatrix, DateManager):
     def __init__(self, sim):
@@ -537,19 +509,9 @@ def scenario_qaqc(s2, s3, recipes):
 
     erosion_benchmark = 1 * 0.000112085  # lbs/acre -> kg/m2
     rainfall_benchmark = 35.9 / 39.37  # inches -> m  (Des Moines, IA)
-    """
-                    scenario_id  cdl_alias  weather_grid  pwc_class  s1_index
-    recipe_index                                                                   
-    43230939       CDo1r1a1l1-18071-1          1         18071         10         0
-    43241414       CDo2r1a1l1-18071-1          1         18071         10         1
-    """
+
     s2_index = s2.s1.lookup
-    """
-                    scenario_id  s1_index  ...  s3_index  contribution_index
-    recipe_index                                  ...                              
-    43230939        CDo1r1a1l1-18071-1         0  ...         0                   0
-    43241414        CDo2r1a1l1-18071-1         1  ...         1                   0
-    """
+
     s3_index = s3.lookup
     """
             year      comid     start       end
@@ -563,7 +525,7 @@ def scenario_qaqc(s2, s3, recipes):
     values = []
     for i, scenario_id in enumerate(s2_index.scenario_id):
         # runoff, erosion, leaching, soil_water, rain
-        scenario = s2.fetch_single(i, iloc=True)
+        scenario = s2.fetch_for_s3(i, iloc=True)
         annual_averages = scenario.mean(axis=1) * 365.25
         values.append([scenario_id] + list(annual_averages))
     all_averages = pd.DataFrame(values, columns=['scenario_id'] + list(s2.arrays))

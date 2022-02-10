@@ -1,3 +1,13 @@
 The most expensive part of SAM is fetching the scenarios from the recipes, which is called from ReachManager.combine_scenarios(), which is called by process_local().
 
 Does process_full() not take as much time?
+
+could i save time by not indexing in fetch_from_recipe?  [:,:,asdfads] is probably slow
+    * these don't seem to matter. it's already an array by then and not a view
+
+
+it looks like dask can read from a mmap in parallel, but maybe not write?
+the reading "fetch_multiple etc" seems to be the expensive part anyway and happens a lot more
+
+
+s2 fetch from recipe is way slower than s3 fetch from recipe

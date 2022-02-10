@@ -1,4 +1,0 @@
-X s1.adjust_data functions to scenario generator
-X stop chunking scenarios for now
-X sort by weather grid
-X change 'scenario_index' to 'recipe_index'

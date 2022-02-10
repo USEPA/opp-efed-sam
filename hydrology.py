@@ -37,7 +37,7 @@ class HydroRegion(Navigator):
         self.intakes, self.intake_reaches = self.find_intakes()
 
         # Select which stream reaches will be fully processed, locally processed, or excluded
-        self.local_reaches, self.full_reaches, self.reservoir_outlets = self.sort_reaches()
+        self.local_reaches, self.upstream_reaches, self.reservoir_outlets = self.sort_reaches()
 
         # Holder for reaches that have been processed
         self.burned_reaches = set()
@@ -72,25 +72,23 @@ class HydroRegion(Navigator):
         return pd.Series(upstream_reaches, name='comid')
 
     def daily_flows(self, reach_id):
-        # TODO - this is taking a little time, maybe a one-time month-to-field comprehension
-        selected = self.flow_table(reach_id)
-        return selected[self.flow_fields].values.astype(np.float32)
+        selected = self.reach_table.loc[reach_id]
+        flows = selected.loc[self.flow_fields].values.astype(np.float32)
+        surface_area = selected['surface_area']
+        return flows, surface_area
 
     def find_intakes(self):
         """ Read a hardwired intake file """
-        if self.sim.custom_intakes is None:
+        if self.sim.confined_intakes is None:
             intake_file = self.sim.dw_intakes_path.format(self.id)
             intakes_table = pd.read_csv(intake_file)
         else:
             intakes_table = pd.DataFrame({
-                'site_num': np.arange(1, len(self.sim.custom_intakes) + 1),
-                'site_name': [f"site_{comid}" for comid in self.sim.custom_intakes],
-                'comid': self.sim.custom_intakes})
+                'site_num': np.arange(1, len(self.sim.confined_intakes) + 1),
+                'site_name': [f"site_{comid}" for comid in self.sim.confined_intakes],
+                'comid': self.sim.confined_intakes})
         intakes_reaches = sorted(intakes_table.comid.unique())
         return intakes_table, intakes_reaches
-
-    def flow_table(self, reach_id):
-        return self.reach_table.loc[reach_id]
 
     def process_nhd(self):
         self.lake_table = \
@@ -120,26 +118,26 @@ class HydroRegion(Navigator):
         """
         intakes - reaches corresponding to an intake
         local - all reaches upstream of an intake
-        full - reaches for which a full suite of outputs is computed
+        upstream - reaches for which contributions from upstream reaches are considered
         intakes_only - do we do the full monty for the intakes only, or all upstream?
         lake_outlets - reaches that correspond to the outlet of a lake
         """
 
-        # If running 'eco' mode, all reaches are treated the same
+        # 'Local' reaches are all that will get run in the simulation
         local = self.reach_table.index.unique().values
-        if self.sim.sim_type == 'eco':
-            full = local
-        elif self.sim.sim_type == 'dwr':
-            full = self.intake_reaches
-
-        # If 'custom' intakes were provided in a special run mode, confine to those reaches and upstream
-        if self.sim.custom_intakes is not None:
+        if self.sim.confined_intakes is not None:
             local = self.confine(self.intake_reaches)
+
+        # 'upstream' reaches are the subset where full time-of-travel analysis is performed
+        if self.sim.sim_type == 'eco':
+            upstream = local
+        elif self.sim.sim_type == 'dwr':
+            upstream = self.intake_reaches
 
         reservoir_outlets = \
             self.lake_table.loc[np.in1d(self.lake_table.outlet_comid, local)][['outlet_comid', 'wb_comid']]
 
-        return local, full, reservoir_outlets
+        return local, upstream, reservoir_outlets
 
 
 class ImpulseResponseMatrix(MemoryMatrix):
