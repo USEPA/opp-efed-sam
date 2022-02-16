@@ -367,6 +367,9 @@ class ModelOutputs(DateManager):
             [list(self.sim.fields.fetch('local_time_series')).index(f) for f in self.local_time_series]
         upstream_index = \
             [list(self.sim.fields.fetch('upstream_time_series')).index(f) for f in self.upstream_time_series]
+        print('Debugging initialize_time_series - START')
+        print(self.output_reaches, local_index + upstream_index, self.n_dates, self.array_path.format('all'))
+        print('Debugging initialize_time_series - END')
         time_series = MemoryMatrix(
             [self.output_reaches, local_index + upstream_index, self.n_dates], name='output time series',
             path=self.array_path.format('all'))
