@@ -1,0 +1,40 @@
+
+ QAQC Checks:
+    1. Pick out a scenario in the map
+    * Does the combination in the map match to a scenario in the s1 scenarios file?
+    * How does the results of that scenario in PWC compare to the results from SAM?
+    * Does the daily weather match?
+    2. Pick out a reach catchment in the map
+    * Does the recipe in SAM match the recipe tabulated manually?
+    * Does SAM accurately pull out and add up those recipes?
+    * Is the upstream watershed correct?
+    3. Find a reach in each tier
+    * Does the output from upstream reaches appear to be contributing properly?
+    4. What's happening globally?
+    * Any nan or zero values anywhere they don't belong?
+
+Model drainage basin: Mexico (subset of Mark Twain)
+  Outlet 5040458
+
+Model scenario (2017):
+  Rowid, VALUE, COUNT, F2017_30M_CDLS, CAT, STATIONS, MAPUNITRASTER_30
+  2,	12069634, 207, 1, 1117682, 18073, 3052021
+
+cdl,combo_id,count,gridcode,mukey,weather_grid,area
+[1,  # , #, 1117682, 3052021, 18073, #]
+
+Model scenario found in 07_2017.csv:
+Row # 12069634
+{'cdl': 1,
+ 'combo_id': 12069634,
+ 'count': 207,
+ 'gridcode': 1117682,
+ 'mukey': 3052021,
+ 'weather_grid': 18073,
+ 'area': 186300}
+found in 5040988 only
+
+1.
+
+Manually-selected scenario from map matches the record in Combinations\r07_2017.csv
+

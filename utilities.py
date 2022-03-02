@@ -286,7 +286,7 @@ class ModelInputs(dict):
 
         # Create a float array of the applications table for faster use
         for i, row in applications.iterrows():
-            applications.loc[i, 'event'] = ['plant', 'harvest', 'maxcover', 'harvest'].index(row.event)
+            applications.loc[i, 'event'] = ['plant', 'emergence', 'maxcover', 'harvest'].index(row.event)
             applications.loc[i, 'dist'] = ['canopy', 'ground'].index(row.dist)
             applications.loc[i, 'method'] = ['uniform', 'step'].index(row.method)
 
@@ -346,20 +346,37 @@ class ModelOutputs(DateManager):
         header = [f"{lbl}_{crop}" for lbl in ('runoff', 'erosion') for crop in self.sim.active_crops]
         self.contributions = pd.DataFrame(np.zeros((self.n_reaches, len(header))), self.local_reaches, header)
 
+        # Concentrations
+        self.concentrations = pd.DataFrame(np.zeros((self.n_reaches, 2)), self.local_reaches,
+                                           ['wc_conc', 'benthic_conc'])
+
         # The probability that concentration exceeds endpoint thresholds
         self.exceedances = pd.DataFrame(np.zeros((self.n_reaches, self.sim.endpoints.shape[0])),
                                         self.local_reaches, self.sim.endpoints.short_name)
 
-    def contributions_by_huc(self, df, by_percentile=True):
-        # Build a dictionary to hold contributions by reach
-        tables = []
-        df = df.join(self.huc_crosswalk)
+    def summarize_by_huc(self):
+        # Merge all output data going to the map and add HUC crosswalk
+        contributions_by_reach = self.contributions.sum(axis=1).rename("mass")
+        df = self.huc_crosswalk.join(contributions_by_reach, how="right")
+        if self.sim.sim_type == "eco":
+            df = df.join(self.exceedances).join(self.concentrations)
+        # out_table = {'COMID': df.to_dict()}
+        out_table = {}
+        # Aggregate everything by HUC
         for field in 'HUC_8', 'HUC_12':
-            table = df.groupby(field).agg('sum')
-            if by_percentile:
-                table = self.percentiles(table, 'total_mass')['percentile']
-            tables.append(table)
-        return tables
+            table = df.groupby(field).agg([np.mean, np.sum])
+            for column in table.columns:
+                table[column[0], 'pct'] = self.percentiles(table[column])
+        out_table[field] = \
+            table.T.unstack().T.groupby(level=0).apply(lambda x: x.xs(x.name).to_dict()).to_dict()
+        return out_table
+
+    def summarize_by_intake(self):
+        out_dict = {'comid': []}
+        if self.sim.sim_type == 'dwr':
+            out_table = self.exceedances.join(self.concentrations)
+            out_dict['comid'] = out_table.T.to_dict()
+        return out_dict
 
     def initialize_time_series(self):
         # Find the numerical indices for the variables that get carried through to the output
@@ -372,64 +389,38 @@ class ModelOutputs(DateManager):
             path=self.array_path.format('all'))
         return local_index, upstream_index, time_series
 
-    def percentiles(self, table, sort_col):
-        table_index = np.arange(table.shape[0])
-        # Assign a percentile rank to each stream reach
-        table['original_order'] = table_index
-        table = table.sort_values(sort_col)
-        table['percentile'] = ((table_index + 1) / table.shape[0]) * 100
-        table = table.sort_values('original_order')
-        del table['original_order']
-        return table
+    def percentiles(self, series):
+        table = series.reset_index(drop=True) \
+            .reset_index(name="val") \
+            .rename(columns={'index': 'original'}) \
+            .sort_values('val') \
+            .reset_index()
+        table['percentile'] = ((table.index + 1) / table.shape[0]) * 100
+        table = table.sort_values('original')
+        return table.percentile.values
 
     def populate_random(self):
         self.time_series_out.writer[:] = np.random.rand(*self.time_series_out.shape) * 10.
         self.contributions[:] = np.random.rand(*self.contributions.shape) * 10.
+        self.concentrations[:] = np.random.rand(*self.concentrations.shape) * 100.
         self.exceedances[:] = np.random.rand(*self.exceedances.shape)
 
     def prepare_output(self):
 
-        """
-        self.sel =
-            {'local_time_series': [],
-            'upstream_time_series': ['runoff', 'runoff_mass', 'erosion', 'erosion_mass', 'total_flow', 'baseflow', 'wc_conc'],
-            'write_map': True}
-        """
         if self.sim.random:
             self.populate_random()
 
-        # Break down terrestrial sources of pesticide mass
-        summary_table, contributions_dict = self.process_contributions()
-
-        # Write time series output
-        self.write_time_series()
+        # Summarize pesticide masses and endpoint exceedances by reach and watershed
+        huc_dict = self.summarize_by_huc()
+        intake_dict = self.summarize_by_intake()
 
         # Write output summary tables
-        self.write_summary_tables(self.contributions, summary_table, self.exceedances)
+        self.write_summary_tables()
 
         # Get intake time series data to return
         intake_time_series = self.get_time_series()
 
-        # Write output dictionaries for mapping
-        intake_dict = {'COMID': self.exceedances.T.to_dict()}
-        reach_dict = contributions_dict
-
-        return intake_dict, reach_dict, intake_time_series
-
-    def process_contributions(self):
-        by_source_and_crop = self.contributions.sum(axis=0)
-        by_reach = self.contributions.sum(axis=1)
-        by_reach = by_reach.to_frame("total_mass")
-        reach_pct = self.percentiles(by_reach.copy(), "total_mass")
-        huc8_pct, huc12_pct = self.contributions_by_huc(by_reach)
-
-        # Parse outputs into tables and json
-        map_dict = {
-            'comid': reach_pct['percentile'].T.to_dict(),
-            'huc_8': huc8_pct.T.to_dict(),
-            'huc_12': huc12_pct.T.to_dict()
-        }
-        return by_source_and_crop, map_dict
+        return intake_dict, huc_dict, intake_time_series
 
     def update_time_series(self, reach_id, data, mode):
         output_index = self.lookup[reach_id]
@@ -443,13 +434,13 @@ class ModelOutputs(DateManager):
         else:
             raise ValueError(f"Invalid mode {mode}, must be 'local' or 'upstream")
 
-    def write_summary_tables(self, full_table, summary_table, exceedances):
+    def write_summary_tables(self):
         # Join output data with intake descriptors
         exceedances = self.intakes.merge(self.exceedances, on='comid', how='right')
 
         # Write summary tables
-        full_table.to_csv(os.path.join(self.sim.output_path, "upstream_table.csv"), index=None)
-        summary_table.to_csv(os.path.join(self.sim.output_path, "summary.csv"))
+        self.contributions.to_csv(os.path.join(self.sim.output_path, "upstream_table.csv"), index=None)
+        self.contributions.sum(axis=0).to_csv(os.path.join(self.sim.output_path, "summary.csv"))
         exceedances.to_csv(os.path.join(self.sim.output_path, "exceedances.csv"))
 
     def write_time_series(self):
@@ -499,43 +490,6 @@ class WeatherArray(MemoryMatrix, DateManager):
         data = self.fetch(station_id, copy=True, verbose=True).T
         data[:2] /= 100.  # Precip, PET  cm -> m
         return data[:, self.start_offset:-self.end_offset]
-
-
-def scenario_qaqc(s2, s3, recipes):
-    # TODO - QAQC questions
-    #   * Should leaching and runoff add up to 1?
-    #   * We've got weather files with zero rain. That needs fixing
-    #
-
-    erosion_benchmark = 1 * 0.000112085  # lbs/acre -> kg/m2
-    rainfall_benchmark = 35.9 / 39.37  # inches -> m  (Des Moines, IA)
-
-    s2_index = s2.s1.lookup
-
-    s3_index = s3.lookup
-    """
-            year      comid     start       end
-    0       2015    -203752         0       103
-    1       2015    -203751       103       438
-    2       2015    -203750       438       535
-    """
-    recipe_map = recipes.map
-
-    # Check the values in the s2 matrix
-    values = []
-    for i, scenario_id in enumerate(s2_index.scenario_id):
-        # runoff, erosion, leaching, soil_water, rain
-        scenario = s2.fetch_for_s3(i, iloc=True)
-        annual_averages = scenario.mean(axis=1) * 365.25
-        values.append([scenario_id] + list(annual_averages))
-    all_averages = pd.DataFrame(values, columns=['scenario_id'] + list(s2.arrays))
-    runoff, erosion, leaching, soil_water, rain = all_averages.mean(axis=0)
-    print(f"Annual average rain: {rain} ({int((rain / rainfall_benchmark) * 100.)}%)")
-    print(f"Annual average erosion: {erosion} ({int((erosion / erosion_benchmark) * 100.)}%)")
-    runoff_fraction = int((runoff / rain) * 100.)
-    leaching_fraction = int((leaching / rain) * 100.)
-    print(f"Runoff/leaching: {runoff_fraction}/{leaching_fraction}")
-    all_averages.to_csv("s2_report.csv")
 
 
 def report(message, tabs=0):

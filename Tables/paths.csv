@@ -13,7 +13,7 @@ level,var,dir,base,vars
 2,navigator,input_path,NavigatorFiles/nav{}.npz,region
 2,nhd_wbd_xwalk,data_root,NHD_HUC_Crosswalk/CrosswalkTable_NHDplus_HU12.csv,
 2,s1_scenarios,intermediate_path,StageOneScenarios/r{},region
-2,s2_scenarios,intermediate_path,StageTwoScenarios/r{},region
+2,s2_scenarios,intermediate_path,StageTwoScenarios/r{}_{},"region, chemical"
 2,s3_scenarios,scratch_path,r{}_s3.dat,region
 2,fields_and_qc,table_path,fields_and_qc.csv,
 2,types,table_path,tr_55.csv,

@@ -1,11 +1,10 @@
 from .hydrology import HydroRegion
-from .utilities import Simulation, WeatherArray, ModelOutputs, report, scenario_qaqc
+from .utilities import Simulation, WeatherArray, ModelOutputs, report
 from .reach_processing import ReachManager, WatershedRecipes
 from .scenario_processing import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
 
-retain_s1 = True
+retain_s1 = False
 retain_s3 = True
-qaqc_scenarios = False
 
 
 # ISSUES:
@@ -20,7 +19,6 @@ def pesticide_calculator(input_data):
 
     # Iterate through each hydroregion that encompasses the run
     for region_id in sim.run_regions:
-        report('Processing hydroregion {}...'.format(region_id))
 
         # Initialize a weather file reader
         met = WeatherArray(sim)
@@ -37,8 +35,8 @@ def pesticide_calculator(input_data):
         # Initialize output object
         outputs = ModelOutputs(sim, region)
 
+        # No need to do any scenarios processing if generating random output
         if sim.random:
-            # No need to do any scenarios processing if generating random output
             continue
 
         # Initialize Stage 2 scenarios (time series of non-chemical data, e.g., runoff, erosion, rainfall...)
@@ -50,15 +48,12 @@ def pesticide_calculator(input_data):
         # Initialize Stage 3 scenarios (time series of chemical transport data e.g., runoff mass, erosion mass)
         stage_three = StageThreeScenarios(sim, stage_one, stage_two)
 
-        # Examine the scenarios if QAQC is turned on
-        if qaqc_scenarios:
-            scenario_qaqc(stage_two, stage_three, recipes)
-
         # Initialize objects to hold results by stream reach and reservoir
         reaches = ReachManager(sim, stage_three, region, recipes, outputs)
 
         # Combine scenarios to generate data for catchments
         for tier, reach_ids, lakes in region.cascade():  # Traverse downstream in the watershed
+
             report(f'Running tier {tier}, ({len(reach_ids)} reaches)...')
             upstream_reaches = reach_ids & set(region.upstream_reaches)
             output_reaches = reach_ids & set(region.intake_reaches)

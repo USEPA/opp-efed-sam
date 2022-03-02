@@ -94,11 +94,14 @@ class StageOneScenarios(MemoryMatrix):
             cursor += chunk.shape[0]
         del writer
 
-    def fetch(self, index, fields=None, iloc=True):
+    def fetch(self, index, fields=None, iloc=True, return_fields=False):
         fields = {'s2': self.s2_fields, 's3': self.s3_fields}.get(fields, self.array_fields)
         field_index = [self.array_fields.index(f) for f in fields]
         row = super(StageOneScenarios, self).fetch(index, iloc=iloc)
-        return list(row[field_index])
+        if not return_fields:
+            return list(row[field_index])
+        else:
+            return pd.Series(row[field_index], index=fields)
 
     def get_active_crops(self):
         # Read the lookup table to send all active crops to the simulation
@@ -163,6 +166,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
         # Group by weather grid to reduce the overhead from fetching met data
         weather_grid = None
         for _, row in self.s1.lookup.iterrows():
+
             # Stage 1 scenarios are sorted by weather grid. When it changes, update the time series data
             if row.weather_grid != weather_grid:
                 weather_grid = row.weather_grid
@@ -177,13 +181,17 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
             scenario_inputs = time_series_data + s1_params + sim_params
 
             # In debug mode, the processing will not use Dask or occur in parallel
-            debug_mode = False
+            debug_mode = True
             if not debug_mode:
                 batch.append(self.sim.dask_client.submit(stage_one_to_two, *scenario_inputs))
                 batch_index.append(row.scenario_id)
             else:
-                results = stage_one_to_two(*scenario_inputs)
-                runoff, erosion, leaching, soil_water, rain = map(float, results.sum(axis=1))
+                if row.s1_index == 3101:
+                    results = stage_one_to_two(*scenario_inputs)
+                    results = pd.DataFrame(results.T, columns=['runoff', 'erosion', 'leaching', 'soil_water', 'rain'])
+                    results.to_csv("scenario_test1.csv")
+                    exit()
+                    runoff, erosion, leaching, soil_water, rain = map(float, results.sum(axis=1))
 
             # Submit the batch for asynchronous processing
             # TODO - how do the weather and scenario arrays match up?
@@ -213,7 +221,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
         return names, start_date, end_date, n_dates
 
     def set_paths(self, region):
-        root_path = self.sim.s2_scenarios_path.format(region)
+        root_path = self.sim.s2_scenarios_path.format(region, self.sim.chemical_name)
         keyfile_path = root_path + '_key.txt'
         array_path = root_path + '_arrays.dat'
         return keyfile_path, array_path
@@ -280,7 +288,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                 scenario_inputs = [crop_applications.values] + sim_params + s2_time_series + s1_params
 
                 # In debug mode, the processing will not use Dask or occur in parallel
-                debug_mode = False
+                debug_mode = True
                 if not debug_mode:
                     batch.append(self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs))
                     batch_index.append(scenario_id)
