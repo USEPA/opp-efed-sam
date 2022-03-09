@@ -71,5 +71,5 @@ def pesticide_calculator(input_data):
 
     # Write output
     report('Writing output...')
-    intake_dict, reach_dict, intake_time_series_dict = outputs.prepare_output()
-    return {'intakes': intake_dict, 'reaches': reach_dict, 'intake_time_series': intake_time_series_dict}
+    intake_dict, huc_dict, intake_time_series_dict = outputs.prepare_output()
+    return {'intakes': intake_dict, 'reaches': huc_dict, 'intake_time_series': intake_time_series_dict}

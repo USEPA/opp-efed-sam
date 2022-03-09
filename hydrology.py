@@ -87,7 +87,7 @@ class HydroRegion(Navigator):
                 'site_num': np.arange(1, len(self.sim.confined_intakes) + 1),
                 'site_name': [f"site_{comid}" for comid in self.sim.confined_intakes],
                 'comid': self.sim.confined_intakes})
-        intakes_reaches = sorted(intakes_table.comid.unique())
+        intakes_reaches = pd.Series(sorted(intakes_table.comid.unique()), name="comid")
         return intakes_table, intakes_reaches
 
     def process_nhd(self):

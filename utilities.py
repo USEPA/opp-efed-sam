@@ -10,7 +10,6 @@ from distributed import Client
 from .hydrology import ImpulseResponseMatrix
 from .tools.efed_lib import FieldManager, MemoryMatrix, DateManager
 
-
 class Simulation(DateManager):
     """
     User-specified parameters and parameters derived from hem.
@@ -334,7 +333,9 @@ class ModelOutputs(DateManager):
         self.upstream_time_series = self.sim.selected_output['upstream_time_series']
         self.all_time_series = self.local_time_series + self.upstream_time_series
         self.lookup = pd.Series(np.arange(len(self.output_reaches)), self.output_reaches)
-        self.n_reaches = len(self.local_reaches)
+        self.n_local = len(self.local_reaches)
+        self.n_upstream = len(self.upstream_reaches)
+
         # Initialize dates
         DateManager.__init__(self, sim.start_date, sim.end_date)
         self.array_path = os.path.join(sim.scratch_path, 'r{}_{{}}_out'.format(region.id))
@@ -344,35 +345,37 @@ class ModelOutputs(DateManager):
 
         # The relative contribution of pesticide mass broken down by reach, runoff/erosion and crop
         header = [f"{lbl}_{crop}" for lbl in ('runoff', 'erosion') for crop in self.sim.active_crops]
-        self.contributions = pd.DataFrame(np.zeros((self.n_reaches, len(header))), self.local_reaches, header)
+        self.contributions = pd.DataFrame(np.zeros((self.n_local, len(header))), self.local_reaches, header)
 
         # Concentrations
-        self.concentrations = pd.DataFrame(np.zeros((self.n_reaches, 2)), self.local_reaches,
-                                           ['wc_conc', 'benthic_conc'])
+        self.concentrations = pd.DataFrame(np.zeros((self.n_upstream, 2)), self.upstream_reaches, ['wc_conc', 'benthic_conc'])
 
         # The probability that concentration exceeds endpoint thresholds
-        self.exceedances = pd.DataFrame(np.zeros((self.n_reaches, self.sim.endpoints.shape[0])),
-                                        self.local_reaches, self.sim.endpoints.short_name)
+        self.exceedances = pd.DataFrame(np.zeros((self.n_upstream, self.sim.endpoints.shape[0])),
+                                        self.upstream_reaches, self.sim.endpoints.short_name)
 
     def summarize_by_huc(self):
+
         # Merge all output data going to the map and add HUC crosswalk
         contributions_by_reach = self.contributions.sum(axis=1).rename("mass")
         df = self.huc_crosswalk.join(contributions_by_reach, how="right")
         if self.sim.sim_type == "eco":
             df = df.join(self.exceedances).join(self.concentrations)
-        # out_table = {'COMID': df.to_dict()}
+        # If we decide to do reach-level output: out_table = {'COMID': df.to_dict()}
         out_table = {}
+
         # Aggregate everything by HUC
         for field in 'HUC_8', 'HUC_12':
             table = df.groupby(field).agg([np.mean, np.sum])
             for column in table.columns:
                 table[column[0], 'pct'] = self.percentiles(table[column])
-        out_table[field] = \
-            table.T.unstack().T.groupby(level=0).apply(lambda x: x.xs(x.name).to_dict()).to_dict()
+            out_table[field] = \
+                table.T.unstack().T.groupby(level=0).apply(lambda x: x.xs(x.name).to_dict()).to_dict()
+
         return out_table
 
     def summarize_by_intake(self):
-        out_dict = {'comid': []}
+        out_dict = {'comid': {}}
         if self.sim.sim_type == 'dwr':
             out_table = self.exceedances.join(self.concentrations)
             out_dict['comid'] = out_table.T.to_dict()
