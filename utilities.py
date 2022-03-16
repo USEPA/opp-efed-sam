@@ -10,6 +10,7 @@ from distributed import Client
 from .hydrology import ImpulseResponseMatrix
 from .tools.efed_lib import FieldManager, MemoryMatrix, DateManager
 
+
 class Simulation(DateManager):
     """
     User-specified parameters and parameters derived from hem.
@@ -49,11 +50,7 @@ class Simulation(DateManager):
 
         # TODO - get rid of MTB at the frontend?
         # Unpack the 'simulation_name' parameter to detect if a special run is called for
-        detected, self.build_scenarios, self.random, self.confine, self.confined_intakes, self.tag = \
-            self.detect_special_run()
-
-        assert self.sim_type in ('eco', 'dwr'), \
-            'Invalid simulation type "{}"'.format(self.sim_type)
+        self.build_scenarios, self.random, self.tag, self.confine_reaches = self.detect_special_run()
 
         # Initialize dates
         DateManager.__init__(self, *self.align_dates())
@@ -153,24 +150,23 @@ class Simulation(DateManager):
         A special run can include the following things:
             1. Random output will be generated, bypassing the modeling functions. This is for output testing
             2. A Stage 1 to Stage 2 scenario build can be triggered
-            3. COMIDs can be provided to constrain the model run to an area smaller than a full region
-        The Simulation Name string has the format "[special_mode&intake_reaches&tag]
+            3. A 'tag' can be provided to use a special intake file
+        The Simulation Name string has the format "[special_mode&tag]
         Random output can be triggered by entering "test" as the special mode
         Scenario building can be triggered by entering "build" as the special mode
-        Geographical constraints can be applied by entering outlet COMIDs separated by commas as intake_reaches
-        An identifying 'tag' is used to create separate files
+        The run can be confined to areas upstream of a set of reaches by entering "confine" as the special mode
+            and providing an identifying 'tag'. For instance, the string 'confine&mtb' will point to the table
+            Tables/confine_mtb.csv, which will provide the reaches to constrain the analysis. Random runs can also
+            be confined with 'test&[tag]'
 
-        Example build string: 'build&4867727&mtb'
         :return: build_scenarios, intakes, run_regions, intake_reaches, tag, random
         """
-        detected = build = random = False
-        confined_intakes = tag = None
+        build = random = False
+        tag, confine_reaches = None, None
         params = self.simulation_name.lower().split("&")
-        message = None
 
         if params[0] == 'test':
             random = True
-            tag = "random"
             message = f"Generating randomized output"
         elif params[0] == 'build':
             build = True
@@ -178,37 +174,23 @@ class Simulation(DateManager):
         elif params[0] == 'confine':  # Any keyword will work if simply providing custom intakes
             message = f"Special run for custom intakes"
 
-        # Using the 'Mark Twain Demo' selection for region precludes all settings except 'test'
+        if len(params) > 1:
+            tag = params[1]
+
+        # Using the 'Mark Twain Demo' selection for region overrides all settings except 'test'
         if self.region == 'Mark Twain Demo':
             self.region = '07'
-            confined_intakes = [4867727]
             tag = 'mtb'
-        else:
-            if len(params) > 1:
-                confined_intakes = list(map(int, params[1].split(",")))
-                tag = "_custom"  # default tag so full regional data isn't overwritten
-            if len(params) > 2:
-                tag = params[2]
-                if random:
-                    tag = f"random_{tag}"
-            if any((build, random, confined_intakes, tag)):
-                detected = True
 
-        # A flag to indicate that confined scenarios and recipes should be constructed
-        if confined_intakes is not None and not random:
-            confine = True
-        else:
-            confine = False
-
-        if message is not None:
-            message += f" for Region {self.region}"
-        if confined_intakes is not None:
-            message += f", subset to comid(s) {', '.join(map(str, confined_intakes))}"
         if tag is not None:
-            message += f". Files generated will end with tag \"_{tag}\""
+            confined_reaches = pd.read_csv(self.confine_reaches_path.format(tag)).comid.values
+            message += f". Confining analysis to areas upstream of reach(es) {', '.join(map(str, confined_reaches))}"
+        else:
+            confined_reaches = None
+
         report(message)
 
-        return detected, build, random, confine, confined_intakes, tag
+        return build, random, tag, confined_reaches
 
     def initialize_parameters(self):
         params = pd.read_csv(self.parameters_path, usecols=['parameter', 'value', 'dtype'])
@@ -324,43 +306,45 @@ class ModelOutputs(DateManager):
 
     def __init__(self, sim, region):
         self.sim = sim
-        self.intakes = region.intakes
-        self.local_reaches = region.local_reaches
-        self.upstream_reaches = region.upstream_reaches
-        self.output_reaches = region.intake_reaches
+        self.active_reaches = region.active_reaches
+        self.output_reaches = region.output_reaches
         self.huc_crosswalk = region.reach_table[['HUC_8', 'HUC_12']]
         self.local_time_series = self.sim.selected_output['local_time_series']  # output selection from frontend
         self.upstream_time_series = self.sim.selected_output['upstream_time_series']
         self.all_time_series = self.local_time_series + self.upstream_time_series
-        self.lookup = pd.Series(np.arange(len(self.output_reaches)), self.output_reaches)
-        self.n_local = len(self.local_reaches)
-        self.n_upstream = len(self.upstream_reaches)
+        self.n_reaches = len(self.active_reaches)
+        self.run_time_series = (self.output_reaches is not None)
+        if self.output_reaches is not None:
+            self.lookup = pd.Series(np.arange(len(self.output_reaches)), self.output_reaches)
+        else:
+            self.lookup = None
 
         # Initialize dates
         DateManager.__init__(self, sim.start_date, sim.end_date)
         self.array_path = os.path.join(sim.scratch_path, 'r{}_{{}}_out'.format(region.id))
 
         # Time series data for a single catchment (run everywhere)
-        self.local_index, self.upstream_index, self.time_series_out = self.initialize_time_series()
+        self.local_index, self.upstream_index, self.time_series_output = self.initialize_time_series()
 
         # The relative contribution of pesticide mass broken down by reach, runoff/erosion and crop
         header = [f"{lbl}_{crop}" for lbl in ('runoff', 'erosion') for crop in self.sim.active_crops]
-        self.contributions = pd.DataFrame(np.zeros((self.n_local, len(header))), self.local_reaches, header)
+        self.contributions = pd.DataFrame(np.zeros((self.n_reaches, len(header))), self.active_reaches, header)
 
         # Concentrations
-        self.concentrations = pd.DataFrame(np.zeros((self.n_upstream, 2)), self.upstream_reaches, ['wc_conc', 'benthic_conc'])
+        self.concentrations = pd.DataFrame(np.zeros((self.n_reaches, 2)), self.active_reaches,
+                                           ['wc_conc', 'benthic_conc'])
 
         # The probability that concentration exceeds endpoint thresholds
-        self.exceedances = pd.DataFrame(np.zeros((self.n_upstream, self.sim.endpoints.shape[0])),
-                                        self.upstream_reaches, self.sim.endpoints.short_name)
+        self.exceedances = pd.DataFrame(np.zeros((self.n_reaches, self.sim.endpoints.shape[0])),
+                                        self.active_reaches, self.sim.endpoints.short_name)
 
     def summarize_by_huc(self):
 
         # Merge all output data going to the map and add HUC crosswalk
         contributions_by_reach = self.contributions.sum(axis=1).rename("mass")
-        df = self.huc_crosswalk.join(contributions_by_reach, how="right")
-        if self.sim.sim_type == "eco":
-            df = df.join(self.exceedances).join(self.concentrations)
+        df = self.huc_crosswalk.join(contributions_by_reach, how="right") \
+            .join(self.exceedances).join(self.concentrations)
+
         # If we decide to do reach-level output: out_table = {'COMID': df.to_dict()}
         out_table = {}
 
@@ -374,10 +358,19 @@ class ModelOutputs(DateManager):
 
         return out_table
 
+    def summarize_by_reach(self):
+        out_dict = {}
+        out_table = self.exceedances.join(self.concentrations)
+        out_dict['comid'] = out_table.T.to_dict()
+        return out_dict
+
     def summarize_by_intake(self):
+        # TODO - not sure what we're going to put here
         out_dict = {'comid': {}}
-        if self.sim.sim_type == 'dwr':
+        if self.run_time_series:
+            out_dict = {}
             out_table = self.exceedances.join(self.concentrations)
+            out_table = pd.Series(self.output_reaches, name='comid').to_frame().set_index('comid').join(out_table)
             out_dict['comid'] = out_table.T.to_dict()
         return out_dict
 
@@ -390,9 +383,13 @@ class ModelOutputs(DateManager):
         print('Debugging initialize_time_series - START')
         print(self.output_reaches, local_index + upstream_index, self.n_dates, self.array_path.format('all'))
         print('Debugging initialize_time_series - END')
-        time_series = MemoryMatrix(
-            [self.output_reaches, local_index + upstream_index, self.n_dates], name='output time series',
-            path=self.array_path.format('all'))
+        if self.run_time_series:
+
+            time_series = MemoryMatrix(
+                [self.output_reaches, local_index + upstream_index, self.n_dates], name='output time series',
+                path=self.array_path.format('all'))
+        else:
+            time_series = None
         return local_index, upstream_index, time_series
 
     def percentiles(self, series):
@@ -406,7 +403,8 @@ class ModelOutputs(DateManager):
         return table.percentile.values
 
     def populate_random(self):
-        self.time_series_out.writer[:] = np.random.rand(*self.time_series_out.shape) * 10.
+        if self.run_time_series:
+            self.time_series_output.writer[:] = np.random.rand(*self.time_series_output.shape) * 10.
         self.contributions[:] = np.random.rand(*self.contributions.shape) * 10.
         self.concentrations[:] = np.random.rand(*self.concentrations.shape) * 100.
         self.exceedances[:] = np.random.rand(*self.exceedances.shape)
@@ -418,50 +416,52 @@ class ModelOutputs(DateManager):
 
         # Summarize pesticide masses and endpoint exceedances by reach and watershed
         huc_dict = self.summarize_by_huc()
+        reach_dict = self.summarize_by_reach()
         intake_dict = self.summarize_by_intake()
 
         # Write output summary tables
         self.write_summary_tables()
 
         # Get intake time series data to return
-        intake_time_series = self.get_time_series()
+        if self.run_time_series:
+            intake_time_series = self.get_time_series()
+        else:
+            intake_time_series = None
 
-        return intake_dict, huc_dict, intake_time_series
+        return reach_dict, huc_dict, intake_dict, intake_time_series
 
     def update_time_series(self, reach_id, data, mode):
-        output_index = self.lookup[reach_id]
-        writer = self.time_series_out.writer
-        if mode == 'local':
-            if any(self.local_index):
-                writer[output_index, :len(self.local_index)] = data[self.local_index]
-        elif mode == 'upstream':
-            if any(self.upstream_index):
-                writer[output_index, len(self.local_index):] = data[self.upstream_index]
-        else:
-            raise ValueError(f"Invalid mode {mode}, must be 'local' or 'upstream")
+        if self.run_time_series:
+            output_index = self.lookup[reach_id]
+            writer = self.time_series_output.writer
+            if mode == 'local':
+                if any(self.local_index):
+                    writer[output_index, :len(self.local_index)] = data[self.local_index]
+            elif mode == 'upstream':
+                if any(self.upstream_index):
+                    writer[output_index, len(self.upstream_index):] = data[self.upstream_index]
+            else:
+                raise ValueError(f"Invalid mode {mode}, must be 'local' or 'upstream")
 
     def write_summary_tables(self):
-        # Join output data with intake descriptors
-        exceedances = self.intakes.merge(self.exceedances, on='comid', how='right')
-
         # Write summary tables
         self.contributions.to_csv(os.path.join(self.sim.output_path, "upstream_table.csv"), index=None)
         self.contributions.sum(axis=0).to_csv(os.path.join(self.sim.output_path, "summary.csv"))
-        exceedances.to_csv(os.path.join(self.sim.output_path, "exceedances.csv"))
+        self.exceedances.to_csv(os.path.join(self.sim.output_path, "exceedances.csv"))
 
     def write_time_series(self):
         outfile_path = os.path.join(self.sim.output_path, "time series", "time_series_{}_{}.csv")
         if not os.path.exists(os.path.dirname(outfile_path)):
             os.makedirs(os.path.dirname(outfile_path))
         for reach_id in self.output_reaches:
-            data = pd.DataFrame(self.time_series_out.fetch(reach_id).T, self.sim.dates, self.all_time_series)
+            data = pd.DataFrame(self.time_series_output.fetch(reach_id).T, self.sim.dates, self.all_time_series)
             data.to_csv(outfile_path.format(reach_id, 'all'))
 
     def get_time_series(self):
         upstream_time_series_dict = {}
         if any(self.all_time_series):
             for reach_id in self.output_reaches:
-                data = pd.DataFrame(self.time_series_out.fetch(reach_id).T,
+                data = pd.DataFrame(self.time_series_output.fetch(reach_id).T,
                                     self.sim.dates.astype(str), self.all_time_series)
                 upstream_time_series_dict[str(reach_id)] = data.to_dict(orient='split')
         return upstream_time_series_dict

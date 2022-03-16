@@ -21,3 +21,4 @@ level,var,dir,base,vars
 2,endpoint_format,table_path,endpoint_format.csv,
 2,parameters,table_path,params.csv,
 2,output_selection,table_path,output_selection.csv,
+2,confine_reaches,table_path,confine_{}.csv,

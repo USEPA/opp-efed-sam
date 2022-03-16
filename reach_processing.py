@@ -21,8 +21,8 @@ class ReachManager(DateManager, MemoryMatrix):
         self.recipes = recipes
         self.output = output
         self.array_path = os.path.join(sim.scratch_path, 'reach_array')
-        self.reach_index = region.local_reaches
-        self.lookup = pd.Series(region.local_reaches.index.values, self.region.local_reaches)
+        self.reach_index = region.active_reaches
+        self.lookup = pd.Series(region.active_reaches.index.values, region.active_reaches)
         self.n_active_crops = int(self.sim.n_active_crops)
 
         # Initialize dates
@@ -30,7 +30,7 @@ class ReachManager(DateManager, MemoryMatrix):
         self.array_path = os.path.join(sim.scratch_path, 'r{}_working'.format(region.id))
 
         # The working array, which contains the same variables as s3, but for a reach instead of a scenario
-        MemoryMatrix.__init__(self, [region.local_reaches, self.sim.fields.fetch('local_time_series'), self.n_dates],
+        MemoryMatrix.__init__(self, [region.active_reaches, self.sim.fields.fetch('local_time_series'), self.n_dates],
                               name='reaches', path=self.array_path)
 
         # Keep track of which reaches have been run

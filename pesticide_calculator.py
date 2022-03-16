@@ -55,8 +55,7 @@ def pesticide_calculator(input_data):
         for tier, reach_ids, lakes in region.cascade():  # Traverse downstream in the watershed
 
             report(f'Running tier {tier}, ({len(reach_ids)} reaches)...')
-            upstream_reaches = reach_ids & set(region.upstream_reaches)
-            output_reaches = reach_ids & set(region.intake_reaches)
+            output_reaches = reach_ids & set(region.output_reaches)
 
             # Perform analysis within reach catchments
             report("\tProcessing local...")
@@ -64,12 +63,18 @@ def pesticide_calculator(input_data):
 
             # Perform full upstream analysis including time-of-travel and concentration
             report("\tProcessing upstream...")
-            reaches.process_upstream(upstream_reaches, output_reaches)
+            reaches.process_upstream(reach_ids, output_reaches)
 
             # Pass each reach in the tier through a downstream lake
             reaches.burn(lakes)
 
     # Write output
     report('Writing output...')
-    intake_dict, huc_dict, intake_time_series_dict = outputs.prepare_output()
+    reach_dict, huc_dict, intake_dict, intake_time_series_dict = outputs.prepare_output()
+    print(f"Returning output for\n"
+          f"{len(reach_dict['comid'].keys())} reaches, "
+          f"{len(huc_dict['HUC_8'].keys())} HUC 8s, "
+          f"{len(huc_dict['HUC_12'].keys())} HUC 12s, and "
+          f"{len(intake_dict['comid'].keys())} intakes")
+
     return {'intakes': intake_dict, 'reaches': huc_dict, 'intake_time_series': intake_time_series_dict}

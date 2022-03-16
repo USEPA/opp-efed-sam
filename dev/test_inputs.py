@@ -44,7 +44,7 @@ r07_eco_random = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d90e154e
                    'chronic_vasc_plant': {'0': ''}}
 
 confine_mexico_eco = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d90e154e7ddc'},
-                    'simulation_name': {'0': 'confine&5040458&mexico'},
+                    'simulation_name': {'0': 'confine&mexico'},
                     'chemical_name': {'0': 'atrazine_test'},
                     'kd_flag': {'0': '1.0'},
                     'koc': {'0': '75.0'},
@@ -86,7 +86,7 @@ confine_mexico_eco = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d90e
                    'chronic_vasc_plant': {'0': ''}}
 
 mtb_dwr_random = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d90e154e7ddc'},
-                    'simulation_name': {'0': 'test&4867727&mtb'},
+                    'simulation_name': {'0': 'test&mtb'},
                     'chemical_name': {'0': 'atrazine_test'},
                     'kd_flag': {'0': '1.0'},
                     'koc': {'0': '75.0'},
@@ -128,7 +128,7 @@ mtb_dwr_random = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d90e154e
                    'chronic_vasc_plant': {'0': ''}}
 
 mtb_eco_random = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d90e154e7ddc'},
-                    'simulation_name': {'0': 'test&4867727&mtb'},
+                    'simulation_name': {'0': 'test&mtb'},
                     'chemical_name': {'0': 'atrazine_test'},
                     'kd_flag': {'0': '1.0'},
                     'koc': {'0': '75.0'},
@@ -170,7 +170,7 @@ mtb_eco_random = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d90e154e
                    'chronic_vasc_plant': {'0': ''}}
 
 confine_mtb_eco = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d90e154e7ddc'},
-                    'simulation_name': {'0': 'confine&4867727&mtb'},
+                    'simulation_name': {'0': 'confine&mtb'},
                     'chemical_name': {'0': 'atrazine_test'},
                     'kd_flag': {'0': '1.0'},
                     'koc': {'0': '75.0'},
@@ -212,7 +212,7 @@ confine_mtb_eco = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d90e154
                    'chronic_vasc_plant': {'0': ''}}
 
 random_mtb = {'csrfmiddlewaretoken': {'0': '986432de-3493-4260-b026-d90e154e7ddc'},
-              'simulation_name': {'0': 'test&4867727&mtb'},
+              'simulation_name': {'0': 'test&mtb'},
               'chemical_name': {'0': 'atrazine_test'},
               'kd_flag': {'0': '1.0'},
               'koc': {'0': '75.0'},

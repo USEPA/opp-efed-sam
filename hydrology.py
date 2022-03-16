@@ -33,11 +33,9 @@ class HydroRegion(Navigator):
         # Initialize the fields that will be used to pull flows based on month
         self.flow_fields = [f'q_{str(month).zfill(2)}' for month in sim.month_index]
 
-        # Read intakes from file
-        self.intakes, self.intake_reaches = self.find_intakes()
-
         # Select which stream reaches will be fully processed, locally processed, or excluded
-        self.local_reaches, self.upstream_reaches, self.reservoir_outlets = self.sort_reaches()
+        self.active_reaches, self.output_reaches, self.reservoir_outlets, self.output_index = \
+            self.sort_reaches()
 
         # Holder for reaches that have been processed
         self.burned_reaches = set()
@@ -57,7 +55,7 @@ class HydroRegion(Navigator):
             lakes = self.lake_table[np.in1d(self.lake_table.outlet_comid, lake_outlets)]
             all_upstream = {reach for outlet in lake_outlets for reach in self.upstream_watershed(outlet)}
             reaches = (all_upstream - set(lake_outlets)) | upstream_outlets
-            reaches &= set(self.local_reaches)
+            reaches &= set(self.active_reaches)
             reaches -= self.burned_reaches
             yield tier, reaches, lakes
             self.burned_reaches |= reaches
@@ -68,7 +66,7 @@ class HydroRegion(Navigator):
     def confine(self, outlets):
         """ If running a series of intakes or reaches, confine analysis to upstream areas only """
         upstream_reaches = \
-            list({upstream for outlet in outlets for upstream in self.upstream_watershed(outlet)})
+            sorted({upstream for outlet in outlets for upstream in self.upstream_watershed(outlet)})
         return pd.Series(upstream_reaches, name='comid')
 
     def daily_flows(self, reach_id):
@@ -76,19 +74,6 @@ class HydroRegion(Navigator):
         flows = selected.loc[self.flow_fields].values.astype(np.float32)
         surface_area = selected['surface_area']
         return flows, surface_area
-
-    def find_intakes(self):
-        """ Read a hardwired intake file """
-        if self.sim.confined_intakes is None:
-            intake_file = self.sim.dw_intakes_path.format(self.id)
-            intakes_table = pd.read_csv(intake_file)
-        else:
-            intakes_table = pd.DataFrame({
-                'site_num': np.arange(1, len(self.sim.confined_intakes) + 1),
-                'site_name': [f"site_{comid}" for comid in self.sim.confined_intakes],
-                'comid': self.sim.confined_intakes})
-        intakes_reaches = pd.Series(sorted(intakes_table.comid.unique()), name="comid")
-        return intakes_table, intakes_reaches
 
     def process_nhd(self):
         self.lake_table = \
@@ -123,21 +108,24 @@ class HydroRegion(Navigator):
         lake_outlets - reaches that correspond to the outlet of a lake
         """
 
-        # 'Local' reaches are all that will get run in the simulation
-        local = self.reach_table.index.unique().values
-        if self.sim.confined_intakes is not None:
-            local = self.confine(self.intake_reaches)
+        # All the reaches in the simulation. Confine the simulation geographically if confine reaches are provided
+        if self.sim.confine_reaches is not None:
+            active_reaches = self.confine(self.sim.confine_reaches)
+        else:
+            active_reaches = pd.Series(self.reach_table.index.drop_duplicates().values, name="comid")
 
-        # 'upstream' reaches are the subset where full time-of-travel analysis is performed
-        if self.sim.sim_type == 'eco':
-            upstream = local
-        elif self.sim.sim_type == 'dwr':
-            upstream = self.intake_reaches
-
+        # Identify which reaches correspond to the outlet of a reservoir
         reservoir_outlets = \
-            self.lake_table.loc[np.in1d(self.lake_table.outlet_comid, local)][['outlet_comid', 'wb_comid']]
+            self.lake_table.loc[np.in1d(self.lake_table.outlet_comid, active_reaches)][['outlet_comid', 'wb_comid']]
 
-        return local, upstream, reservoir_outlets
+        # If running in 'drinking water' mode, provide additional output for reaches containing a drinking water intake
+        output_reaches = None
+        output_index = None
+        if self.sim.sim_type == 'dwr':
+            intakes_path = self.sim.dw_intakes_path.format(self.id)
+            output_index = pd.read_csv(intakes_path)
+            output_reaches = pd.Series(sorted(set(active_reaches.values) & set(output_index.comid)), name="comid")
+        return active_reaches, output_reaches, reservoir_outlets, output_index
 
 
 class ImpulseResponseMatrix(MemoryMatrix):
