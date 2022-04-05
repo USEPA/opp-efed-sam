@@ -26,7 +26,7 @@ def pesticide_calculator(input_data):
         # Load watershed topology maps and account for necessary files
         region = HydroRegion(region_id, sim)
 
-        # Load recipes for region and year
+        #me Load recipes for region and year
         recipes = WatershedRecipes(region_id, sim)
 
         # Initialize Stage 1 scenarios (parameters linked to a unique soil-weather-land cover combination)

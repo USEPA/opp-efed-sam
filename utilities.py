@@ -164,15 +164,16 @@ class Simulation(DateManager):
         build = random = False
         tag, confine_reaches = None, None
         params = self.simulation_name.lower().split("&")
+        message = ""
 
         if params[0] == 'test':
             random = True
             message = f"Generating randomized output"
         elif params[0] == 'build':
             build = True
-            message = f"Building new Stage 2 Scenarios"
+            message = f"Building new Stage 2 Scenarios. "
         elif params[0] == 'confine':  # Any keyword will work if simply providing custom intakes
-            message = f"Special run for custom intakes"
+            message = f"Special run for custom intakes. "
 
         if len(params) > 1:
             tag = params[1]
@@ -184,7 +185,7 @@ class Simulation(DateManager):
 
         if tag is not None:
             confined_reaches = pd.read_csv(self.confine_reaches_path.format(tag)).comid.values
-            message += f". Confining analysis to areas upstream of reach(es) {', '.join(map(str, confined_reaches))}"
+            message += f"Confining analysis to areas upstream of reach(es) {', '.join(map(str, confined_reaches))}"
         else:
             confined_reaches = None
 
