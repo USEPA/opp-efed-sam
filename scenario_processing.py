@@ -221,7 +221,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
         return names, start_date, end_date, n_dates
 
     def set_paths(self, region):
-        root_path = self.sim.s2_scenarios_path.format(region, self.sim.chemical_name)
+        root_path = self.sim.s2_scenarios_path.format(region, 'mtb') #self.sim.chemical_name)
         keyfile_path = root_path + '_key.txt'
         array_path = root_path + '_arrays.dat'
         return keyfile_path, array_path
