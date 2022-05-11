@@ -49,7 +49,7 @@ class StageOneScenarios(MemoryMatrix):
         self.sim = sim
 
         # Set paths
-        self.array_path = self.sim.s1_scenarios_path.format(self.region_id)
+        self.array_path = self.sim.s1_scenarios_array_path.format(self.region_id)
         self.table_path = self.sim.s1_scenarios_table_path.format(self.region_id, 1)
 
         # Designate the fields that carry through to higher-level scenarios
