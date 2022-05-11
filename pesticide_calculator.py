@@ -77,4 +77,4 @@ def pesticide_calculator(input_data):
           f"{len(huc_dict['HUC_12'].keys())} HUC 12s, and "
           f"{len(intake_dict['comid'].keys())} intakes")
 
-    return {'intakes': intake_dict, 'reaches': huc_dict, 'intake_time_series': intake_time_series_dict}
+    return {'intakes': intake_dict, 'watersheds': huc_dict, 'intake_time_series': intake_time_series_dict}
