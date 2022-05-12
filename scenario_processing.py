@@ -49,7 +49,7 @@ class StageOneScenarios(MemoryMatrix):
         self.sim = sim
 
         # Set paths
-        self.array_path = self.sim.s1_scenarios_path.format(self.region_id)
+        self.array_path = self.sim.s1_scenarios_array_path.format(self.region_id)
         self.table_path = self.sim.s1_scenarios_table_path.format(self.region_id, 1)
 
         # Designate the fields that carry through to higher-level scenarios
@@ -119,6 +119,8 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
         self.met = met
         self.fields = sim.fields
         self.keyfile_path, self.array_path = self.set_paths(region.id)
+        print(self.keyfile_path, self.array_path)
+        exit()
         self.n_scenarios = self.s1.n_scenarios
 
         # If build is True, create the Stage 2 Scenarios by running model routines on Stage 1 scenario inputs
@@ -221,7 +223,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
         return names, start_date, end_date, n_dates
 
     def set_paths(self, region):
-        root_path = self.sim.s2_scenarios_path.format(region, 'mtb') #self.sim.chemical_name)
+        root_path = self.sim.s2_scenarios_path.format(region)
         keyfile_path = root_path + '_key.txt'
         array_path = root_path + '_arrays.dat'
         return keyfile_path, array_path

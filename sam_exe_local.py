@@ -16,7 +16,7 @@ class Sam(object):
 
 def main():
     """ This is what gets run when running straight from Python """
-    from .dev.test_inputs import mtb_eco_random as input_dict
+    from .dev.test_inputs import confine_mtb_eco as input_dict
 
     print('Running pesticide calculator...')
     sam = Sam(input_dict)
