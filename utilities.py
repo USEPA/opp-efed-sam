@@ -313,11 +313,13 @@ class ModelOutputs(DateManager):
         self.local_time_series = self.sim.selected_output['local_time_series']  # output selection from frontend
         self.upstream_time_series = self.sim.selected_output['upstream_time_series']
         self.all_time_series = self.local_time_series + self.upstream_time_series
-        self.n_reaches = len(self.active_reaches)
-        self.run_time_series = (self.output_reaches is not None)
+        self.n_active = len(self.active_reaches)
+        self.run_time_series = (len(self.output_reaches) > 0)
         if self.output_reaches is not None:
+            self.n_output = len(self.output_reaches)
             self.lookup = pd.Series(np.arange(len(self.output_reaches)), self.output_reaches)
         else:
+            self.n_output = 0
             self.lookup = None
 
         # Initialize dates
@@ -329,14 +331,14 @@ class ModelOutputs(DateManager):
 
         # The relative contribution of pesticide mass broken down by reach, runoff/erosion and crop
         header = [f"{lbl}_{crop}" for lbl in ('runoff', 'erosion') for crop in self.sim.active_crops]
-        self.contributions = pd.DataFrame(np.zeros((self.n_reaches, len(header))), self.active_reaches, header)
+        self.contributions = pd.DataFrame(np.zeros((self.n_active, len(header))), self.active_reaches, header)
 
         # Concentrations
-        self.concentrations = pd.DataFrame(np.zeros((self.n_reaches, 2)), self.active_reaches,
-                                           ['wc_conc', 'benthic_conc'])
+        self.concentrations = pd.DataFrame(np.zeros((self.n_active, 4)), self.active_reaches,
+                                           ['wc_conc_mean', 'wc_conc_max', 'benthic_conc_mean', 'benthic_conc_max'])
 
         # The probability that concentration exceeds endpoint thresholds
-        self.exceedances = pd.DataFrame(np.zeros((self.n_reaches, self.sim.endpoints.shape[0])),
+        self.exceedances = pd.DataFrame(np.zeros((self.n_active, self.sim.endpoints.shape[0])),
                                         self.active_reaches, self.sim.endpoints.short_name)
 
     def summarize_by_huc(self):

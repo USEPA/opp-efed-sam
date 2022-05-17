@@ -119,8 +119,6 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
         self.met = met
         self.fields = sim.fields
         self.keyfile_path, self.array_path = self.set_paths(region.id)
-        print(self.keyfile_path, self.array_path)
-        exit()
         self.n_scenarios = self.s1.n_scenarios
 
         # If build is True, create the Stage 2 Scenarios by running model routines on Stage 1 scenario inputs
@@ -183,7 +181,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
             scenario_inputs = time_series_data + s1_params + sim_params
 
             # In debug mode, the processing will not use Dask or occur in parallel
-            debug_mode = True
+            debug_mode = False
             if not debug_mode:
                 batch.append(self.sim.dask_client.submit(stage_one_to_two, *scenario_inputs))
                 batch_index.append(row.scenario_id)

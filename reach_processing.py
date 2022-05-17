@@ -117,7 +117,8 @@ class ReachManager(DateManager, MemoryMatrix):
             # Calculate the pesticide concentrations in water and get hydrology time series
             total_flow, baseflow, wc_conc, benthic_conc, runoff_conc = \
                 self.compute_concentration(reach_id, runoff, runoff_mass, erosion, erosion_mass)
-            self.output.concentrations.iloc[reach_index] = np.array([wc_conc, benthic_conc])
+            self.output.concentrations.iloc[reach_index] = \
+                np.array([wc_conc.mean(), wc_conc.max(), benthic_conc.mean(), benthic_conc.max()])
 
             # Pick out the time series that will be retained in the output
             if reach_id in output_reach_ids:
@@ -180,7 +181,7 @@ class ReachManager(DateManager, MemoryMatrix):
             benthic_conc = benthic_concentration(
                 erosion, erosion_mass, surface_area, self.sim.benthic_depth, self.sim.benthic_porosity)
         except Exception as e:
-            raise(e)
+            report(reach_id, e)
             benthic_conc = np.zeros(total_flow.shape)
         # Make sure this matches the order specified in fields_and_qc.csv
         return np.array([total_flow, baseflow, wc_conc, benthic_conc, runoff_conc])

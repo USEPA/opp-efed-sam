@@ -119,12 +119,13 @@ class HydroRegion(Navigator):
             self.lake_table.loc[np.in1d(self.lake_table.outlet_comid, active_reaches)][['outlet_comid', 'wb_comid']]
 
         # If running in 'drinking water' mode, provide additional output for reaches containing a drinking water intake
-        output_reaches = None
+        output_reaches = set()
         output_index = None
         if self.sim.sim_type == 'dwr':
             intakes_path = self.sim.dw_intakes_path.format(self.id)
             output_index = pd.read_csv(intakes_path)
             output_reaches = pd.Series(sorted(set(active_reaches.values) & set(output_index.comid)), name="comid")
+
         return active_reaches, output_reaches, reservoir_outlets, output_index
 
 
