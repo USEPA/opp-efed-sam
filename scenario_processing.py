@@ -288,12 +288,11 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                 scenario_inputs = [crop_applications.values] + sim_params + s2_time_series + s1_params
 
                 # In debug mode, the processing will not use Dask or occur in parallel
-                debug_mode = True
+                debug_mode = False
                 if not debug_mode:
                     batch.append(self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs))
                     batch_index.append(scenario_id)
                 else:
-                    print(scenario_id)
                     results = stage_two_to_three(*scenario_inputs)
                     runoff, runoff_mass, erosion, erosion_mass = map(float, results.sum(axis=1))
 
