@@ -181,7 +181,7 @@ class ReachManager(DateManager, MemoryMatrix):
             benthic_conc = benthic_concentration(
                 erosion, erosion_mass, surface_area, self.sim.benthic_depth, self.sim.benthic_porosity)
         except Exception as e:
-            report(reach_id, e)
+            report(f"{reach_id}: {e}")
             benthic_conc = np.zeros(total_flow.shape)
         # Make sure this matches the order specified in fields_and_qc.csv
         return np.array([total_flow, baseflow, wc_conc, benthic_conc, runoff_conc])
