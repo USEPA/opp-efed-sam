@@ -7,7 +7,7 @@ level,var,dir,base,vars
 2,condensed_nhd,input_path,CondensedNHD/{}/r{}_{}.csv,"nav/sam, region, reach/waterbody"
 2,weather,input_path,Weather/weather_{},array or key
 2,recipes,input_path,RecipeFiles/r{}_recipes,region
-2,s1_scenarios_table,input_path,StageOneScenarios/r{}_{}.csv,"region,batch"
+2,s1_scenarios_table,input_path,StageOneScenarios/r{}_s1_{}.csv,"region,batch"
 2,dw_intakes,input_path,Intakes/intake_locations_{}.csv,region
 2,manual_intakes,input_path,Intakes/mtb_single_intake.csv,
 2,navigator,input_path,NavigatorFiles/nav{}.npz,region
