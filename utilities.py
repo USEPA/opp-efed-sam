@@ -387,10 +387,10 @@ class ModelOutputs(DateManager):
         print(self.output_reaches, local_index + upstream_index, self.n_dates, self.array_path.format('all'))
         print('Debugging initialize_time_series - END')
         if self.run_time_series:
-
             time_series = MemoryMatrix(
                 [self.output_reaches, local_index + upstream_index, self.n_dates], name='output time series',
                 path=self.array_path.format('all'))
+            print(12345, time_series.shape)
         else:
             time_series = None
         return local_index, upstream_index, time_series
@@ -441,8 +441,9 @@ class ModelOutputs(DateManager):
                 if any(self.local_index):
                     writer[output_index, :len(self.local_index)] = data[self.local_index]
             elif mode == 'upstream':
+                print(987, len(self.upstream_index), self.time_series_output.shape)
                 if any(self.upstream_index):
-                    writer[output_index, len(self.upstream_index):] = data[self.upstream_index]
+                    writer[output_index, :len(self.upstream_index)] = data[self.upstream_index]
             else:
                 raise ValueError(f"Invalid mode {mode}, must be 'local' or 'upstream")
 
