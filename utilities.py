@@ -356,6 +356,7 @@ class ModelOutputs(DateManager):
             table = df.groupby(field).agg([np.mean, np.sum])
             for column in table.columns:
                 table[column[0], 'pct'] = self.percentiles(table[column])
+            table[np.isnan(table)] = -1
             out_table[field] = \
                 table.T.unstack().T.groupby(level=0).apply(lambda x: x.xs(x.name).to_dict()).to_dict()
 
@@ -364,6 +365,7 @@ class ModelOutputs(DateManager):
     def summarize_by_reach(self):
         out_dict = {}
         out_table = self.exceedances.join(self.concentrations)
+        out_table[np.isnan(out_table)] = -1
         out_dict['comid'] = out_table.T.to_dict()
         return out_dict
 
@@ -373,7 +375,11 @@ class ModelOutputs(DateManager):
         if self.run_time_series:
             out_dict = {}
             out_table = self.exceedances.join(self.concentrations)
-            out_table = pd.Series(self.output_reaches, name='comid').to_frame().set_index('comid').join(out_table)
+            out_table = pd.Series(self.output_reaches, name='comid')\
+                .to_frame()\
+                .set_index('comid')\
+                .join(out_table)\
+                .fillna(-1)
             out_dict['comid'] = out_table.T.to_dict()
         return out_dict
 
