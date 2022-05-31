@@ -396,7 +396,6 @@ class ModelOutputs(DateManager):
             time_series = MemoryMatrix(
                 [self.output_reaches, local_index + upstream_index, self.n_dates], name='output time series',
                 path=self.array_path.format('all'))
-            print(12345, time_series.shape)
         else:
             time_series = None
         return local_index, upstream_index, time_series
