@@ -155,6 +155,7 @@ class ImpulseResponseMatrix(MemoryMatrix):
         def gamma_distribution(t, a, b):
             a, b = map(float, (a, b))
             tau = a * b
+            print(234567, a, b, tau)
             return ((t ** (a - 1)) / (((tau / a) ** a) * math.gamma(a))) * math.exp(-(a / tau) * t)
 
         return np.array([gamma_distribution(i, alpha, beta) for i in range(length)])
