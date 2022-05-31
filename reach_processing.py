@@ -53,7 +53,7 @@ class ReachManager(DateManager, MemoryMatrix):
         writer = self.writer
         for _, lake in lakes.iterrows():
             lake_index = self.lookup[lake.outlet_comid]
-            print(1234567, lake.residence_time, len(self.n_dates))
+            print(1234567, lake.residence_time, self.n_dates)
             irf = ImpulseResponseMatrix.generate(1, lake.residence_time, self.n_dates)
 
             # Get the convolution function
