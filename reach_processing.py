@@ -162,8 +162,8 @@ class ReachManager(DateManager, MemoryMatrix):
 
             # Fetch time series data for each upstream reach
             index = self.lookup[reaches]
-            reach_array = reader[index, :2]  # (reaches, vars, dates)
-
+            reach_array = reader[index, :2].astype(np.float128)  # (reaches, vars, dates)
+            print(reach_array.max())
             # Stagger time series by dayshed
             for tank in range(np.max(reach_times) + 1):
                 in_tank = reach_array[reach_times == tank].sum(axis=0)
