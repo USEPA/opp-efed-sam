@@ -367,7 +367,7 @@ def water_column_concentration(runoff, transported_mass, n_dates, q):
     Calculates pesticide concentration in water column from runoff inputs, accounting for time of travel
     Need to add references: VVWM (for basics), SAM write-up on time of travel
     """
-    mean_runoff = runoff.mean()  # m3/d
+    mean_runoff = runoff.astype(np.float64).mean()  # m3/d
     baseflow = np.subtract(q, mean_runoff, out=np.zeros(n_dates), where=(q > mean_runoff))
 
     total_flow = runoff + baseflow
