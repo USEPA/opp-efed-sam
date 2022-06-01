@@ -236,7 +236,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         self.s1 = stage_one
         self.s2 = stage_two
         self.sim = sim
-        self.array_path = sim.s3_scenarios_path.format(self.s1.region_id)
+        self.array_path = sim.s3_scenarios_path.format(self.token)
         self.lookup = self.build_lookup()
         self.n_scenarios = self.lookup.active.sum()
         self.vars = sim.fields.fetch('s3_arrays')  # runoff, runoff_mass, erosion, erosion_mass
