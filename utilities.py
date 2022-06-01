@@ -1,5 +1,5 @@
 import os
-import re
+import time
 import numpy as np
 import pandas as pd
 import sys
@@ -140,8 +140,11 @@ class Simulation(DateManager):
 
         # Purge temp folder
         for f in os.listdir(self.scratch_path):
+            file_path = os.path.join(self.scratch_path, f)
+            file_age = (time.time() - os.stat(f).st_mtime) / 86400
             if not self.retain_s3 or "_s3" not in f:
-                os.remove(os.path.join(self.scratch_path, f))
+                if file_age > 1:
+                    os.remove(file_path)
 
     def detect_special_run(self):
         # TODO - update this so scenarios can't be built for a subset
