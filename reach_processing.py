@@ -54,7 +54,7 @@ class ReachManager(DateManager, MemoryMatrix):
         for _, lake in lakes.iterrows():
             lake_index = self.lookup[lake.outlet_comid]
             print(1234567, lake.residence_time, self.n_dates)
-            irf = ImpulseResponseMatrix.generate(1, lake.residence_time, self.n_dates)
+
 
             # Get the convolution function
             # Get mass and runoff for the reach
@@ -62,7 +62,15 @@ class ReachManager(DateManager, MemoryMatrix):
                 self.upstream_loading(lake.outlet_comid, lake_index, reader)
 
             # Modify combined time series to reflect lake
-            new_mass = np.convolve(total_mass, irf)[:self.n_dates]
+            if self.sim.convolve_mass or self.sim.convolve_runoff:
+                irf = ImpulseResponseMatrix.generate(1, lake.residence_time, self.n_dates)
+            else:
+                irf = None
+
+            if self.sim.convolve_mass:
+                new_mass = np.convolve(total_mass, irf)[:self.n_dates]
+            else:
+                new_mass = np.repeat(np.mean(total_mass), self.n_dates)
             if self.sim.convolve_runoff:  # Convolve runoff
                 new_runoff = np.convolve(total_runoff, irf)[:self.n_dates]
             else:  # Flatten runoff

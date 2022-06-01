@@ -25,6 +25,7 @@ sfac,0.247,np.float32,snowmelt factor
 flow_interpolation,quadratic,str,
 gamma_convolve,0,np.int,
 convolve_runoff,0,np.int,
+convolve_mass,0,np.int,
 minimum_residence_time,1.5,np.float32,
 benthic_depth,0.05,np.float32,
 benthic_porosity,0.5,np.float32,
