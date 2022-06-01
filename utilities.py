@@ -142,7 +142,7 @@ class Simulation(DateManager):
         # Purge temp folder
         for f in os.listdir(self.scratch_path):
             file_path = os.path.join(self.scratch_path, f)
-            file_age = (time.time() - os.stat(f).st_mtime) / 86400
+            file_age = (time.time() - os.stat(file_path).st_mtime) / 86400
             if not self.retain_s3 or "_s3" not in f:
                 if file_age > 1:
                     os.remove(file_path)
