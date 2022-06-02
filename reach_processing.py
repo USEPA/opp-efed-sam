@@ -33,11 +33,19 @@ class ReachManager(DateManager, MemoryMatrix):
         MemoryMatrix.__init__(self, [region.active_reaches, self.sim.fields.fetch('local_time_series'), self.n_dates],
                               name='reaches', path=self.array_path)
 
+        # Initialize to zero (test)
+        self.set_zero()
+
         # Keep track of which reaches have been run
         self.burned_reaches = set()  # reaches that have been processed
 
         # Create an 'index array' which tells which year's recipe to use for each day in the time series
         self.recipe_year_index = self.stagger_years()
+
+    def set_zero(self):
+        writer = self.writer
+        writer[:] = 0.
+        del writer
 
     def stagger_years(self):
         all_years = self.dates.year.unique()
@@ -54,7 +62,6 @@ class ReachManager(DateManager, MemoryMatrix):
         for _, lake in lakes.iterrows():
             lake_index = self.lookup[lake.outlet_comid]
             print(1234567, lake.residence_time, self.n_dates)
-
 
             # Get the convolution function
             # Get mass and runoff for the reach
