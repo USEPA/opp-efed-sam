@@ -93,7 +93,7 @@ class HydroRegion(Navigator):
         self.lake_table['residence_time'] = self.lake_table.wb_volume / self.lake_table.q_ma
 
         # Remove reservoirs with residence times less than the minimum
-        self.lake_table = self.lake_table[self.lake_table.residence_time < self.sim.minimum_residence_time]
+        self.lake_table = self.lake_table[self.lake_table.residence_time > self.sim.minimum_residence_time]
 
         # Convert units
         self.reach_table['length'] = self.reach_table.pop('lengthkm') * 1000.  # km -> m
