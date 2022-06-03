@@ -173,8 +173,8 @@ class ReachManager(DateManager, MemoryMatrix):
                 print(11111, reach_id, reach_array.shape, reach_array.max())
                 bogies = (reach_array > 1e25)
                 baddies = bogies.sum(axis=(1, 2))
-                print(reaches[baddies])
-                print(bogies[baddies])
+                print(reaches[np.where(baddies)])
+                print(np.where(bogies[np.where(baddies)]))
                 exit()
 
             # Stagger time series by dayshed
