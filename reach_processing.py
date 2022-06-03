@@ -171,11 +171,10 @@ class ReachManager(DateManager, MemoryMatrix):
             reach_array = reader[index, :2].astype(np.float64)  # (reaches, vars, dates)
             if reach_array.max() > 1e25:
                 print(11111, reach_id, reach_array.shape, reach_array.max())
-                bogies = (reach_array > 1e25)
-                baddies = bogies.sum(axis=(1, 2))
-                print(reaches[np.where(baddies)])
-                print(np.where(bogies[np.where(baddies)]))
-                exit()
+                bogies = (reach_array > 1e25).sum(axis=(1, 2))
+                baddies = reaches[np.where(bogies)]
+                report(f"Overflow value found in reaches {', '.join(baddies)}. Setting values to zero")
+                reach_array[reach_array > 1e25] = 0.
 
             # Stagger time series by dayshed
             for tank in range(np.max(reach_times) + 1):
