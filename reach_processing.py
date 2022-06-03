@@ -34,7 +34,7 @@ class ReachManager(DateManager, MemoryMatrix):
                               name='reaches', path=self.array_path)
 
         # Initialize to zero (test)
-        self.set_zero()
+        #self.set_zero()
 
         # Keep track of which reaches have been run
         self.burned_reaches = set()  # reaches that have been processed
@@ -164,13 +164,13 @@ class ReachManager(DateManager, MemoryMatrix):
         # Start with 'local' data
         time_series = reader[reach_index]
 
-        # Don't need to do proceed if there's nothing upstream
+        # Don't need to do proceed if there'snothing upstream
         if len(reaches) > 1:
 
             # Fetch time series data for each upstream reach
             index = self.lookup[reaches]
             reach_array = reader[index, :2].astype(np.float64)  # (reaches, vars, dates)
-            if reach_array.max() > 1000000000:
+            if reach_array.max() > 1e25:
                 print(11111, reaches, reach_array.shape, reach_array.max())
                 exit()
 
