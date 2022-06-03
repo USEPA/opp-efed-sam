@@ -232,11 +232,14 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
 
 
 class StageThreeScenarios(DateManager, MemoryMatrix):
-    def __init__(self, sim, stage_one, stage_two):
+    def __init__(self, sim, stage_one, stage_two, retain_s3=False):
         self.s1 = stage_one
         self.s2 = stage_two
         self.sim = sim
-        self.array_path = sim.s3_scenarios_path.format(self.sim.token)
+        if retain_s3:
+            self.array_path = sim.s3_scenarios_path.format('keep')
+        else:
+            self.array_path = sim.s3_scenarios_path.format(self.sim.token)
         self.lookup = self.build_lookup()
         self.n_scenarios = self.lookup.active.sum()
         self.vars = sim.fields.fetch('s3_arrays')  # runoff, runoff_mass, erosion, erosion_mass

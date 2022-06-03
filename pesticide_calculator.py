@@ -46,7 +46,7 @@ def pesticide_calculator(input_data):
             return
 
         # Initialize Stage 3 scenarios (time series of chemical transport data e.g., runoff mass, erosion mass)
-        stage_three = StageThreeScenarios(sim, stage_one, stage_two)
+        stage_three = StageThreeScenarios(sim, stage_one, stage_two, retain_s3)
 
         # Initialize objects to hold results by stream reach and reservoir
         reaches = ReachManager(sim, stage_three, region, recipes, outputs)
