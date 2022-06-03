@@ -61,7 +61,6 @@ class ReachManager(DateManager, MemoryMatrix):
         writer = self.writer
         for _, lake in lakes.iterrows():
             lake_index = self.lookup[lake.outlet_comid]
-            print(1234567, lake.residence_time, self.n_dates)
 
             # Get the convolution function
             # Get mass and runoff for the reach
@@ -173,7 +172,9 @@ class ReachManager(DateManager, MemoryMatrix):
             if reach_array.max() > 1e25:
                 print(11111, reach_id, reach_array.shape, reach_array.max())
                 bogies = (reach_array > 1e25)
-                print(bogies.sum(axis=(1, 2)))
+                baddies = bogies.sum(axis=(1, 2))
+                print(reaches[baddies])
+                print(bogies[baddies])
                 exit()
 
             # Stagger time series by dayshed
