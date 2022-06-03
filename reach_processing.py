@@ -173,7 +173,7 @@ class ReachManager(DateManager, MemoryMatrix):
                 print(11111, reach_id, reach_array.shape, reach_array.max())
                 bogies = (reach_array > 1e25).sum(axis=(1, 2))
                 baddies = reaches[np.where(bogies)]
-                report(f"Overflow value found in reaches {', '.join(baddies)}. Setting values to zero")
+                report(f"Overflow value found in reaches {', '.join(map(str, baddies))}. Setting values to zero")
                 reach_array[reach_array > 1e25] = 0.
 
             # Stagger time series by dayshed
