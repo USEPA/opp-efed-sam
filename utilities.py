@@ -357,7 +357,7 @@ class ModelOutputs(DateManager):
 
         # Aggregate everything by HUC
         for field in 'HUC_8', 'HUC_12':
-            table = df.groupby(field).agg([np.mean, np.sum])
+            table = df.groupby(field).agg([np.mean, np.sum]).astype(np.float32)
             for column in table.columns:
                 table[column[0], 'pct'] = self.percentiles(table[column])
             table[np.isnan(table)] = -1
