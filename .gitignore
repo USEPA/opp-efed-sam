@@ -1,4 +1,5 @@
 # SAM Input Data Files
+dev/*
 envs/*
 temp/*
 dask-worker-space/*
@@ -67,3 +68,4 @@ target/
 # PyCharm
 .idea/
 .Rproj.user
+/dev/

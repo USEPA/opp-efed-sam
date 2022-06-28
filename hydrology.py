@@ -369,7 +369,6 @@ def water_column_concentration(runoff, transported_mass, n_dates, q):
     """
     mean_runoff = runoff.mean()  # m3/d
     baseflow = np.subtract(q, mean_runoff, out=np.zeros(n_dates), where=(q > mean_runoff))
-
     total_flow = runoff + baseflow
     concentration = np.divide(transported_mass, total_flow, out=np.zeros(n_dates), where=(total_flow != 0))
     runoff_concentration = np.divide(transported_mass, runoff, out=np.zeros(n_dates), where=(runoff != 0))

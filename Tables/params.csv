@@ -23,9 +23,9 @@ layer_dx,0.05,np.float32,
 cn_min,0.001,np.float32,"curve number to use if unavailable or <0,"
 sfac,0.247,np.float32,snowmelt factor
 flow_interpolation,quadratic,str,
-gamma_convolve,0,np.int,
-convolve_runoff,0,np.int,
-convolve_mass,0,np.int,
+gamma_convolve,0,np.int16
+convolve_runoff,0,np.int16
+convolve_mass,0,np.int16
 minimum_residence_time,1.5,np.float32,
 benthic_depth,0.05,np.float32,
 benthic_porosity,0.5,np.float32,

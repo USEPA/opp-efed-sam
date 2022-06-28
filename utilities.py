@@ -205,7 +205,7 @@ class Simulation(DateManager):
         paths = {}
         # Identify the path to the table containing all other paths
         if self.local_run:
-            paths['data_root'] = r'E:/opp-efed-data/sam'
+            paths['data_root'] = r'D:/opp-efed-data/sam'
         else:
             paths['data_root'] = os.getenv('SAM_INPUTS_DIR', r'/src/app-data/sampreprocessed')
         paths['local_root'] = pathlib.Path(__file__).parent.absolute()

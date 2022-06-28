@@ -25,7 +25,10 @@ def pesticide_calculator(input_data):
 
         # Load watershed topology maps and account for necessary files
         region = HydroRegion(region_id, sim)
-
+        flow, surface_area = region.daily_flows(5641602)
+        print(flow)
+        print(surface_area)
+       
         #me Load recipes for region and year
         recipes = WatershedRecipes(region_id, sim)
 
@@ -53,19 +56,19 @@ def pesticide_calculator(input_data):
 
         # Combine scenarios to generate data for catchments
         for tier, reach_ids, lakes in region.cascade():  # Traverse downstream in the watershed
-
             report(f'Running tier {tier}, ({len(reach_ids)} reaches)...')
             output_reaches = reach_ids & set(region.output_reaches)
 
             # Perform analysis within reach catchments
-            report("\tProcessing local...")
+            report("\tProcessing local contributions...")
             reaches.process_local(reach_ids, output_reaches)
 
             # Perform full upstream analysis including time-of-travel and concentration
-            report("\tProcessing upstream...")
+            report("\tProcessing upstream contributions...")
             reaches.process_upstream(reach_ids, output_reaches)
 
             # Pass each reach in the tier through a downstream lake
+            report("\tSimulating flow through reservoirs...")
             reaches.burn(lakes)
 
     # Write output

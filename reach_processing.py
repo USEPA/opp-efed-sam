@@ -34,7 +34,7 @@ class ReachManager(DateManager, MemoryMatrix):
                               name='reaches', path=self.array_path)
 
         # Initialize to zero (test)
-        #self.set_zero()
+        # self.set_zero()
 
         # Keep track of which reaches have been run
         self.burned_reaches = set()  # reaches that have been processed
@@ -110,7 +110,7 @@ class ReachManager(DateManager, MemoryMatrix):
             reach_index = self.lookup[reach_id]
             for i, (year, recipe) in enumerate(self.recipes.fetch(reach_id, df=True)):
                 time_series, found_s3 = self.s3.fetch_from_recipe(recipe.s1_index)
-                time_series = self.build_time_series(time_series, self.recipe_year_index[i], recipe.area)
+                time_series = self.build_time_series(time_series, self.recipe_year_index[i], recipe.area.values)
                 contributions = self.get_contributions(found_s3, time_series, reach_index)
                 time_series = time_series.sum(axis=2)
                 combined += time_series
@@ -195,9 +195,12 @@ class ReachManager(DateManager, MemoryMatrix):
         # Get hydrologic data for reach
         flow, surface_area = self.region.daily_flows(reach_id)
 
-        # Get local runoff, erosion, and pesticide masses
+        # Get local runoff, erosion, and pesticide masse
         total_flow, baseflow, (wc_conc, runoff_conc) = \
-            water_column_concentration(runoff, runoff_mass, self.n_dates, flow)
+                water_column_concentration(runoff, runoff_mass, self.n_dates, flow)
+        #print(reach_id, 444, f"baseflow: {baseflow.sum()}")
+        #if baseflow.sum() < 1:
+        #    exit()
         try:
             benthic_conc = benthic_concentration(
                 erosion, erosion_mass, surface_area, self.sim.benthic_depth, self.sim.benthic_porosity)
@@ -266,7 +269,7 @@ def exceedance_probability(time_series, durations, endpoints, years_since_start)
 
         # If the duration or endpoint isn't set, set the value to 1
         if np.isnan(endpoint) or np.isnan(duration):
-            result[test_number] = -1
+            result[test_number] = np.nan
         else:
             # Initialize an array of exceedance
             exceedances = np.zeros(n_years)
