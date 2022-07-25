@@ -25,10 +25,7 @@ def pesticide_calculator(input_data):
 
         # Load watershed topology maps and account for necessary files
         region = HydroRegion(region_id, sim)
-        flow, surface_area = region.daily_flows(5641602)
-        print(flow)
-        print(surface_area)
-       
+
         #me Load recipes for region and year
         recipes = WatershedRecipes(region_id, sim)
 

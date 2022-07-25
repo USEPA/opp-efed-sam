@@ -191,6 +191,7 @@ class Simulation(DateManager):
             confined_reaches = pd.read_csv(self.confine_reaches_path.format(tag)).comid.values
             message += f"Confining analysis to areas upstream of reach(es) {', '.join(map(str, confined_reaches))}"
         else:
+            tag = self.region
             confined_reaches = None
 
         report(message)
@@ -439,6 +440,8 @@ class ModelOutputs(DateManager):
             intake_time_series = self.get_time_series()
         else:
             intake_time_series = None
+        if self.sim.local_run:
+            self.write_time_series()
 
         return reach_dict, huc_dict, intake_dict, intake_time_series
 

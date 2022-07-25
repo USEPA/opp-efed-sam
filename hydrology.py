@@ -125,7 +125,7 @@ class HydroRegion(Navigator):
         output_reaches = set()
         output_index = None
         if self.sim.sim_type == 'dwr':
-            intakes_path = self.sim.dw_intakes_path.format(self.id)
+            intakes_path = self.sim.dw_intakes_path.format(self.sim.tag)
             output_index = pd.read_csv(intakes_path)
             output_reaches = pd.Series(sorted(set(active_reaches.values) & set(output_index.comid)), name="comid")
 

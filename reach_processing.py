@@ -34,7 +34,7 @@ class ReachManager(DateManager, MemoryMatrix):
                               name='reaches', path=self.array_path)
 
         # Initialize to zero (test)
-        # self.set_zero()
+        self.set_zero()
 
         # Keep track of which reaches have been run
         self.burned_reaches = set()  # reaches that have been processed
@@ -86,6 +86,7 @@ class ReachManager(DateManager, MemoryMatrix):
 
             # Add all lake mass and runoff to outlet
             writer[lake_index] = np.array([new_runoff, new_mass, erosion, erosion_mass])
+
         del reader, writer
 
     def get_contributions(self, found_s3, time_series, output_index):
@@ -104,6 +105,7 @@ class ReachManager(DateManager, MemoryMatrix):
         return time_series
 
     def process_local(self, reach_ids, output_reach_ids):
+        reader = self.reader
         writer = self.writer
         for reach_id in reach_ids:
             combined = np.zeros((4, self.n_dates))
@@ -120,18 +122,20 @@ class ReachManager(DateManager, MemoryMatrix):
                     self.output.update_time_series(reach_id, time_series, 'local')
             writer[reach_index] = combined
         del writer
+        del reader
 
     def process_upstream(self, reach_ids, output_reach_ids):
         reader = self.reader
         for reach_id in reach_ids:
             reach_index = self.lookup[reach_id]
-
             # Accumulate runoff, erosion, and pesticide mass from upstream
             runoff, runoff_mass, erosion, erosion_mass = self.upstream_loading(reach_id, reach_index, reader)
 
             # Calculate the pesticide concentrations in water and get hydrology time series
             total_flow, baseflow, wc_conc, benthic_conc, runoff_conc = \
                 self.compute_concentration(reach_id, runoff, runoff_mass, erosion, erosion_mass)
+
+
             self.output.concentrations.iloc[reach_index] = \
                 np.array([wc_conc.mean(), wc_conc.max(), benthic_conc.mean(), benthic_conc.max()])
 
@@ -161,7 +165,7 @@ class ReachManager(DateManager, MemoryMatrix):
         reaches, reach_times = upstream_reaches[indices], travel_times[indices]
 
         # Start with 'local' data
-        time_series = reader[reach_index]
+        time_series = reader[reach_index].copy()
 
         # Don't need to do proceed if there'snothing upstream
         if len(reaches) > 1:
@@ -169,12 +173,6 @@ class ReachManager(DateManager, MemoryMatrix):
             # Fetch time series data for each upstream reach
             index = self.lookup[reaches]
             reach_array = reader[index, :2].astype(np.float64)  # (reaches, vars, dates)
-            if reach_array.max() > 1e25:
-                print(11111, reach_id, reach_array.shape, reach_array.max())
-                bogies = (reach_array > 1e25).sum(axis=(1, 2))
-                baddies = reaches[np.where(bogies)]
-                report(f"Overflow value found in reaches {', '.join(map(str, baddies))}. Setting values to zero")
-                reach_array[reach_array > 1e25] = 0.
 
             # Stagger time series by dayshed
             for tank in range(np.max(reach_times) + 1):
@@ -187,7 +185,6 @@ class ReachManager(DateManager, MemoryMatrix):
                     else:
                         in_tank = np.pad(in_tank[:2, :-tank], ((0, 0), (tank, 0)), mode='constant')
                 time_series[:2] += in_tank  # Add the convolved tank time series to the total for the reach
-
         return time_series
 
     def compute_concentration(self, reach_id, runoff, runoff_mass, erosion, erosion_mass):
@@ -198,9 +195,7 @@ class ReachManager(DateManager, MemoryMatrix):
         # Get local runoff, erosion, and pesticide masse
         total_flow, baseflow, (wc_conc, runoff_conc) = \
                 water_column_concentration(runoff, runoff_mass, self.n_dates, flow)
-        #print(reach_id, 444, f"baseflow: {baseflow.sum()}")
-        #if baseflow.sum() < 1:
-        #    exit()
+
         try:
             benthic_conc = benthic_concentration(
                 erosion, erosion_mass, surface_area, self.sim.benthic_depth, self.sim.benthic_porosity)

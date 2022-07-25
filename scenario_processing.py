@@ -249,8 +249,6 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
         # Initialize memory matrix
         # arrays - runoff_mass, erosion_mass
-        print(45666, self.sim.retain_s3, os.path.exists(self.array_path), self.array_path)
-
         disable_build = (self.sim.retain_s3 and os.path.exists(self.array_path))
         MemoryMatrix.__init__(self, [self.lookup.s1_index, self.vars, self.n_dates], name='pesticide mass',
                               dtype=np.float32, path=self.array_path, existing=disable_build,
