@@ -461,6 +461,8 @@ class ModelOutputs(DateManager):
 
     def write_summary_tables(self):
         # Write summary tables
+        print(self.contributions)
+        print(self.exceedances)
         self.contributions.to_csv(os.path.join(self.sim.output_path, "upstream_table.csv"), index=None)
         self.contributions.sum(axis=0).to_csv(os.path.join(self.sim.output_path, "summary.csv"))
         self.exceedances.to_csv(os.path.join(self.sim.output_path, "exceedances.csv"))
