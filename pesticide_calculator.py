@@ -3,9 +3,8 @@ from .utilities import Simulation, WeatherArray, ModelOutputs, report
 from .reach_processing import ReachManager, WatershedRecipes
 from .scenario_processing import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
 
-retain_s1 = True
-retain_s3 = True
-
+retain_s1 = False
+retain_s3 = False
 
 # ISSUES:
 #  Attach r/e array to s3

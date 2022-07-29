@@ -145,7 +145,10 @@ class Simulation(DateManager):
             file_age = (time.time() - os.stat(file_path).st_mtime) / 86400
             if not self.retain_s3 or "_s3" not in f:
                 if file_age > 1:
-                    os.remove(file_path)
+                    try:
+                        os.remove(file_path)
+                    except PermissionError:
+                        report(f"Can't delete {f} due to a permission error")
 
     def detect_special_run(self):
         # TODO - update this so scenarios can't be built for a subset
@@ -453,7 +456,6 @@ class ModelOutputs(DateManager):
                 if any(self.local_index):
                     writer[output_index, :len(self.local_index)] = data[self.local_index]
             elif mode == 'upstream':
-                print(987, len(self.upstream_index), self.time_series_output.shape)
                 if any(self.upstream_index):
                     writer[output_index, :len(self.upstream_index)] = data[self.upstream_index]
             else:
@@ -461,8 +463,6 @@ class ModelOutputs(DateManager):
 
     def write_summary_tables(self):
         # Write summary tables
-        print(self.contributions)
-        print(self.exceedances)
         self.contributions.to_csv(os.path.join(self.sim.output_path, "upstream_table.csv"), index=None)
         self.contributions.sum(axis=0).to_csv(os.path.join(self.sim.output_path, "summary.csv"))
         self.exceedances.to_csv(os.path.join(self.sim.output_path, "exceedances.csv"))
