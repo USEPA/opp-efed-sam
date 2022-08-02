@@ -194,7 +194,7 @@ class ReachManager(DateManager, MemoryMatrix):
 
         # Get local runoff, erosion, and pesticide masse
         total_flow, baseflow, (wc_conc, runoff_conc) = \
-                water_column_concentration(runoff, runoff_mass, self.n_dates, predicted_flow)
+                water_column_concentration(reach_id, runoff, runoff_mass, self.n_dates, predicted_flow)
 
         try:
             benthic_conc = benthic_concentration(
