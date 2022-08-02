@@ -362,14 +362,15 @@ def surface_hydrology(field_capacity, wilting_point, plant_factor, cn, depth,  #
     return daily_runoff, daily_rain, daily_effective_rain, surface_soil_water, surface_velocity
 
 
-def water_column_concentration(runoff, transported_mass, n_dates, q):
+def water_column_concentration(runoff, transported_mass, n_dates, q_pred):
     """
     Calculates pesticide concentration in water column from runoff inputs, accounting for time of travel
     Need to add references: VVWM (for basics), SAM write-up on time of travel
     """
     mean_runoff = runoff.mean()  # m3/d
-    baseflow = q - np.subtract(q, mean_runoff, out=np.zeros(n_dates), where=(q > mean_runoff))
-    total_flow = runoff + baseflow
+    mean_flow = q_pred.mean()
+    baseflow = ((mean_flow - mean_runoff) / mean_flow) * q_pred
+    total_flow = baseflow + runoff
     concentration = np.divide(transported_mass, total_flow, out=np.zeros(n_dates), where=(total_flow != 0))
     runoff_concentration = np.divide(transported_mass, runoff, out=np.zeros(n_dates), where=(runoff != 0))
     return total_flow, baseflow, map(lambda x: x * 1000000., (concentration, runoff_concentration))  # kg/m3 -> ug/L

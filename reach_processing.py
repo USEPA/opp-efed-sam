@@ -190,11 +190,11 @@ class ReachManager(DateManager, MemoryMatrix):
     def compute_concentration(self, reach_id, runoff, runoff_mass, erosion, erosion_mass):
 
         # Get hydrologic data for reach
-        flow, surface_area = self.region.daily_flows(reach_id)
+        predicted_flow, surface_area = self.region.daily_flows(reach_id)
 
         # Get local runoff, erosion, and pesticide masse
         total_flow, baseflow, (wc_conc, runoff_conc) = \
-                water_column_concentration(runoff, runoff_mass, self.n_dates, flow)
+                water_column_concentration(runoff, runoff_mass, self.n_dates, predicted_flow)
 
         try:
             benthic_conc = benthic_concentration(

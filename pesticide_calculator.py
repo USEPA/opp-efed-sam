@@ -4,7 +4,7 @@ from .reach_processing import ReachManager, WatershedRecipes
 from .scenario_processing import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
 
 retain_s1 = False
-retain_s3 = False
+retain_s3 = True
 
 # ISSUES:
 #  Attach r/e array to s3
@@ -24,6 +24,7 @@ def pesticide_calculator(input_data):
 
         # Load watershed topology maps and account for necessary files
         region = HydroRegion(region_id, sim)
+        bogey = 5039952
 
         #me Load recipes for region and year
         recipes = WatershedRecipes(region_id, sim)
