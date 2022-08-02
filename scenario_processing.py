@@ -232,7 +232,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
 
 
 class StageThreeScenarios(DateManager, MemoryMatrix):
-    def __init__(self, sim, stage_one, stage_two, retain_s3=False):
+    def __init__(self, sim, stage_one, stage_two, retain_s3=False, overwrite_s3=False):
         self.s1 = stage_one
         self.s2 = stage_two
         self.sim = sim
@@ -249,7 +249,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
         # Initialize memory matrix
         # arrays - runoff_mass, erosion_mass
-        disable_build = (self.sim.retain_s3 and os.path.exists(self.array_path))
+        disable_build = all((retain_s3, not overwrite_s3, self.os.path.exists(self.array_path)))
         MemoryMatrix.__init__(self, [self.lookup.s1_index, self.vars, self.n_dates], name='pesticide mass',
                               dtype=np.float32, path=self.array_path, existing=disable_build,
                               persistent_read=True, persistent_write=True)

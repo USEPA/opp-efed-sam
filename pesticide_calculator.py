@@ -4,7 +4,8 @@ from .reach_processing import ReachManager, WatershedRecipes
 from .scenario_processing import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
 
 retain_s1 = False
-retain_s3 = False
+retain_s3 = True
+overwrite_s3 = True
 
 # ISSUES:
 #  Attach r/e array to s3
@@ -46,7 +47,7 @@ def pesticide_calculator(input_data):
             return
 
         # Initialize Stage 3 scenarios (time series of chemical transport data e.g., runoff mass, erosion mass)
-        stage_three = StageThreeScenarios(sim, stage_one, stage_two, retain_s3)
+        stage_three = StageThreeScenarios(sim, stage_one, stage_two, retain_s3, overwrite_s3)
 
         # Initialize objects to hold results by stream reach and reservoir
         reaches = ReachManager(sim, stage_three, region, recipes, outputs)
