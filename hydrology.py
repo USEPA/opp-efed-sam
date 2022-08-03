@@ -371,10 +371,10 @@ def water_column_concentration(reach_id, runoff, transported_mass, n_dates, q_pr
     mean_flow = q_pred.mean()
     try:
         baseflow = ((mean_flow - mean_runoff) / mean_flow) * q_pred
-        total_flow = baseflow + runoff
     except:
         print(f"Error calculating baseflow for {reach_id}. mean_runoff={mean_runoff}, mean_flow={mean_flow}")
-        total_flow = q_pred + runoff
+        baseflow = q_pred
+    total_flow = baseflow + runoff
     concentration = np.divide(transported_mass, total_flow, out=np.zeros(n_dates), where=(total_flow != 0))
     runoff_concentration = np.divide(transported_mass, runoff, out=np.zeros(n_dates), where=(runoff != 0))
     return total_flow, baseflow, map(lambda x: x * 1000000., (concentration, runoff_concentration))  # kg/m3 -> ug/L
