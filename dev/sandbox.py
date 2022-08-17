@@ -1,7 +1,10 @@
 import numpy as np
 import pandas as pd
-mean_runoff = 6
-q = np.array([3, 4, 5, 6, 7, 6, 5, 4, 3, 2])
-n_dates = q.size
-baseflow = q - np.subtract(q, mean_runoff, out=np.zeros(n_dates), where=(q > mean_runoff))
-print(baseflow)
+
+active_scenarios = [1, 3, 4]
+
+test_df = pd.DataFrame(np.array([[False, False], [True, True], [False, False], [False, False], [False, False], [False, False]]), columns=['a', 'b'])
+
+test_df.loc[np.array(active_scenarios), 'b'] *= True
+
+print(test_df)

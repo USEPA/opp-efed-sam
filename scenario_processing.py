@@ -235,13 +235,9 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         self.s2 = stage_two
         self.sim = sim
         self.array_path = sim.s3_scenarios_path.format(self.sim.token)
-        self.lookup = self.build_lookup()
+        self.lookup = self.build_lookup(active_reaches, recipes)
         self.n_scenarios = self.lookup.active.sum()
         self.vars = sim.fields.fetch('s3_arrays')  # runoff, runoff_mass, erosion, erosion_mass
-
-        # Confine processing if not running the whole region
-        if self.sim.confine_reaches is not None:
-            self.confine(active_reaches, recipes)
 
         # Set dates
         DateManager.__init__(self, stage_two.start_date, stage_two.end_date)
@@ -262,14 +258,21 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
             for i, (year, recipe) in enumerate(recipes.fetch(reach_id, df=True)):
                 active_scenarios |= set(recipe.s1_index)
         print(len(active_scenarios))
-        print(self.shape)
-        print(time.time() - start)
-        exit()
+        return sorted(active_scenarios)
 
-    def build_lookup(self):
+    def build_lookup(self, active_reaches, recipes):
+        # Carry over the index table from the s1 scenarios
         lookup = self.s1.lookup
+
+        # Create a simple numeric index for each crop type. Crops receiving chemical are active
         lookup['contribution_index'] = lookup.cdl_alias.map({val: i for i, val in enumerate(self.sim.active_crops)})
         lookup['active'] = lookup['contribution_index'].notna()
+
+        # Confine processing if not running the whole region
+        if self.sim.confine_reaches is not None:
+            active_scenarios = self.confine(active_reaches, recipes)
+        lookup.loc[np.array(active_scenarios), 'active'] *= True
+
         return lookup
 
     def build_from_stage_two(self):
@@ -284,6 +287,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
         # Iterate scenarios
         selected = self.lookup[self.lookup.active]
+        n_selected = selected.shape[0]
         for count, (s1_index, scenario_id) in enumerate(selected[['s1_index', 'scenario_id']].values):
             # These fields should match the order of the parameters used by stage_two_to_three
             # Currently: [plant_date, emergence_date, maxcover_date, harvest_date, max_canopy, orgC_5, bd_5, season]
@@ -312,7 +316,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                     start_pos = batch_count * self.sim.batch_size
                     self.writer[start_pos:start_pos + len(batch)] = arrays
                     batch_count += 1
-                    report(f'Processed {count + 1} of {self.n_scenarios} scenarios...', 1)
+                    report(f'Processed {count + 1} of {n_selected} scenarios...', 1)
                     write_sample(self.dates, self.sim, arrays, batch_index, 3)
                     batch = []
                     batch_index = []
