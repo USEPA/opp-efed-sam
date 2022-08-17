@@ -45,7 +45,7 @@ def pesticide_calculator(input_data):
         reaches = ReachManager(sim, region, recipes, outputs)
 
         # Initialize Stage 3 scenarios (time series of chemical transport data e.g., runoff mass, erosion mass)
-        stage_three = StageThreeScenarios(sim, stage_one, stage_two, reaches, recipes)
+        stage_three = StageThreeScenarios(sim, stage_one, stage_two, region.active_reaches, recipes)
 
         # Combine scenarios to generate data for catchments
         for tier, reach_ids, lakes in region.cascade():  # Traverse downstream in the watershed

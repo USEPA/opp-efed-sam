@@ -230,7 +230,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
 
 
 class StageThreeScenarios(DateManager, MemoryMatrix):
-    def __init__(self, sim, stage_one, stage_two, reaches, recipes):
+    def __init__(self, sim, stage_one, stage_two, active_reaches, recipes):
         self.s1 = stage_one
         self.s2 = stage_two
         self.sim = sim
@@ -241,7 +241,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
         # Confine processing if not running the whole region
         if self.sim.confine_reaches is not None:
-            self.confine(reaches.active_reaches, recipes)
+            self.confine(active_reaches, recipes)
 
         # Set dates
         DateManager.__init__(self, stage_two.start_date, stage_two.end_date)
