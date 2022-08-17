@@ -58,7 +58,7 @@ def pesticide_calculator(input_data):
 
             # Perform full upstream analysis including time-of-travel and concentration
             report("\tProcessing upstream contributions...")
-            reaches.process_upstream(stage_three, reach_ids, output_reaches)
+            reaches.process_upstream(reach_ids, output_reaches)
 
             # Pass each reach in the tier through a downstream lake
             report("\tSimulating flow through reservoirs...")

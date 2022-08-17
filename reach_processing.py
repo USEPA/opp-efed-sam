@@ -14,9 +14,8 @@ class ReachManager(DateManager, MemoryMatrix):
     A class to hold runoff and runoff mass for each reach as it's processed
     """
 
-    def __init__(self, sim, s3, region, recipes, output):
+    def __init__(self, sim, region, recipes, output):
         self.sim = sim
-        self.s3 = s3
         self.region = region
         self.recipes = recipes
         self.output = output
@@ -104,14 +103,14 @@ class ReachManager(DateManager, MemoryMatrix):
         time_series[2:] *= np.power(area / 10000., .12)
         return time_series
 
-    def process_local(self, reach_ids, output_reach_ids):
+    def process_local(self, s3, reach_ids, output_reach_ids):
         reader = self.reader
         writer = self.writer
         for reach_id in reach_ids:
             combined = np.zeros((4, self.n_dates))
             reach_index = self.lookup[reach_id]
             for i, (year, recipe) in enumerate(self.recipes.fetch(reach_id, df=True)):
-                time_series, found_s3 = self.s3.fetch_from_recipe(recipe.s1_index)
+                time_series, found_s3 = s3.fetch_from_recipe(recipe.s1_index)
                 time_series = self.build_time_series(time_series, self.recipe_year_index[i], recipe.area.values)
                 contributions = self.get_contributions(found_s3, time_series, reach_index)
                 time_series = time_series.sum(axis=2)
