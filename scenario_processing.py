@@ -64,11 +64,9 @@ class StageOneScenarios(MemoryMatrix):
         self.sim.active_crops = self.get_active_crops()
 
         # No need to allocate memory if just generating random output
-        disable_build = (self.sim.retain_s1 and os.path.exists(self.array_path)) or self.sim.random
-        if not disable_build:
-            MemoryMatrix.__init__(self, [self.lookup.s1_index, self.array_fields], name='s1 scenario',
-                                  dtype=np.float32, path=self.array_path, persistent_read=True)
-            self.csv_to_memmap()
+        MemoryMatrix.__init__(self, [self.lookup.s1_index, self.array_fields], name='s1 scenario',
+                              dtype=np.float32, path=self.array_path, persistent_read=True)
+        self.csv_to_memmap()
 
     def build_index(self):
         # Get all the column headings from the input table
