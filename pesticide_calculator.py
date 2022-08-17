@@ -3,10 +3,6 @@ from .utilities import Simulation, WeatherArray, ModelOutputs, report
 from .reach_processing import ReachManager, WatershedRecipes
 from .scenario_processing import StageOneScenarios, StageTwoScenarios, StageThreeScenarios
 
-retain_s1 = False
-retain_s3 = True
-overwrite_s3 = True
-
 # ISSUES:
 #  Attach r/e array to s3
 #  0s for erosion in s2
@@ -15,7 +11,7 @@ overwrite_s3 = True
 
 def pesticide_calculator(input_data):
     # Initialize a class with all the simulation parameters (input data, field names, hardwired parameters, dates etc)
-    sim = Simulation(input_data, retain_s1, retain_s3)
+    sim = Simulation(input_data)
 
     # Iterate through each hydroregion that encompasses the run
     for region_id in sim.run_regions:
@@ -25,7 +21,6 @@ def pesticide_calculator(input_data):
 
         # Load watershed topology maps and account for necessary files
         region = HydroRegion(region_id, sim)
-        bogey = 5039952
 
         #me Load recipes for region and year
         recipes = WatershedRecipes(region_id, sim)
@@ -46,11 +41,11 @@ def pesticide_calculator(input_data):
             report("Successfully finished building Stage Two Scenarios.")
             return
 
-        # Initialize Stage 3 scenarios (time series of chemical transport data e.g., runoff mass, erosion mass)
-        stage_three = StageThreeScenarios(sim, stage_one, stage_two, retain_s3, overwrite_s3)
-
         # Initialize objects to hold results by stream reach and reservoir
-        reaches = ReachManager(sim, stage_three, region, recipes, outputs)
+        reaches = ReachManager(sim, region, recipes, outputs)
+
+        # Initialize Stage 3 scenarios (time series of chemical transport data e.g., runoff mass, erosion mass)
+        stage_three = StageThreeScenarios(sim, stage_one, stage_two, reaches, recipes)
 
         # Combine scenarios to generate data for catchments
         for tier, reach_ids, lakes in region.cascade():  # Traverse downstream in the watershed
@@ -59,11 +54,11 @@ def pesticide_calculator(input_data):
 
             # Perform analysis within reach catchments
             report("\tProcessing local contributions...")
-            reaches.process_local(reach_ids, output_reaches)
+            reaches.process_local(stage_three, reach_ids, output_reaches)
 
             # Perform full upstream analysis including time-of-travel and concentration
             report("\tProcessing upstream contributions...")
-            reaches.process_upstream(reach_ids, output_reaches)
+            reaches.process_upstream(stage_three, reach_ids, output_reaches)
 
             # Pass each reach in the tier through a downstream lake
             report("\tSimulating flow through reservoirs...")

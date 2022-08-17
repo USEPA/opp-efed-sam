@@ -19,12 +19,10 @@ class Simulation(DateManager):
     run including Endpoints, Crops, Dates, Intake reaches, and Impulse Response Functions
     """
 
-    def __init__(self, input_json, retain_s1=False, retain_s3=False):
+    def __init__(self, input_json):
         # TODO - confirm that everything works as intended here, esp. for eco runs
         # Determine whether the simulation is being run on a windows desktop (local for epa devs)
         self.local_run = any([r'C:' in p for p in sys.path])
-        self.retain_s1 = retain_s1
-        self.retain_s3 = retain_s3
 
         # Add paths
         self.__dict__.update(self.initialize_paths())

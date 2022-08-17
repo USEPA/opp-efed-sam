@@ -232,31 +232,41 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
 
 
 class StageThreeScenarios(DateManager, MemoryMatrix):
-    def __init__(self, sim, stage_one, stage_two, retain_s3=False, overwrite_s3=False):
+    def __init__(self, sim, stage_one, stage_two, reaches, recipes):
         self.s1 = stage_one
         self.s2 = stage_two
         self.sim = sim
-        if retain_s3:
-            self.array_path = sim.s3_scenarios_path.format('keep')
-        else:
-            self.array_path = sim.s3_scenarios_path.format(self.sim.token)
+        self.array_path = sim.s3_scenarios_path.format(self.sim.token)
         self.lookup = self.build_lookup()
         self.n_scenarios = self.lookup.active.sum()
         self.vars = sim.fields.fetch('s3_arrays')  # runoff, runoff_mass, erosion, erosion_mass
+
+        # Confine processing if not running the whole region
+        if self.sim.confined_reaches is not None:
+            self.confine(reaches.active_reaches, recipes)
 
         # Set dates
         DateManager.__init__(self, stage_two.start_date, stage_two.end_date)
 
         # Initialize memory matrix
         # arrays - runoff_mass, erosion_mass
-        disable_build = all((retain_s3, not overwrite_s3, os.path.exists(self.array_path)))
         MemoryMatrix.__init__(self, [self.lookup.s1_index, self.vars, self.n_dates], name='pesticide mass',
-                              dtype=np.float32, path=self.array_path, existing=disable_build,
-                              persistent_read=True, persistent_write=True)
+                              dtype=np.float32, path=self.array_path, persistent_read=True, persistent_write=True)
 
-        if not disable_build:
-            report(f'Building Stage 3 scenarios...')
-            self.build_from_stage_two()
+        report(f'Building Stage 3 scenarios...')
+        self.build_from_stage_two()
+
+    def confine(self, active_reaches, recipes):
+        import time
+        start = time.time()
+        active_scenarios = set()
+        for reach_id in active_reaches:
+            for i, (year, recipe) in enumerate(recipes.fetch(reach_id, df=True)):
+                active_scenarios |= set(recipe.s1_index)
+        print(len(active_scenarios))
+        print(self.shape)
+        print(time.time() - start)
+        exit()
 
     def build_lookup(self):
         lookup = self.s1.lookup
