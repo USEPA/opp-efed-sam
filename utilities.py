@@ -141,12 +141,11 @@ class Simulation(DateManager):
         for f in os.listdir(self.scratch_path):
             file_path = os.path.join(self.scratch_path, f)
             file_age = (time.time() - os.stat(file_path).st_mtime) / 86400
-            if not self.retain_s3 or "_s3" not in f:
-                if file_age > 1:
-                    try:
-                        os.remove(file_path)
-                    except PermissionError:
-                        report(f"Can't delete {f} due to a permission error")
+            if file_age > 1:
+                try:
+                    os.remove(file_path)
+                except PermissionError:
+                    report(f"Can't delete {f} due to a permission error")
 
     def detect_special_run(self):
         # TODO - update this so scenarios can't be built for a subset
