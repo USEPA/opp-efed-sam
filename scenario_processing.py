@@ -240,7 +240,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         self.vars = sim.fields.fetch('s3_arrays')  # runoff, runoff_mass, erosion, erosion_mass
 
         # Confine processing if not running the whole region
-        if self.sim.confined_reaches is not None:
+        if self.sim.confine_reaches is not None:
             self.confine(reaches.active_reaches, recipes)
 
         # Set dates
