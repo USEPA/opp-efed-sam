@@ -306,20 +306,18 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                 debug_mode = False
                 if not debug_mode:
                     batch.append(self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs))
-                    batch_index.append(scenario_id)
+                    batch_index.append(s1_index)
                 else:
                     results = stage_two_to_three(*scenario_inputs)
                     runoff, runoff_mass, erosion, erosion_mass = map(float, results.sum(axis=1))
 
                 if len(batch) == self.sim.batch_size or (count + 1) == self.n_scenarios:
                     arrays = self.sim.dask_client.gather(batch)
+                    # [(vars, dates)*batch_size]
                     start_pos = batch_count * self.sim.batch_size
-                    print(f"len arrays: {len(arrays)}, Arrays shape: {arrays[0].shape}")
-                    exit()
-                    self.writer[start_pos:start_pos + len(batch)] = arrays
+                    self.writer[batch_index] = np.array(arrays)
                     batch_count += 1
                     report(f'Processed {count + 1} of {n_selected} scenarios...', 1)
-                    #write_sample(self.dates, self.sim, arrays, batch_index, 3)
                     batch = []
                     batch_index = []
 
@@ -327,15 +325,6 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         found = self.lookup.iloc[recipe]
         arrays = super(StageThreeScenarios, self).fetch(found.s1_index, iloc=True, verbose=verbose)
         return arrays, found
-
-
-def write_sample(dates, sim, results, batch_index, s=2):
-    if sample_row is not None:
-        sample_id = batch_index[sample_row]
-        sample_path = os.path.join(sim.scratch_path, f"{sample_id}_s{s}.csv")
-        sample_data = pd.DataFrame(results[sample_row].T, dates, sim.fields.fetch(f's{s}_arrays'))
-        sample_data.to_csv(sample_path)
-        report(f'Wrote a Stage {s} sample to {sample_path}', 2)
 
 
 def stage_one_to_two(precip, pet, temp, new_year,  # weather params
