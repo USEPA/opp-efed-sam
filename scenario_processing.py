@@ -271,7 +271,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         # Confine processing if not running the whole region
         if self.sim.confine_reaches is not None:
             active_scenarios = self.confine(active_reaches, recipes)
-        lookup.loc[np.array(active_scenarios), 'active'] *= True
+        lookup.loc[np.array(active_scenarios), 'active'] &= True
 
         return lookup
 
