@@ -314,7 +314,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                 if len(batch) == self.sim.batch_size or (count + 1) == self.n_scenarios:
                     arrays = self.sim.dask_client.gather(batch)
                     start_pos = batch_count * self.sim.batch_size
-                    print(f"Arrays shape: {arrays.shape}")
+                    print(f"len arrays: {len(arrays)}, Arrays shape: {arrays[0].shape}")
                     exit()
                     self.writer[start_pos:start_pos + len(batch)] = arrays
                     batch_count += 1
