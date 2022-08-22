@@ -257,7 +257,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         for reach_id in active_reaches:
             for i, (year, recipe) in enumerate(recipes.fetch(reach_id, df=True)):
                 active_scenarios |= set(recipe.s1_index)
-        print(f"Found {len(active_scenarios)} active scenarios in {int(time.time() - start)} seconds"
+        print(f"Found {len(active_scenarios)} active scenarios in {int(time.time() - start)} seconds")
         return sorted(active_scenarios)
 
     def build_lookup(self, active_reaches, recipes):
