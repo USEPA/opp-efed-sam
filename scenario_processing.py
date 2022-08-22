@@ -94,7 +94,7 @@ class StageOneScenarios(MemoryMatrix):
 
     def fetch(self, index, field_set=None, iloc=True, return_fields=False):
         fields = {'s2': self.s2_fields, 's3': self.s3_fields}.get(field_set, self.array_fields)
-        field_index = [fields.index(f) for f in self.array_fields]
+        field_index = [self.array_fields.index(f) for f in fields]
         row = super(StageOneScenarios, self).fetch(index, iloc=iloc)
         if not return_fields:
             row = np.array(row[field_index])
