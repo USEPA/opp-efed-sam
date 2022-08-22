@@ -67,6 +67,5 @@ total_flow,TotalFlow(m3),np.float32,,,,50,,,,,,,
 wc_conc,WaterColumnConc(ug/L),np.float32,,,,70,,,,,,,
 wc_metabolism_hl,,np.float32,,,,,,1,,,,,
 weather_grid,,np.int32,,,,,,,,,,,10
-window1,,np.float32,,,,,60,,,,,,
-window2,,np.float32,,,,,80,,,,,,
-,,,,,,,,,,,,,
+window1,,np.int32,,,,,60,,,,,,
+window2,,np.int32,,,,,80,,,,,,
