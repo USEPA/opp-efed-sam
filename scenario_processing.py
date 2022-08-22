@@ -100,9 +100,9 @@ class StageOneScenarios(MemoryMatrix):
             row = np.array(row)
             nans = np.isnan(row)
             if nans.any():
-                print(fields[nans])
+                print(np.array(fields)[nans])
             else:
-                print("Clean!")
+                print(f"Clean! {row}")
             return list(row[field_index])
         else:
             return pd.Series(row[field_index], index=fields)
@@ -272,6 +272,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         print(9876, lookup.shape)
 
         # Create a simple numeric index for each crop type. Crops receiving chemical are active
+        print(f"active crops: {self.sim.active_crops}")
         lookup['contribution_index'] = lookup.cdl_alias.map({val: i for i, val in enumerate(self.sim.active_crops)})
         lookup['chemical_applied'] = lookup['contribution_index'].notna()
         print(1234, lookup[lookup.chemical_applied].shape)
