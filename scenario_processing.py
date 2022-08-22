@@ -102,7 +102,7 @@ class StageOneScenarios(MemoryMatrix):
             if nans.any():
                 print(fields[nans])
             else:
-                print("Clean!")
+                print("Clean!", row.shape, len(list(row)), len(fields), len(self.array_fields))
             return list(row)
         else:
             return pd.Series(row[field_index], index=field_set)
