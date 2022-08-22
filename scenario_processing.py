@@ -268,7 +268,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         # Create a simple numeric index for each crop type. Crops receiving chemical are active
         lookup['contribution_index'] = lookup.cdl_alias.map({val: i for i, val in enumerate(self.sim.active_crops)})
         lookup['chemical_applied'] = lookup['contribution_index'].notna()
-        print(1234, lookup['chemical_applied'].shape)
+        print(1234, lookup[lookup.chemical_applied].shape)
 
         # Confine processing if not running the whole region
         lookup['in_confine'] = False
@@ -300,6 +300,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
             # Get application information for the active crop
             crop_applications = self.sim.applications[self.sim.applications.crop == crop_group]
 
+            print(count, s1_index, scenario_id, np.isnan(np.array(s1_params)).any())
             if not np.isnan(np.array(s1_params)).any():
 
                 # Extract stored data
@@ -314,8 +315,8 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                 else:
                     results = stage_two_to_three(*scenario_inputs)
                     runoff, runoff_mass, erosion, erosion_mass = map(float, results.sum(axis=1))
-
-                if len(batch) == self.sim.batch_size or (count + 1) == self.n_scenarios:
+                if len(batch) == self.sim.batch_size or (count + 1) == n_selected:
+                    print(len(batch))
                     arrays = self.sim.dask_client.gather(batch)
                     # [(vars, dates)*batch_size]
                     start_pos = batch_count * self.sim.batch_size
