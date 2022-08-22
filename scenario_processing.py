@@ -92,20 +92,20 @@ class StageOneScenarios(MemoryMatrix):
             cursor += chunk.shape[0]
         del writer
 
-    def fetch(self, index, fields=None, iloc=True, return_fields=False):
-        fields = {'s2': self.s2_fields, 's3': self.s3_fields}.get(fields, self.array_fields)
-        field_index = [self.array_fields.index(f) for f in fields]
+    def fetch(self, index, field_set=None, iloc=True, return_fields=False):
+        fields = {'s2': self.s2_fields, 's3': self.s3_fields}.get(field_set, self.array_fields)
+        field_index = [self.array_fields.index(f) for f in self.array_fields]
         row = super(StageOneScenarios, self).fetch(index, iloc=iloc)
         if not return_fields:
-            row = np.array(row)
+            row = np.array(row[field_index])
             nans = np.isnan(row)
             if nans.any():
-                print(np.array(fields)[nans])
+                print(fields[nans])
             else:
-                print(f"Clean! {row}")
-            return list(row[field_index])
+                print("Clean!")
+            return list(row)
         else:
-            return pd.Series(row[field_index], index=fields)
+            return pd.Series(row[field_index], index=field_set)
 
     def get_active_crops(self):
         # Read the lookup table to send all active crops to the simulation
