@@ -100,9 +100,7 @@ class StageOneScenarios(MemoryMatrix):
             row = np.array(row[field_index])
             nans = np.isnan(row)
             if nans.any():
-                print(fields[nans])
-            else:
-                print("Clean!", row.shape, len(list(row)), len(fields), len(self.array_fields))
+                print(np.array(fields)[nans])
             return list(row)
         else:
             return pd.Series(row[field_index], index=field_set)
