@@ -97,6 +97,8 @@ class StageOneScenarios(MemoryMatrix):
         field_index = [self.array_fields.index(f) for f in fields]
         row = super(StageOneScenarios, self).fetch(index, iloc=iloc)
         if not return_fields:
+            print(fields)
+            print(row[field_index])
             return list(row[field_index])
         else:
             return pd.Series(row[field_index], index=fields)
@@ -295,13 +297,11 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         for count, (s1_index, scenario_id) in enumerate(selected[['s1_index', 'scenario_id']].values):
             # These fields should match the order of the parameters used by stage_two_to_three
             # Currently: [plant_date, emergence_date, maxcover_date, harvest_date, max_canopy, orgC_5, bd_5, season]
-            crop_group, *s1_params = self.s1.fetch(s1_index, 's3', return_fields=True)
-            print(s1_params)
+            crop_group, *s1_params = self.s1.fetch(s1_index, 's3')
 
             # Get application information for the active crop
             crop_applications = self.sim.applications[self.sim.applications.crop == crop_group]
 
-            print(count, s1_index, scenario_id, np.isnan(np.array(s1_params)).any())
             if not np.isnan(np.array(s1_params)).any():
 
                 # Extract stored data
