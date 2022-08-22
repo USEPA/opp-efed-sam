@@ -97,8 +97,12 @@ class StageOneScenarios(MemoryMatrix):
         field_index = [self.array_fields.index(f) for f in fields]
         row = super(StageOneScenarios, self).fetch(index, iloc=iloc)
         if not return_fields:
-            print(fields)
-            print(row[field_index])
+            row = np.array(row)
+            nans = np.isnan(row)
+            if nans.any():
+                print(fields[nans])
+            else:
+                print("Clean!")
             return list(row[field_index])
         else:
             return pd.Series(row[field_index], index=fields)
