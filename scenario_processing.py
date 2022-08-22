@@ -257,7 +257,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         for reach_id in active_reaches:
             for i, (year, recipe) in enumerate(recipes.fetch(reach_id, df=True)):
                 active_scenarios |= set(recipe.s1_index)
-        print(len(active_scenarios))
+        print(f"Found {len(active_scenarios)} active scenarios in {int(time.time() - start)} seconds"
         return sorted(active_scenarios)
 
     def build_lookup(self, active_reaches, recipes):
@@ -271,7 +271,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         # Confine processing if not running the whole region
         if self.sim.confine_reaches is not None:
             active_scenarios = self.confine(active_reaches, recipes)
-        lookup.loc[np.array(active_scenarios), 'active'] |= True
+        lookup.loc[np.array(active_scenarios), 'active'] &= True
         print(2345, lookup[lookup.active].shape)
         return lookup
 
