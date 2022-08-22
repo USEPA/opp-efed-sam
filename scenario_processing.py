@@ -267,15 +267,15 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
         # Create a simple numeric index for each crop type. Crops receiving chemical are active
         lookup['contribution_index'] = lookup.cdl_alias.map({val: i for i, val in enumerate(self.sim.active_crops)})
-        chemical_applied = lookup['contribution_index'].notna()
-        print(1234, lookup[chemical_applied].shape)
+        lookup['chemical_applied'] = lookup['contribution_index'].notna()
+        print(1234, lookup['chemical_applied'].shape)
 
         # Confine processing if not running the whole region
         lookup['in_confine'] = False
         if self.sim.confine_reaches is not None:
             active_scenarios = self.confine(active_reaches, recipes)
             lookup.loc[np.array(active_scenarios), 'in_confine'] = True
-        lookup[active] = lookup.chemical_applied & lookup.in_confine
+        lookup['active'] = lookup.chemical_applied & lookup.in_confine
         print(2345, lookup[lookup.active].shape)
         return lookup
 
