@@ -294,7 +294,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                       self.sim.koc, self.sim.deg_aqueous, self.new_year, self.sim.kd_flag]
 
         # Subset the scenarios if necessary
-        selected = self.lookup[self.lookup.in_confine]['s1_index', 'scenario_id', 'chemical_applied']
+        selected = self.lookup[self.lookup.in_confine][['s1_index', 'scenario_id', 'chemical_applied']]
         n_selected = selected.shape[0]
 
         # Iterate scenarios
