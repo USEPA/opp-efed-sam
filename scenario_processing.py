@@ -267,21 +267,21 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
     def build_lookup(self, active_reaches, recipes):
         # Carry over the index table from the s1 scenarios
         lookup = self.s1.lookup
-        print(9876, lookup.shape)
 
         # Create a simple numeric index for each crop type. Crops receiving chemical are active
         print(f"active crops: {self.sim.active_crops}")
         lookup['contribution_index'] = lookup.cdl_alias.map({val: i for i, val in enumerate(self.sim.active_crops)})
         lookup['chemical_applied'] = lookup['contribution_index'].notna()
-        print(1234, lookup[lookup.chemical_applied].shape)
 
         # Confine processing if not running the whole region
-        lookup['in_confine'] = False
+
         if self.sim.confine_reaches is not None:
+            lookup['in_confine'] = False
             active_scenarios = self.confine(active_reaches, recipes)
             lookup.loc[np.array(active_scenarios), 'in_confine'] = True
-        lookup['active'] = lookup.chemical_applied & lookup.in_confine
-        print(2345, lookup[lookup.active].shape)
+        else:
+            lookup['in_confine'] = True
+
         return lookup
 
     def build_from_stage_two(self):
@@ -294,31 +294,32 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                       self.sim.cm_2, self.sim.soil_depth, self.sim.deg_foliar, self.sim.washoff_coeff,
                       self.sim.koc, self.sim.deg_aqueous, self.new_year, self.sim.kd_flag]
 
-        # Iterate scenarios
-        selected = self.lookup[self.lookup.active]
+        # Subset the scenarios if necessary
+        selected = self.lookup[self.lookup.in_confine]['s1_index', 'scenario_id', 'chemical_applied']
         n_selected = selected.shape[0]
-        for count, (s1_index, scenario_id) in enumerate(selected[['s1_index', 'scenario_id']].values):
+
+        # Iterate scenarios
+        for count, (s1_index, scenario_id, chemical_applied) in enumerate(selected.values):
+            # self.shape = [scenarios, vars, dates]
+            s2_time_series = self.s2.fetch(s1_index)  # runoff, erosion, leaching, soil_water, rain
+
+            if not chemical_applied:
+                batch.append(self.sim.dask_client.submit(stage_two_to_three, *s2_time_series[:2]))
+                continue
+
             # These fields should match the order of the parameters used by stage_two_to_three
             # Currently: [plant_date, emergence_date, maxcover_date, harvest_date, max_canopy, orgC_5, bd_5, season]
             crop_group, *s1_params = self.s1.fetch(s1_index, 's3')
-
-            # Get application information for the active crop
-            crop_applications = self.sim.applications[self.sim.applications.crop == crop_group]
-
             if not np.isnan(np.array(s1_params)).any():
 
-                # Extract stored data
-                s2_time_series = self.s2.fetch(s1_index)  # runoff, erosion, leaching, soil_water, rain
-                scenario_inputs = [crop_applications.values] + sim_params + s2_time_series + s1_params
+                # Get application information for the active crop
+                crop_applications = self.sim.applications[self.sim.applications.crop == crop_group]
 
-                # In debug mode, the processing will not use Dask or occur in parallel
-                debug_mode = False
-                if not debug_mode:
-                    batch.append(self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs))
-                    batch_index.append(s1_index)
-                else:
-                    results = stage_two_to_three(*scenario_inputs)
-                    runoff, runoff_mass, erosion, erosion_mass = map(float, results.sum(axis=1))
+                # Extract stored data
+                scenario_inputs = [crop_applications.values] + sim_params + s2_time_series + s1_params
+                batch.append(self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs))
+                batch_index.append(s1_index)
+
                 if len(batch) == self.sim.batch_size or (count + 1) == n_selected:
                     print(len(batch))
                     arrays = self.sim.dask_client.gather(batch)
@@ -365,6 +366,13 @@ def stage_one_to_two(precip, pet, temp, new_year,  # weather params
 
     # Output array order is specified in fields_and_qc.py
     return np.array([runoff, erosion, leaching, soil_water, rain])
+
+
+def pass_s2_to_s3(runoff, erosion):
+    out_array = np.zeros((4, runoff.size), dtype=np.float64)
+    out_array[0] = runoff
+    out_array[2] = erosion
+    return out_array
 
 
 def stage_two_to_three(application_matrix,

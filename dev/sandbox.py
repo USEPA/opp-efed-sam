@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
 
-a = np.array([True, False, True])
-b = [1, 2, 3]
+a = pd.DataFrame({"a": [0, 1, 2, 3, 4, 5]})
+keepers = [1, 2, 4]
+a['keep'] = True
+a.loc[np.array(keepers), 'keep'] = False
 
-c = b[a]
-
-print(c)
+print(a)
