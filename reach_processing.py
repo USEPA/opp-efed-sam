@@ -91,7 +91,7 @@ class ReachManager(DateManager, MemoryMatrix):
     def get_contributions(self, found_s3, time_series, output_index):
         if found_s3.chemical_applied.any():
             contribution_idx = found_s3[found_s3.chemical_applied].contribution_index
-            runoff_mass, erosion_mass = np.moveaxis(time_series[[1, 3]], 2, 0)[found_s3.active].sum(axis=2).T
+            runoff_mass, erosion_mass = np.moveaxis(time_series[[1, 3]], 2, 0)[found_s3.chemical_applied].sum(axis=2).T
             runoff_cont = np.bincount(contribution_idx, weights=runoff_mass, minlength=self.n_active_crops)
             erosion_cont = np.bincount(contribution_idx, weights=erosion_mass, minlength=self.n_active_crops)
             return np.concatenate([runoff_cont, erosion_cont])

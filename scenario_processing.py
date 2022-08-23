@@ -320,7 +320,6 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                 batch_index.append(s1_index)
 
                 if len(batch) == self.sim.batch_size or (count + 1) == n_selected:
-                    print(len(batch))
                     arrays = self.sim.dask_client.gather(batch)
                     # [(vars, dates)*batch_size]
                     start_pos = batch_count * self.sim.batch_size
