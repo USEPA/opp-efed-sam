@@ -240,7 +240,6 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         self.sim = sim
         self.array_path = sim.s3_scenarios_path.format(self.sim.token)
         self.lookup = self.build_lookup(active_reaches, recipes)
-        self.n_scenarios = self.lookup.active.sum()
         self.vars = sim.fields.fetch('s3_arrays')  # runoff, runoff_mass, erosion, erosion_mass
 
         # Set dates
