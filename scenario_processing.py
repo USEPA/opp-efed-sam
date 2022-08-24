@@ -177,6 +177,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
 
             # Unpack the needed parameters from the Stage 1 scenario
             # The parameters that are fetched here can be found in fields_and_qc.csv by sorting by 's1_to_s2'
+
             s1_params = self.s1.fetch(row.s1_index, 's2')
 
             # Combine needed input parameters and add a call to the processing function (stage_one_to_two)
@@ -290,12 +291,18 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         n_selected = selected.shape[0]
 
         # Iterate scenarios
+        nochem = 0
+        badvars = 0
+        success = 0
         for count, (s1_index, scenario_id, chemical_applied) in enumerate(selected.values):
+            report(f'Submitted {count + 1} of {n_selected} scenarios...', 1)
+            report(f'')
             # self.shape = [scenarios, vars, dates]
             s2_time_series = self.s2.fetch(s1_index)  # runoff, erosion, leaching, soil_water, rain
 
             if not chemical_applied:
                 batch.append(self.sim.dask_client.submit(stage_two_to_three, *s2_time_series[:2]))
+                nochem += 1
                 continue
 
             # These fields should match the order of the parameters used by stage_two_to_three
@@ -310,16 +317,22 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                 scenario_inputs = [crop_applications.values] + sim_params + s2_time_series + s1_params
                 batch.append(self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs))
                 batch_index.append(s1_index)
+                success += 1
+            else:
+                badvars += 1
 
-                if len(batch) == self.sim.batch_size or (count + 1) == n_selected:
-                    arrays = self.sim.dask_client.gather(batch)
-                    # [(vars, dates)*batch_size]
-                    start_pos = batch_count * self.sim.batch_size
-                    self.writer[batch_index] = np.array(arrays)
-                    batch_count += 1
-                    report(f'Processed {count + 1} of {n_selected} scenarios...', 1)
-                    batch = []
-                    batch_index = []
+            if len(batch) == self.sim.batch_size or (count + 1) == n_selected:
+                arrays = self.sim.dask_client.gather(batch)
+                report(f"Processed {count + 1} of {n_selected} scenarios...")
+                report(f"Good:{success} Bad:{badvars} Nochem:{nochem}")
+
+                # [(vars, dates)*batch_size]
+                start_pos = batch_count * self.sim.batch_size
+                self.writer[batch_index] = np.array(arrays)
+                batch_count += 1
+                batch = []
+                batch_index = []
+
 
     def fetch_from_recipe(self, recipe, verbose=False):
         found = self.lookup.iloc[recipe]
