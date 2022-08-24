@@ -299,7 +299,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
             s2_time_series = self.s2.fetch(s1_index)  # runoff, erosion, leaching, soil_water, rain
 
             if not chemical_applied:
-                job = self.sim.dask_client.submit(stage_two_to_three, *s2_time_series[:2])
+                job = self.sim.dask_client.submit(pass_s2_to_s3, *s2_time_series[:2])
                 nochem += 1
             else:
                 # These fields should match the order of the parameters used by stage_two_to_three
