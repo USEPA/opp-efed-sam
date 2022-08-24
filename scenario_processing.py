@@ -295,34 +295,34 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         badvars = 0
         success = 0
         for count, (s1_index, scenario_id, chemical_applied) in enumerate(selected.values):
-            report(f"Submitted {count + 1} of {n_selected} scenarios...")
-            report(f"Good:{success} Bad:{badvars} Nochem:{nochem}")
             # self.shape = [scenarios, vars, dates]
             s2_time_series = self.s2.fetch(s1_index)  # runoff, erosion, leaching, soil_water, rain
 
             if not chemical_applied:
-                batch.append(self.sim.dask_client.submit(stage_two_to_three, *s2_time_series[:2]))
+                job = self.sim.dask_client.submit(stage_two_to_three, *s2_time_series[:2])
                 nochem += 1
-                continue
-
-            # These fields should match the order of the parameters used by stage_two_to_three
-            # Currently: [plant_date, emergence_date, maxcover_date, harvest_date, max_canopy, orgC_5, bd_5, season]
-            crop_group, *s1_params = self.s1.fetch(s1_index, 's3')
-            if not np.isnan(np.array(s1_params)).any():
-
-                # Get application information for the active crop
-                crop_applications = self.sim.applications[self.sim.applications.crop == crop_group]
-
-                # Extract stored data
-                scenario_inputs = [crop_applications.values] + sim_params + s2_time_series + s1_params
-                batch.append(self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs))
-                batch_index.append(s1_index)
-                success += 1
             else:
-                badvars += 1
+                # These fields should match the order of the parameters used by stage_two_to_three
+                # Currently: [plant_date, emergence_date, maxcover_date, harvest_date, max_canopy, orgC_5, bd_5, season]
+                crop_group, *s1_params = self.s1.fetch(s1_index, 's3')
+                if not np.isnan(np.array(s1_params)).any():
 
+                    # Get application information for the active crop
+                    crop_applications = self.sim.applications[self.sim.applications.crop == crop_group]
+
+                    # Extract stored data
+                    scenario_inputs = [crop_applications.values] + sim_params + s2_time_series + s1_params
+                    job = self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs)
+                    success += 1
+                else:
+                    report(f"Unable to process {scenario_id} due to missing data")
+                    badvars += 1
+                    continue
+            batch.append(job)
+            batch_index.append(s1_index)
             if len(batch) == self.sim.batch_size or (count + 1) == n_selected:
-                print("Submitting batch!")
+                report(f"Processed {count + 1} of {n_selected} scenarios...")
+                report(f"Good:{success} Bad:{badvars} Nochem:{nochem}")
                 arrays = self.sim.dask_client.gather(batch)
                 self.writer[batch_index] = np.array(arrays)
                 batch_count += 1
