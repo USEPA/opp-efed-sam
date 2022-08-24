@@ -183,20 +183,12 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
             scenario_inputs = time_series_data + s1_params + sim_params
 
             # In debug mode, the processing will not use Dask or occur in parallel
-            debug_mode = False
-            if not debug_mode:
-                batch.append(self.sim.dask_client.submit(stage_one_to_two, *scenario_inputs))
-                batch_index.append(row.scenario_id)
-            else:
-                if row.s1_index == 3101:
-                    results = stage_one_to_two(*scenario_inputs)
-                    results = pd.DataFrame(results.T, columns=['runoff', 'erosion', 'leaching', 'soil_water', 'rain'])
-                    results.to_csv("scenario_test1.csv")
-                    exit()
-                    runoff, erosion, leaching, soil_water, rain = map(float, results.sum(axis=1))
+            batch.append(self.sim.dask_client.submit(stage_one_to_two, *scenario_inputs))
+            batch_index.append(row.scenario_id)
 
             # Submit the batch for asynchronous processing
             # TODO - how do the weather and scenario arrays match up?
+            print(len(batch))
             if len(batch) == self.sim.batch_size or row.s1_index == self.n_scenarios:
                 results = np.float32(self.sim.dask_client.gather(batch))
                 batch_count += 1
