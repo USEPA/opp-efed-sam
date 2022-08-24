@@ -295,8 +295,8 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         badvars = 0
         success = 0
         for count, (s1_index, scenario_id, chemical_applied) in enumerate(selected.values):
-            report(f'Submitted {count + 1} of {n_selected} scenarios...', 1)
-            report(f'')
+            report(f"Submitted {count + 1} of {n_selected} scenarios...")
+            report(f"Good:{success} Bad:{badvars} Nochem:{nochem}")
             # self.shape = [scenarios, vars, dates]
             s2_time_series = self.s2.fetch(s1_index)  # runoff, erosion, leaching, soil_water, rain
 
@@ -323,11 +323,6 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
             if len(batch) == self.sim.batch_size or (count + 1) == n_selected:
                 arrays = self.sim.dask_client.gather(batch)
-                report(f"Processed {count + 1} of {n_selected} scenarios...")
-                report(f"Good:{success} Bad:{badvars} Nochem:{nochem}")
-
-                # [(vars, dates)*batch_size]
-                start_pos = batch_count * self.sim.batch_size
                 self.writer[batch_index] = np.array(arrays)
                 batch_count += 1
                 batch = []
