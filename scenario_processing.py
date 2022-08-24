@@ -322,6 +322,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                 badvars += 1
 
             if len(batch) == self.sim.batch_size or (count + 1) == n_selected:
+                print("Submitting batch!")
                 arrays = self.sim.dask_client.gather(batch)
                 self.writer[batch_index] = np.array(arrays)
                 batch_count += 1
