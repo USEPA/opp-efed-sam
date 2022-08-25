@@ -493,7 +493,8 @@ class ModelOutputs(DateManager):
             for reach_id in self.output_reaches:
                 data = pd.DataFrame(self.time_series_output.fetch(reach_id).T,
                                     self.sim.dates.astype(str), self.all_time_series)
-                upstream_time_series_dict[str(reach_id)] = data.to_dict(orient='split')
+                # TODO - filling nans with -2 here
+                upstream_time_series_dict[str(reach_id)] = data.fillna(-2).to_dict(orient='split')
         return upstream_time_series_dict
 
 
