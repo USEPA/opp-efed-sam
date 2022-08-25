@@ -422,6 +422,16 @@ class ModelOutputs(DateManager):
         self.concentrations[:] = np.random.rand(*self.concentrations.shape) * 100.
         self.exceedances[:] = np.random.rand(*self.exceedances.shape)
 
+    def replace_nan(self, value_dict):
+        """ There probably shouldn't be nans at all. Use this to find them """
+        for k, v in value_dict.items():
+            if isinstance(v, dict):
+                value_dict[k] = self.replace_nan(v)
+            elif np.isnan(v):
+                report(f"NaN value detected for {k}. Setting to -2")
+                value_dict[k] = -2
+        return value_dict
+
     def prepare_output(self):
 
         if self.sim.random:
@@ -431,6 +441,11 @@ class ModelOutputs(DateManager):
         huc_dict = self.summarize_by_huc()
         reach_dict = self.summarize_by_reach()
         intake_dict = self.summarize_by_intake()
+
+        # Detect nans
+        huc_dict = self.replace_nan(huc_dict)
+        reach_dict = self.replace_nan(reach_dict)
+        intake_dict = self.replace_nan(intake_dict)
 
         # Write output summary tables
         self.write_summary_tables()
