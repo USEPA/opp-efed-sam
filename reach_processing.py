@@ -127,13 +127,13 @@ class ReachManager(DateManager, MemoryMatrix):
         reader = self.reader
         for reach_id in reach_ids:
             reach_index = self.lookup[reach_id]
+
             # Accumulate runoff, erosion, and pesticide mass from upstream
             runoff, runoff_mass, erosion, erosion_mass = self.upstream_loading(reach_id, reach_index, reader)
 
             # Calculate the pesticide concentrations in water and get hydrology time series
             total_flow, baseflow, wc_conc, benthic_conc, runoff_conc = \
                 self.compute_concentration(reach_id, runoff, runoff_mass, erosion, erosion_mass)
-
 
             self.output.concentrations.iloc[reach_index] = \
                 np.array([wc_conc.mean(), wc_conc.max(), benthic_conc.mean(), benthic_conc.max()])
@@ -174,6 +174,9 @@ class ReachManager(DateManager, MemoryMatrix):
             reach_array = reader[index, :2].astype(np.float64)  # (reaches, vars, dates)
 
             # Stagger time series by dayshed
+            if reach_id == 5039952:
+                report(f"Daysheds for 5039952 are {np.max(reach_times)}")
+                print(reach_array.sum(axis=1))
             for tank in range(np.max(reach_times) + 1):
                 in_tank = reach_array[reach_times == tank].sum(axis=0)
                 if tank > 0:
@@ -183,6 +186,8 @@ class ReachManager(DateManager, MemoryMatrix):
                         in_tank[1] = np.convolve(in_tank[1], irf)[:self.n_dates]  # runoff mass
                     else:
                         in_tank = np.pad(in_tank[:2, :-tank], ((0, 0), (tank, 0)), mode='constant')
+                if reach_id == 5039952:
+                    print(f"Dayshed {tank}: {in_tank.sum(axis=1)}")
                 time_series[:2] += in_tank  # Add the convolved tank time series to the total for the reach
         return time_series
 
