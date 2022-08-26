@@ -104,13 +104,16 @@ class ReachManager(DateManager, MemoryMatrix):
         return time_series
 
     def process_local(self, s3, reach_ids, output_reach_ids):
-        reader = self.reader
         writer = self.writer
+        found = 0
+        not_found = 0
         for reach_id in reach_ids:
             combined = np.zeros((4, self.n_dates))
             reach_index = self.lookup[reach_id]
             for i, (year, recipe) in enumerate(self.recipes.fetch(reach_id, df=True)):
                 time_series, found_s3 = s3.fetch_from_recipe(recipe.s1_index)
+                found += found_s3.shape[0]
+                not_found += recipe.shape[0] - found_s3.shape[0]
                 time_series = self.build_time_series(time_series, self.recipe_year_index[i], recipe.area.values)
                 contributions = self.get_contributions(found_s3, time_series, reach_index)
                 time_series = time_series.sum(axis=2)
@@ -121,7 +124,7 @@ class ReachManager(DateManager, MemoryMatrix):
                     self.output.update_time_series(reach_id, time_series, 'local')
             writer[reach_index] = combined
         del writer
-        del reader
+        report(f"Sucessfully found {found} scenarios. Unable to find {not_found} of them")
 
     def process_upstream(self, reach_ids, output_reach_ids):
         reader = self.reader
