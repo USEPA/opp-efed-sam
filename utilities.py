@@ -271,6 +271,7 @@ class ModelInputs(dict):
 
         applications = pd.DataFrame(matrix, columns=app_fields)
         for col, dtype in zip(app_fields, data_types):
+            print(col, dtype)
             applications[col] = applications[col].astype(dtype)
 
         # Create a float array of the applications table for faster use
