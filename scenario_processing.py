@@ -107,6 +107,7 @@ class StageOneScenarios(MemoryMatrix):
 
     def get_active_crops(self):
         # Read the lookup table to send all active crops to the simulation
+        print(list(self.sim.selected_crops))
         user_selected_crops = \
             pd.DataFrame({self.sim.crop_group_field: list(self.sim.selected_crops)}, dtype=np.int32)
         selected = self.lookup[[self.sim.crop_group_field, 'cdl_alias']] \
