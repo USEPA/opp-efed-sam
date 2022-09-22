@@ -249,7 +249,8 @@ class ModelInputs(dict):
         # TODO - I'm sure this can be cleaned up
         # Get fields and field types
         app_fields, data_types = self.fields.fetch('applications', dtypes=True)
-
+        print(app_fields)
+        print(data_types)
         # Populate matrix
         matrix = []
         for app_num in np.arange(int(float(self['napps']))) + 1:
