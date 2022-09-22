@@ -269,7 +269,9 @@ class ModelInputs(dict):
             for field in app_fields:
                 del self[f'{field}_{app_num}']
 
-        applications = pd.DataFrame(matrix, columns=self.fields.fetch('applications'))
+        applications = pd.DataFrame(matrix, columns=app_fields)
+        for col, dtype in zip(app_fields, data_types):
+            applications[col] = applications[col].astype(dtype)
 
         # Create a float array of the applications table for faster use
         for i, row in applications.iterrows():
@@ -277,7 +279,7 @@ class ModelInputs(dict):
             applications.loc[i, 'dist'] = ['canopy', 'ground'].index(row.dist)
             applications.loc[i, 'method'] = ['uniform', 'step'].index(row.method)
 
-        return applications.astype(np.float32)
+        return applications
 
     def process_dates(self):
         date_format = lambda x: np.datetime64('{2}-{0}-{1}'.format(*x.split('/')))
