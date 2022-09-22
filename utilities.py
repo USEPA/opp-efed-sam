@@ -249,8 +249,7 @@ class ModelInputs(dict):
         # TODO - I'm sure this can be cleaned up
         # Get fields and field types
         app_fields, data_types = self.fields.fetch('applications', dtypes=True)
-        print(app_fields)
-        print(data_types)
+
         # Populate matrix
         matrix = []
         for app_num in np.arange(int(float(self['napps']))) + 1:
@@ -271,7 +270,7 @@ class ModelInputs(dict):
                 del self[f'{field}_{app_num}']
 
         applications = pd.DataFrame(matrix, columns=app_fields)
-        for col, dtype in zip(app_fields, data_types):
+        for col, dtype in data_types.items():
             print(col, dtype)
             applications[col] = applications[col].astype(dtype)
 
