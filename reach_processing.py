@@ -122,11 +122,8 @@ class ReachManager(DateManager, MemoryMatrix):
                     self.output.contributions.iloc[reach_index] += contributions
                 if reach_id in output_reach_ids:
                     self.output.update_time_series(reach_id, time_series, 'local')
-            mins = combined.min(axis=1)
-            print(mins.shape)
-            print(mins)
-            if mins.min() < 0:
-                print(mins)
+            if combined.min() < 0:
+                print(f"Negative values found in reach {reach_id}: {combined.min(axis=1)}")
             writer[reach_index] = combined
         del writer
         report(f"Sucessfully found {found} scenarios. Unable to find {not_found} of them")

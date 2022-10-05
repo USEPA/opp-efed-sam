@@ -316,7 +316,8 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
                     # Extract stored data
                     scenario_inputs = [crop_applications.values] + sim_params + s2_time_series + s1_params
-                    job = self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs)
+                    results = stage_two_to_three(*scenario_inputs)
+                    #job = self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs)
                     success += 1
                 else:
                     report(f"Unable to process {scenario_id} due to missing data")
@@ -391,6 +392,9 @@ def stage_two_to_three(application_matrix,
     if kd_flag:
         koc *= org_carbon
 
+    print(runoff.sum(), erosion.sum(), runoff.min(), erosion.min())
+    print(runoff[:100])
+    print(erosion[:100])
     # Calculate the application of pesticide to the landscape
     plant_dates = [plant_date, emergence_date, maxcover_date, harvest_date]
     application_mass = pesticide_to_field(application_matrix, new_year, plant_dates, rain)
