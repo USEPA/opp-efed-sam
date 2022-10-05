@@ -316,8 +316,8 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
                     # Extract stored data
                     scenario_inputs = [crop_applications.values] + sim_params + s2_time_series + s1_params
-                    results = stage_two_to_three(*scenario_inputs)
-                    #job = self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs)
+                    #results = stage_two_to_three(*scenario_inputs)
+                    job = self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs)
                     success += 1
                 else:
                     report(f"Unable to process {scenario_id} due to missing data")
