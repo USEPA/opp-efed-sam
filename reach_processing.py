@@ -204,7 +204,9 @@ class ReachManager(DateManager, MemoryMatrix):
         # Get local runoff, erosion, and pesticide masse
         total_flow, baseflow, (wc_conc, runoff_conc) = \
                 water_column_concentration(reach_id, runoff, runoff_mass, self.n_dates, predicted_flow)
-
+        print(123, runoff.sum(), runoff_mass.sum(), erosion.sum(), erosion_mass.sum())
+        print(234, np.isnan(np.array([runoff, runoff_mass, erosion, erosion_mass])).sum(axis=1))
+        print(345, (wc_conc < 0).sum())
         try:
             benthic_conc = benthic_concentration(
                 erosion, erosion_mass, surface_area, self.sim.benthic_depth, self.sim.benthic_porosity)

@@ -392,9 +392,9 @@ def stage_two_to_three(application_matrix,
     if kd_flag:
         koc *= org_carbon
 
-    print(runoff.sum(), erosion.sum(), runoff.min(), erosion.min())
-    print(runoff[:100])
-    print(erosion[:100])
+    erosion_nans = np.isnan(erosion).sum()
+    if erosion_nans > 0:
+        print(f"{erosion_nans} NaN values found in erosion for scenario")
     # Calculate the application of pesticide to the landscape
     plant_dates = [plant_date, emergence_date, maxcover_date, harvest_date]
     application_mass = pesticide_to_field(application_matrix, new_year, plant_dates, rain)
