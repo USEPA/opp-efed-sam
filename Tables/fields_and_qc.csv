@@ -33,7 +33,7 @@ ben_metabolism_hl,,np.float32,,,,,,1,,,,,
 benthic_conc,BenthicConc(ug/L),np.float32,,,,80,,,,,,,
 cdl_alias,,np.float32,,,,,,,,,,,40
 chemical_name,,object,,,,,,1,,,,,
-crop,,np.int3,,,,,10,,,,,,
+crop,,np.int32,,,,,10,,,,,,
 csrfmiddlewaretoken,,object,,,,,,1,,,,,
 dist,,str,,,,,40,,,,,,
 effic,,np.float32,,,,,100,,,,,,
