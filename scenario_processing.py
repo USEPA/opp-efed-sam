@@ -296,7 +296,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
         # Iterate scenarios
         nochem = 0
-        badvars = 0
+        badvars = []
         success = 0
         for count, (s1_index, scenario_id, chemical_applied) in enumerate(selected.values):
             # self.shape = [scenarios, vars, dates]
@@ -316,25 +316,26 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
                     # Extract stored data
                     scenario_inputs = [crop_applications.values] + sim_params + s2_time_series + s1_params
-                    #results = stage_two_to_three(*scenario_inputs)
+                    # results = stage_two_to_three(*scenario_inputs)
                     job = self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs)
                     success += 1
                 else:
                     report(f"Unable to process {scenario_id} due to missing data")
-                    badvars += 1
+                    job = self.sim.dask_client.submit(invalid_s2_scenario, self.n_daets)
+                    badvars.append(scenario_id)
                     continue
             batch.append(job)
             batch_index.append(s1_index)
             if len(batch) == self.sim.batch_size or (count + 1) == n_selected:
                 report(f"Processed {count + 1} of {n_selected} scenarios...")
-                report(f"Good:{success} Bad:{badvars} Nochem:{nochem}")
+                report(f"Good:{success} Bad:{len(badvars)} Nochem:{nochem}")
                 arrays = self.sim.dask_client.gather(batch)
                 self.writer[batch_index] = np.array(arrays)
                 batch_count += 1
                 batch = []
                 batch_index = []
-
-
+        badvars = "\n\t".join(badvars)
+        print(f"Unable to process the following scenarios:{badvars}")
     def fetch_from_recipe(self, recipe, verbose=False):
         found = self.lookup.iloc[recipe]
         arrays = super(StageThreeScenarios, self).fetch(found.s1_index, iloc=True, verbose=verbose)
@@ -377,6 +378,10 @@ def pass_s2_to_s3(runoff, erosion):
     out_array[0] = runoff
     out_array[2] = erosion
     return out_array
+
+
+def invalid_s2_scenario(n_dates):
+    return np.zeros([4, n_dates])
 
 
 def stage_two_to_three(application_matrix,
