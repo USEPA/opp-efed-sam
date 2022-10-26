@@ -298,6 +298,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         nochem = 0
         badvars = []
         success = 0
+        bad_combos = set()
         for count, (s1_index, scenario_id, chemical_applied) in enumerate(selected.values):
             # self.shape = [scenarios, vars, dates]
             s2_time_series = self.s2.fetch(s1_index)  # runoff, erosion, leaching, soil_water, rain
@@ -323,6 +324,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                     report(f"Unable to process {scenario_id} due to missing data")
                     job = self.sim.dask_client.submit(invalid_s2_scenario, self.n_dates)
                     badvars.append(scenario_id)
+                    bad_combos.add()
                     continue
             batch.append(job)
             batch_index.append(s1_index)
@@ -336,6 +338,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                 batch_index = []
         badvars = "\n\t".join(badvars)
         print(f"Unable to process the following scenarios:{badvars}")
+        exit()
     def fetch_from_recipe(self, recipe, verbose=False):
         found = self.lookup.iloc[recipe]
         arrays = super(StageThreeScenarios, self).fetch(found.s1_index, iloc=True, verbose=verbose)

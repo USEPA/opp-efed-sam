@@ -179,9 +179,6 @@ class ReachManager(DateManager, MemoryMatrix):
             reach_array = reader[index, :2].astype(np.float64)  # (reaches, vars, dates)
 
             # Stagger time series by dayshed
-            if reach_id == 5039952:
-                report(f"Daysheds for 5039952 are {np.max(reach_times)}")
-                print(reach_array.sum(axis=1))
             for tank in range(np.max(reach_times) + 1):
                 in_tank = reach_array[reach_times == tank].sum(axis=0)
                 if tank > 0:
@@ -207,7 +204,8 @@ class ReachManager(DateManager, MemoryMatrix):
         # TODO - why are there nans in the erosion data
         #print(234, np.isnan(np.array([runoff, runoff_mass, erosion, erosion_mass])).sum(axis=1))
         negative_concs = (wc_conc < 0).sum()
-        print(345, negative_concs)
+        if negative_concs > 0:
+            print(f"{negative_concs} negative concentrations found")
 
         try:
             benthic_conc = benthic_concentration(
