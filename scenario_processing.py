@@ -324,7 +324,6 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                     report(f"Unable to process {scenario_id} due to missing data")
                     job = self.sim.dask_client.submit(invalid_s2_scenario, self.n_dates)
                     badvars.append(scenario_id)
-                    bad_combos.add()
                     continue
             batch.append(job)
             batch_index.append(s1_index)
