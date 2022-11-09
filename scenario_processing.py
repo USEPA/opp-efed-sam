@@ -337,7 +337,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                 batch_index = []
         badvars = "\n\t".join(badvars)
         print(f"Unable to process the following scenarios:{badvars}")
-        exit()
+
     def fetch_from_recipe(self, recipe, verbose=False):
         found = self.lookup.iloc[recipe]
         arrays = super(StageThreeScenarios, self).fetch(found.s1_index, iloc=True, verbose=verbose)
