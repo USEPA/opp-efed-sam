@@ -418,7 +418,10 @@ def stage_two_to_three(application_matrix,
     # Calculate the application of pesticide to the landscape
     plant_dates = [plant_date, emergence_date, maxcover_date, harvest_date]
     application_mass = pesticide_to_field(application_matrix, new_year, plant_dates, rain)
-
+    print(55555555)
+    print(application_mass.min())
+    for i, (plant, foliar) in enumerate(application_mass.T):
+        print(i, plant, foliar)
     # Calculate plant factor (could have this info for s2 scenarios, but if it's quick then it saves space)
     plant_factor = plant_growth(runoff.size, new_year, plant_date, emergence_date, maxcover_date, harvest_date)
 
