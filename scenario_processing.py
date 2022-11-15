@@ -298,7 +298,6 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         nochem = 0
         badvars = []
         success = 0
-        bad_combos = set()
         for count, (s1_index, scenario_id, chemical_applied) in enumerate(selected.values):
             # self.shape = [scenarios, vars, dates]
             s2_time_series = self.s2.fetch(s1_index)  # runoff, erosion, leaching, soil_water, rain
@@ -318,26 +317,14 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                     # Extract stored data
                     scenario_inputs = [crop_applications.values] + sim_params + s2_time_series + s1_params
                     # Turn this on for testing
-                    results = stage_two_to_three(*scenario_inputs)
-                    if results.min() < 0:
-                        print(f"Negative values detected for {scenario_id}")
-                        print(111111)
-                        print(crop_applications.values)
-                        print(2222222)
-                        print(sim_params)
-                        print(333333333)
-                        for val in s2_time_series:
-                            print(val.min())
-                        print(4444444)
-                        print(s1_params)
-                        exit()
+                    #results = stage_two_to_three(*scenario_inputs)
                     job = self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs)
                     success += 1
                 else:
                     report(f"Unable to process {scenario_id} due to missing data")
-                    job = self.sim.dask_client.submit(invalid_s2_scenario, self.n_dates)
+                    # TODO - do i bother with this, or just continue?
+                    job = self.sim.dask_client.submit(invalid_s2_scenario, s2_time_series)
                     badvars.append(scenario_id)
-                    continue
             batch.append(job)
             batch_index.append(s1_index)
             if len(batch) == self.sim.batch_size or (count + 1) == n_selected:
@@ -348,7 +335,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                 batch_count += 1
                 batch = []
                 batch_index = []
-        badvars = "\n\t".join(badvars)
+        badvars = ",".join(badvars)
         print(f"Unable to process the following scenarios:{badvars}")
 
     def fetch_from_recipe(self, recipe, verbose=False):
@@ -395,9 +382,12 @@ def pass_s2_to_s3(runoff, erosion):
     return out_array
 
 
-def invalid_s2_scenario(n_dates):
-    return np.zeros([4, n_dates])
-
+def invalid_s2_scenario(s2_time_series):
+    runoff, erosion = s2_time_series[:2]
+    output = np.zeros([4, len(runoff)])
+    output[0] = runoff
+    output[2] = erosion
+    return output
 
 def stage_two_to_three(application_matrix,
                        runoff_effic, erosion_effic, surface_dx, cm_2, soil_depth, deg_foliar,

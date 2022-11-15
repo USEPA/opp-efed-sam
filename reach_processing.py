@@ -112,11 +112,16 @@ class ReachManager(DateManager, MemoryMatrix):
             reach_index = self.lookup[reach_id]
             for i, (year, recipe) in enumerate(self.recipes.fetch(reach_id, df=True)):
                 time_series, found_s3 = s3.fetch_from_recipe(recipe.s1_index)
+                init_size = time_series.shape
                 found += found_s3.shape[0]
                 not_found += recipe.shape[0] - found_s3.shape[0]
                 time_series = self.build_time_series(time_series, self.recipe_year_index[i], recipe.area.values)
                 contributions = self.get_contributions(found_s3, time_series, reach_index)
-                combined += time_series
+                try:
+                    combined += time_series
+                except Exception as e:
+                    print(combined.shape, init_size, time_series.shape)
+                    raise e
                 if contributions is not None:
                     self.output.contributions.iloc[reach_index] += contributions
                 if reach_id in output_reach_ids:
