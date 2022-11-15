@@ -120,6 +120,7 @@ class ReachManager(DateManager, MemoryMatrix):
                 try:
                     combined += time_series
                 except Exception as e:
+                    print("Failing")
                     print(combined.shape, init_size, time_series.shape)
                     raise e
                 if contributions is not None:
