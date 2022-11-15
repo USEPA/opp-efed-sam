@@ -50,7 +50,8 @@ def field_to_soil(application_mass, rain, plant_factor, soil_2cm, foliar_degrada
                 pesticide_mass_soil[day] += (application_mass[1, day] - canopy_pesticide_additions) * soil_2cm
                 if pesticide_mass_soil[day] < 0:
                     print(1000001010101)
-                    for var in ('application_mass[0, day], application_mass[1, day], canopy_pesticide_additions, plant_factor[day], covmax, soil_2cm'):
+                    for var in ('application_mass[0, day]', 'application_mass[1, day]', 'canopy_pesticide_additions',
+                                'plant_factor[day]', 'covmax', 'soil_2cm'):
                         val = eval(var)
                         print(var, val)
                 canopy_mass = canopy_pesticide_additions + \
@@ -92,7 +93,7 @@ def soil_to_water(pesticide_mass_soil, runoff, erosion, leaching, bulk_density, 
             runoff_mass[day] = average_conc * daily_runoff  # runoff
         elif runoff[day] < 0:
             for var in (
-                    'daily_runoff', 'degradation_rate', 'deg_total','leaching[day]', 'retardation'):
+                    'daily_runoff', 'degradation_rate', 'deg_total', 'leaching[day]', 'retardation'):
                 val = eval(var)
                 if val < 0:
                     print(9999999, var, val)
