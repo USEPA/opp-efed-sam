@@ -44,10 +44,11 @@ def field_to_soil(application_mass, rain, plant_factor, soil_2cm, foliar_degrada
             if application_mass[1, day] > 0:  # Pesticide applied to canopy on this day
 
                 # Amount of pesticide intercepted by canopy
-                canopy_pesticide_additions = application_mass[1, day] * plant_factor[day] * covmax
+                canopy_pesticide_additions = application_mass[1, day] * plant_factor[day] * (covmax / 100.)
 
                 # Add non-intercepted pesticide to soil
                 pesticide_mass_soil[day] += (application_mass[1, day] - canopy_pesticide_additions) * soil_2cm
+
                 if pesticide_mass_soil[day] < 0:
                     print(1000001010101)
                     for var in ('application_mass[0, day]', 'application_mass[1, day]', 'canopy_pesticide_additions',
