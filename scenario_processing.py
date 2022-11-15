@@ -317,7 +317,20 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
                     # Extract stored data
                     scenario_inputs = [crop_applications.values] + sim_params + s2_time_series + s1_params
-                    # results = stage_two_to_three(*scenario_inputs)
+                    # Turn this on for testing
+                    results = stage_two_to_three(*scenario_inputs)
+                    if results.min() < 0:
+                        print(f"Negative values detected for {scenario_id}")
+                        print(111111)
+                        print(crop_applications.values)
+                        print(2222222)
+                        print(sim_params)
+                        print(333333333)
+                        for val in s2_time_series:
+                            print(val.min())
+                        print(4444444)
+                        print(s1_params)
+                        exit()
                     job = self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs)
                     success += 1
                 else:

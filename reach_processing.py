@@ -116,7 +116,6 @@ class ReachManager(DateManager, MemoryMatrix):
                 not_found += recipe.shape[0] - found_s3.shape[0]
                 time_series = self.build_time_series(time_series, self.recipe_year_index[i], recipe.area.values)
                 contributions = self.get_contributions(found_s3, time_series, reach_index)
-                time_series = time_series.sum(axis=2)
                 combined += time_series
                 if contributions is not None:
                     self.output.contributions.iloc[reach_index] += contributions
