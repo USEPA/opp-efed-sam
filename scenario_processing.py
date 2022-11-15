@@ -418,17 +418,29 @@ def stage_two_to_three(application_matrix,
     # Calculate the application of pesticide to the landscape
     plant_dates = [plant_date, emergence_date, maxcover_date, harvest_date]
     application_mass = pesticide_to_field(application_matrix, new_year, plant_dates, rain)
-    print(55555555)
-    print(application_mass.min())
-    for i, (plant, foliar) in enumerate(application_mass.T):
-        print(i, plant, foliar)
+
+    if application_mass.min() < 0:
+        print(55555555)
+        print(application_mass.min())
+        for i, (plant, foliar) in enumerate(application_mass.T):
+            if plant < 0 or foliar < 0:
+                print(i, plant, foliar)
     # Calculate plant factor (could have this info for s2 scenarios, but if it's quick then it saves space)
     plant_factor = plant_growth(runoff.size, new_year, plant_date, emergence_date, maxcover_date, harvest_date)
-
+    if plant_factor.min() < 0:
+        print(6666666666)
+        for i, pf in enumerate(plant_factor):
+            if pf < 0:
+                print(i, pf)
     # Calculate the daily mass of applied pesticide that reaches the soil (crop intercept, runoff)
     pesticide_mass_soil = field_to_soil(application_mass, rain, plant_factor, cm_2,
                                         deg_foliar, washoff_coeff, covmax)
-
+    if pesticide_mass_soil.min() < 0:
+        if pesticide_mass_soil.min() < 0:
+            print(777777777777)
+            for i, pf in enumerate(pesticide_mass_soil):
+                if pf < 0:
+                    print(i, pf)
     # Determine the loading of pesticide into runoff and eroded sediment
     # Also need to add deg_soil, deg_benthic here - NT 8/28/18
     runoff_mass, erosion_mass = \

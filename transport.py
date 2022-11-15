@@ -84,7 +84,13 @@ def soil_to_water(pesticide_mass_soil, runoff, erosion, leaching, bulk_density, 
             degradation_rate = np.exp(-deg_soil)
         average_conc = ((total_mass / retardation / delta_x) / deg_total) * (1 - degradation_rate)
         if runoff[day] > 0:
-            runoff_mass[day] = average_conc * daily_runoff  # runoff
+            for var in (
+                    'daily_runoff', 'degradation_rate', 'pesticide_mass_soil[day]', 'total_mass', 'deg_total',
+                    'leaching[day]', 'retardation', 'average_conc'):
+                val = eval(var)
+                if val < 0:
+                    print(9999999, var, val)
+                runoff_mass[day] = average_conc * daily_runoff  # runoff
         if erosion[day] > 0:
             enrich = np.exp(2.0 - (0.2 * np.log10(erosion[day])))
             enriched_eroded_mass = erosion[day] * enrich * kd * erosion_intensity * 0.1
