@@ -96,11 +96,12 @@ class ReachManager(DateManager, MemoryMatrix):
             erosion_cont = np.bincount(contribution_idx, weights=erosion_mass, minlength=self.n_active_crops)
             return np.concatenate([runoff_cont, erosion_cont])
 
-    def build_time_series(self, time_series, year_index, area):
+    def adjust_time_series(self, time_series, year_index, area):
         time_series *= year_index  # Only keep the data for dates where this recipe year is used
         time_series = np.moveaxis(time_series, 0, 2)  # (scenarios, vars, dates) -> (vars, dates, scenarios)
         time_series[:2] *= area
         time_series[2:] *= np.power(area / 10000., .12)
+        time_series = time_series.sum(axis=2)
         return time_series
 
     def process_local(self, s3, reach_ids, output_reach_ids):
@@ -111,18 +112,12 @@ class ReachManager(DateManager, MemoryMatrix):
             combined = np.zeros((4, self.n_dates))
             reach_index = self.lookup[reach_id]
             for i, (year, recipe) in enumerate(self.recipes.fetch(reach_id, df=True)):
-                time_series, found_s3 = s3.fetch_from_recipe(recipe.s1_index)
-                init_size = time_series.shape
+                raw_time_series, found_s3 = s3.fetch_from_recipe(recipe.s1_index)
                 found += found_s3.shape[0]
                 not_found += recipe.shape[0] - found_s3.shape[0]
-                time_series = self.build_time_series(time_series, self.recipe_year_index[i], recipe.area.values)
+                time_series = self.adjust_time_series(raw_time_series, self.recipe_year_index[i], recipe.area.values)
                 contributions = self.get_contributions(found_s3, time_series, reach_index)
-                try:
-                    combined += time_series
-                except Exception as e:
-                    print("Failing")
-                    print(combined.shape, init_size, time_series.shape)
-                    raise e
+                combined += time_series
                 if contributions is not None:
                     self.output.contributions.iloc[reach_index] += contributions
                 if reach_id in output_reach_ids:
