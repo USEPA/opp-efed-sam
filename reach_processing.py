@@ -101,7 +101,6 @@ class ReachManager(DateManager, MemoryMatrix):
         time_series = np.moveaxis(time_series, 0, 2)  # (scenarios, vars, dates) -> (vars, dates, scenarios)
         time_series[:2] *= area
         time_series[2:] *= np.power(area / 10000., .12)
-        time_series = time_series.sum(axis=2)
         return time_series
 
     def process_local(self, s3, reach_ids, output_reach_ids):
@@ -117,7 +116,7 @@ class ReachManager(DateManager, MemoryMatrix):
                 not_found += recipe.shape[0] - found_s3.shape[0]
                 time_series = self.adjust_time_series(raw_time_series, self.recipe_year_index[i], recipe.area.values)
                 contributions = self.get_contributions(found_s3, time_series, reach_index)
-                combined += time_series
+                combined += time_series.sum(axis=2)
                 if contributions is not None:
                     self.output.contributions.iloc[reach_index] += contributions
                 if reach_id in output_reach_ids:
