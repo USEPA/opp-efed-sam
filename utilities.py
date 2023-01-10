@@ -30,7 +30,7 @@ class Simulation(DateManager):
 
         # Read the hardwired parameters
         self.__dict__.update(self.initialize_parameters())
-        print(self.region)
+        #rint(self.region)
         # Initialize field manager
         self.fields = FieldManager(self.fields_and_qc_path)
 
