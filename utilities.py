@@ -62,6 +62,7 @@ class Simulation(DateManager):
 
         # TODO - placeholder for when running multiple regions is enabled in the frontend
         self.run_regions = [self.region]
+        self.run_regions = list(map(self.format_region, self.run_regions))
 
         # Read token
         self.token = \
@@ -215,6 +216,13 @@ class Simulation(DateManager):
         for var, dirname, basename in table.values:
             paths[f'{var}_path'] = os.path.join(paths[dirname], basename)
         return paths
+
+    @staticmethod
+    def format_region(r):
+        if set("NSEWUL") & set(r):
+            return r
+        else:
+            return str(int(float(r))).zfill(2)
 
     @property
     def n_active_crops(self):
@@ -383,10 +391,10 @@ class ModelOutputs(DateManager):
         if self.run_time_series:
             out_dict = {}
             out_table = self.exceedances.join(self.concentrations)
-            out_table = pd.Series(self.output_reaches, name='comid')\
-                .to_frame()\
-                .set_index('comid')\
-                .join(out_table)\
+            out_table = pd.Series(self.output_reaches, name='comid') \
+                .to_frame() \
+                .set_index('comid') \
+                .join(out_table) \
                 .fillna(-1)
             out_dict['comid'] = out_table.T.to_dict()
         return out_dict

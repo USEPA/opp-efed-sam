@@ -296,7 +296,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
         # Iterate scenarios
         nochem = 0
-        badvars = []
+        badvars = set()
         success = 0
         for count, (s1_index, scenario_id, chemical_applied) in enumerate(selected.values):
             # self.shape = [scenarios, vars, dates]
@@ -324,7 +324,8 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                     report(f"Unable to process {scenario_id} due to missing data")
                     # TODO - do i bother with this, or just continue?
                     job = self.sim.dask_client.submit(invalid_s2_scenario, s2_time_series)
-                    badvars.append(scenario_id)
+                    soil, weather, landcover = scenario_id.split("-")
+                    badvars.add((weather, landcover))
             batch.append(job)
             batch_index.append(s1_index)
             if len(batch) == self.sim.batch_size or (count + 1) == n_selected:
