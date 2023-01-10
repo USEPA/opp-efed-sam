@@ -24,14 +24,13 @@ class Simulation(DateManager):
         # Determine whether the simulation is being run on a windows desktop (local for epa devs)
         self.local_run = any([r'C:' in p for p in sys.path])
         print(input_json)
-        print(self.region)
 
         # Add paths
         self.__dict__.update(self.initialize_paths())
 
         # Read the hardwired parameters
         self.__dict__.update(self.initialize_parameters())
-
+        print(self.region)
         # Initialize field manager
         self.fields = FieldManager(self.fields_and_qc_path)
 
