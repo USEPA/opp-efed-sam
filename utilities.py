@@ -23,14 +23,13 @@ class Simulation(DateManager):
         # TODO - confirm that everything works as intended here, esp. for eco runs
         # Determine whether the simulation is being run on a windows desktop (local for epa devs)
         self.local_run = any([r'C:' in p for p in sys.path])
-        print(input_json)
 
         # Add paths
         self.__dict__.update(self.initialize_paths())
 
         # Read the hardwired parameters
         self.__dict__.update(self.initialize_parameters())
-        #rint(self.region)
+
         # Initialize field manager
         self.fields = FieldManager(self.fields_and_qc_path)
 
@@ -50,6 +49,7 @@ class Simulation(DateManager):
 
         # TODO - get rid of MTB at the frontend?
         # Unpack the 'simulation_name' parameter to detect if a special run is called for
+        self.region = self.format_region(self.region)
         self.build_scenarios, self.random, self.tag, self.confine_reaches = self.detect_special_run()
 
         # Initialize dates
@@ -63,7 +63,7 @@ class Simulation(DateManager):
 
         # TODO - placeholder for when running multiple regions is enabled in the frontend
         self.run_regions = [self.region]
-        self.run_regions = list(map(self.format_region, self.run_regions))
+
         print(self.run_regions)
         # Read token
         self.token = \

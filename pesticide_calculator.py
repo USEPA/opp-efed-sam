@@ -15,6 +15,7 @@ def pesticide_calculator(input_data):
 
     # Iterate through each hydroregion that encompasses the run
     for region_id in sim.run_regions:
+        print(f"region id: {region_id}")
 
         # Initialize a weather file reader
         met = WeatherArray(sim)
