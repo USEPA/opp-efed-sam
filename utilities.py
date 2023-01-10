@@ -220,10 +220,10 @@ class Simulation(DateManager):
 
     @staticmethod
     def format_region(r):
-        if set("NSEWUL") & set(r):
-            return r
-        else:
+        try:
             return str(int(float(r))).zfill(2)
+        except:
+            return r
 
     @property
     def n_active_crops(self):
