@@ -325,7 +325,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                     # TODO - do i bother with this, or just continue?
                     job = self.sim.dask_client.submit(invalid_s2_scenario, s2_time_series)
                     soil, weather, landcover = scenario_id.split("-")
-                    badvars.add((weather, landcover))
+                    badvars.add(f"{weather}, {landcover}")
             batch.append(job)
             batch_index.append(s1_index)
             if len(batch) == self.sim.batch_size or (count + 1) == n_selected:
