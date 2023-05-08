@@ -64,7 +64,6 @@ class Simulation(DateManager):
         # TODO - placeholder for when running multiple regions is enabled in the frontend
         self.run_regions = [self.region]
 
-        print(self.run_regions)
         # Read token
         self.token = \
             self.simulation_name if not hasattr(self, 'csrfmiddlewaretoken') else self.csrfmiddlewaretoken
