@@ -11,9 +11,6 @@ from .scenario_processing import StageOneScenarios, StageTwoScenarios, StageThre
 
 def pesticide_calculator(input_data):
     import sys
-    print(sys.executable)
-    with open("test_file.txt") as f:
-        f.write("hello")
 
     # Initialize a class with all the simulation parameters (input data, field names, hardwired parameters, dates etc)
     sim = Simulation(input_data)

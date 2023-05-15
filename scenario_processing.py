@@ -182,7 +182,7 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
             s1_params = self.s1.fetch(row.s1_index, 's2')
             print(f"S1_params for scenario {row.s1_index}")
             print(s1_params)
-            
+
             # Combine needed input parameters and add a call to the processing function (stage_one_to_two)
             scenario_inputs = time_series_data + s1_params + sim_params
 
