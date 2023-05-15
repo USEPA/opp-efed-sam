@@ -231,7 +231,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         self.s2 = stage_two
         self.sim = sim
         self.array_path = sim.s3_scenarios_path.format(self.sim.token)
-        print(self.sim.array_path)
+        self.sample_path = os.path.join(os.path.dirname(self.array_path), "{}_s{}.csv")
         self.lookup = self.build_lookup(active_reaches, recipes)
         self.vars = sim.fields.fetch('s3_arrays')  # runoff, runoff_mass, erosion, erosion_mass
 
@@ -318,7 +318,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                     # Turn this on for testing
                     if sample_row is not None and sample_row == count:
                         results = stage_two_to_three(*scenario_inputs) # np.array([runoff, runoff_mass, erosion, erosion_mass])
-                        write_sample(scenario_id, s1_params, s2_time_series, results)
+                        write_sample(scenario_id, s1_params, s2_time_series, results, self.sample_path)
 
                     job = self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs)
                     success += 1
@@ -378,17 +378,16 @@ def stage_one_to_two(precip, pet, temp, new_year,  # weather params
     # Output array order is specified in fields_and_qc.py
     return np.array([runoff, erosion, leaching, soil_water, rain])
 
-def write_sample(scenario_id, s1, s2, s3):
+def write_sample(scenario_id, s1, s2, s3, out_path):
     s1_names = ["plant_date", "emergence_date", "maxcover_date", "harvest_date", "max_canopy",
                 "orgC_5", "bd_5", "season"]
     s2_names = ["runoff", "erosion", "leaching", "soil_water", "rain"]
     s3_names = ['runoff', 'runoff_mass', 'erosion', 'erosion_mass']
 
-    out_path = f"/src/opp-efed-sam/{scenario_id}_s{{}}.csv"
-    print(f"Saving sample scenario to {out_path}")
-    pd.DataFrame({s1_names[i]: [val] for i, val in enumerate(s1)}).T.to_csv(out_path.format(1))
-    pd.DataFrame(s2, columns=s2_names).to_csv(out_path.format(2))
-    pd.DataFrame(s3, columns=s3_names).to_csv(out_path.format(3))
+    print(f"Saving sample scenario to {out_path.format(scenario_id, 'x')}")
+    pd.DataFrame({s1_names[i]: [val] for i, val in enumerate(s1)}).T.to_csv(scenario_id, out_path.format(1))
+    pd.DataFrame(s2, columns=s2_names).to_csv(scenario_id, out_path.format(2))
+    pd.DataFrame(s3, columns=s3_names).to_csv(scenario_id, out_path.format(3))
 
 def pass_s2_to_s3(runoff, erosion):
     out_array = np.zeros((4, runoff.size), dtype=np.float64)
