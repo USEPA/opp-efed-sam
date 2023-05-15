@@ -383,7 +383,7 @@ def write_sample(scenario_id, s1, s2, s3):
     s2_names = ["runoff", "erosion", "leaching", "soil_water", "rain"]
     s3_names = ['runoff', 'runoff_mass', 'erosion', 'erosion_mass']
 
-    out_path = f"/home/ec2-user/opp-efed-sam/{scenario_id}_s{{}}.csv"
+    out_path = f"/src/opp-efed-sam/{scenario_id}_s{{}}.csv"
     print(f"Saving sample scenario to {out_path}")
     pd.DataFrame({s1_names[i]: [val] for i, val in enumerate(s1)}).T.to_csv(out_path.format(1))
     pd.DataFrame(s2, columns=s2_names).to_csv(out_path.format(2))
