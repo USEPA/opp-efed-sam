@@ -11,7 +11,7 @@ from .transport import pesticide_to_field, field_to_soil, soil_to_water
 from .utilities import report
 
 # For QAQC or debugging purposes - write the nth scenario from each batch to file (turn off with None)
-sample_row = None  # 17
+sample_row = 17
 
 """
 Scenario indexing:
@@ -107,7 +107,6 @@ class StageOneScenarios(MemoryMatrix):
 
     def get_active_crops(self):
         # Read the lookup table to send all active crops to the simulation
-        print(list(self.sim.selected_crops))
         user_selected_crops = \
             pd.DataFrame({self.sim.crop_group_field: list(self.sim.selected_crops)}, dtype=np.int32)
         selected = self.lookup[[self.sim.crop_group_field, 'cdl_alias']] \
@@ -180,8 +179,6 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
             # The parameters that are fetched here can be found in fields_and_qc.csv by sorting by 's1_to_s2'
 
             s1_params = self.s1.fetch(row.s1_index, 's2')
-            print(f"S1_params for scenario {row.s1_index}")
-            print(s1_params)
 
             # Combine needed input parameters and add a call to the processing function (stage_one_to_two)
             scenario_inputs = time_series_data + s1_params + sim_params
@@ -192,14 +189,13 @@ class StageTwoScenarios(DateManager, MemoryMatrix):
 
             # Submit the batch for asynchronous processing
             # TODO - how do the weather and scenario arrays match up?
-            print(len(batch))
             if len(batch) == self.sim.batch_size or row.s1_index == self.n_scenarios:
                 results = np.float32(self.sim.dask_client.gather(batch))
                 batch_count += 1
                 start_pos = (batch_count - 1) * self.sim.batch_size
                 self.writer[start_pos:start_pos + results.shape[0]] = results
                 report(f'Processed {row.s1_index + 1} of {self.n_scenarios} scenarios', 1)
-                # write_sample(self.dates, self.sim, results, batch_index)
+                #write_sample(self.dates, self.sim, results, batch_index)
                 batch = []
                 batch_index = []
 
@@ -267,7 +263,6 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         lookup = self.s1.lookup
 
         # Create a simple numeric index for each crop type. Crops receiving chemical are active
-        print(f"active crops: {self.sim.active_crops}")
         lookup['contribution_index'] = lookup.cdl_alias.map({val: i for i, val in enumerate(self.sim.active_crops)})
         lookup['chemical_applied'] = lookup['contribution_index'].notna()
 
@@ -318,8 +313,12 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
 
                     # Extract stored data
                     scenario_inputs = [crop_applications.values] + sim_params + s2_time_series + s1_params
+
                     # Turn this on for testing
-                    #results = stage_two_to_three(*scenario_inputs)
+                    if sample_row is not None and sample_row == count:
+                        results = stage_two_to_three(*scenario_inputs) # np.array([runoff, runoff_mass, erosion, erosion_mass])
+                        write_sample(scenario_id, s1_params, s2_time_series, results)
+
                     job = self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs)
                     success += 1
                 else:
@@ -328,6 +327,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                     job = self.sim.dask_client.submit(invalid_s2_scenario, s2_time_series)
                     soil, weather, landcover = scenario_id.split("-")
                     badvars.add(f"{weather}, {landcover}")
+
             batch.append(job)
             batch_index.append(s1_index)
             if len(batch) == self.sim.batch_size or (count + 1) == n_selected:
@@ -377,6 +377,16 @@ def stage_one_to_two(precip, pet, temp, new_year,  # weather params
     # Output array order is specified in fields_and_qc.py
     return np.array([runoff, erosion, leaching, soil_water, rain])
 
+def write_sample(scenario_id, s1, s2, s3):
+    s1_names = ["plant_date", "emergence_date", "maxcover_date", "harvest_date", "max_canopy",
+                "orgC_5", "bd_5", "season"]
+    s2_names = ["runoff", "erosion", "leaching", "soil_water", "rain"]
+    s3_names = ['runoff', 'runoff_mass', 'erosion', 'erosion_mass']
+
+    print(f"Saving sample scenario {scenario_id} to {os.path.join(os.getcwd(), scenario_id)}")
+    pd.DataFrame({s1_names[i]: val for i, val in enumerate(s1)}).T.to_csv(f"{scenario_id}_s1.csv")
+    pd.DataFrame(s2, columns=s2_names).to_csv(f"{scenario_id}_s2.csv")
+    pd.DataFrame(s3, columns=s3_names).to_csv(f"{scenario_id}_s3.csv")
 
 def pass_s2_to_s3(runoff, erosion):
     out_array = np.zeros((4, runoff.size), dtype=np.float64)
@@ -412,28 +422,13 @@ def stage_two_to_three(application_matrix,
     plant_dates = [plant_date, emergence_date, maxcover_date, harvest_date]
     application_mass = pesticide_to_field(application_matrix, new_year, plant_dates, rain)
 
-    if application_mass.min() < 0:
-        print(55555555)
-        print(application_mass.min())
-        for i, (plant, foliar) in enumerate(application_mass.T):
-            if plant < 0 or foliar < 0:
-                print(i, plant, foliar)
     # Calculate plant factor (could have this info for s2 scenarios, but if it's quick then it saves space)
     plant_factor = plant_growth(runoff.size, new_year, plant_date, emergence_date, maxcover_date, harvest_date)
-    if plant_factor.min() < 0:
-        print(6666666666)
-        for i, pf in enumerate(plant_factor):
-            if pf < 0:
-                print(i, pf)
+
     # Calculate the daily mass of applied pesticide that reaches the soil (crop intercept, runoff)
     pesticide_mass_soil = field_to_soil(application_mass, rain, plant_factor, cm_2,
                                         deg_foliar, washoff_coeff, covmax)
-    if pesticide_mass_soil.min() < 0:
-        if pesticide_mass_soil.min() < 0:
-            print(777777777777)
-            for i, pf in enumerate(pesticide_mass_soil):
-                if pf < 0:
-                    print(i, pf)
+
     # Determine the loading of pesticide into runoff and eroded sediment
     # Also need to add deg_soil, deg_benthic here - NT 8/28/18
     runoff_mass, erosion_mass = \

@@ -187,8 +187,6 @@ class ReachManager(DateManager, MemoryMatrix):
                         in_tank[1] = np.convolve(in_tank[1], irf)[:self.n_dates]  # runoff mass
                     else:
                         in_tank = np.pad(in_tank[:2, :-tank], ((0, 0), (tank, 0)), mode='constant')
-                if reach_id == 5039952:
-                    print(f"Dayshed {tank}: {in_tank.sum(axis=1)}")
                 time_series[:2] += in_tank  # Add the convolved tank time series to the total for the reach
         return time_series
 
