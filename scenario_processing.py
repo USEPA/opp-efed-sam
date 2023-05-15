@@ -384,7 +384,7 @@ def write_sample(scenario_id, s1, s2, s3):
     s3_names = ['runoff', 'runoff_mass', 'erosion', 'erosion_mass']
 
     print(f"Saving sample scenario {scenario_id} to {os.path.join(os.getcwd(), scenario_id)}")
-    pd.DataFrame({s1_names[i]: val for i, val in enumerate(s1)}).T.to_csv(f"{scenario_id}_s1.csv")
+    pd.DataFrame({s1_names[i]: [val] for i, val in enumerate(s1)}).T.to_csv(f"{scenario_id}_s1.csv")
     pd.DataFrame(s2, columns=s2_names).to_csv(f"{scenario_id}_s2.csv")
     pd.DataFrame(s3, columns=s3_names).to_csv(f"{scenario_id}_s3.csv")
 
