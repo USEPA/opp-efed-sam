@@ -211,6 +211,7 @@ class Simulation(DateManager):
         else:
             paths['data_root'] = os.getenv('SAM_INPUTS_DIR', r'/src/app-data/sampreprocessed')
         paths['local_root'] = pathlib.Path(__file__).parent.absolute()
+        print(f"Local path is {paths['data_root']}")
         paths_table = os.path.join(paths['local_root'], 'Tables', 'paths.csv')
         table = pd.read_csv(paths_table).sort_values('level')[['var', 'dir', 'base']]
         for var, dirname, basename in table.values:
