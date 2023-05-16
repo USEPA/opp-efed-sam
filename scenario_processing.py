@@ -386,8 +386,8 @@ def write_sample(scenario_id, s1, s2, s3, out_path):
 
     print(f"Saving sample scenario to {out_path.format(scenario_id, 'x')}")
     pd.DataFrame({s1_names[i]: [val] for i, val in enumerate(s1)}).T.to_csv(out_path.format(scenario_id, 1))
-    pd.DataFrame(s2.T, columns=s2_names).to_csv(out_path.format(scenario_id, 2))
-    pd.DataFrame(s3.T, columns=s3_names).to_csv(out_path.format(scenario_id, 3))
+    pd.DataFrame(np.array(s2).T, columns=s2_names).to_csv(out_path.format(scenario_id, 2))
+    pd.DataFrame(np.array(s3).T, columns=s3_names).to_csv(out_path.format(scenario_id, 3))
 
 def pass_s2_to_s3(runoff, erosion):
     out_array = np.zeros((4, runoff.size), dtype=np.float64)
