@@ -11,7 +11,8 @@ from .transport import pesticide_to_field, field_to_soil, soil_to_water
 from .utilities import report
 
 # For QAQC or debugging purposes - write the nth scenario from each batch to file (turn off with None)
-sample_row = 17
+sample_row = 22
+sample_scenario = None
 
 """
 Scenario indexing:
@@ -231,7 +232,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
         self.s2 = stage_two
         self.sim = sim
         self.array_path = sim.s3_scenarios_path.format(self.sim.token)
-        self.sample_path = os.path.join(os.path.dirname(self.array_path), "{}_s{}.csv")
+        self.sample_path = os.path.join(os.path.dirname(self.array_path), "sample_{}_s{}.csv")
         self.lookup = self.build_lookup(active_reaches, recipes)
         self.vars = sim.fields.fetch('s3_arrays')  # runoff, runoff_mass, erosion, erosion_mass
 
@@ -316,7 +317,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                     scenario_inputs = [crop_applications.values] + sim_params + s2_time_series + s1_params
 
                     # Turn this on for testing
-                    if sample_row is not None and sample_row == count:
+                    if (sample_row == count) or (sample_scenario == scenario_id):
                         results = stage_two_to_three(*scenario_inputs) # np.array([runoff, runoff_mass, erosion, erosion_mass])
                         write_sample(scenario_id, s1_params, s2_time_series, results, self.sample_path)
 
