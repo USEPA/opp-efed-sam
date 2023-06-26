@@ -320,7 +320,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                     if (sample_row == count) or (sample_scenario == scenario_id):
                         results = stage_two_to_three(*scenario_inputs) # np.array([runoff, runoff_mass, erosion, erosion_mass])
                         s1_params = self.s1.fetch(s1_index, 's2')
-                        s1_names = list(self.sim.fields.fetch('s1_to_s3'))
+                        s1_names = list(self.sim.fields.fetch('s1_to_s2'))
                         write_sample(scenario_id, s1_params, s2_time_series, results, s1_names, self.sample_path)
 
                     job = self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs)
@@ -384,7 +384,8 @@ def stage_one_to_two(precip, pet, temp, new_year,  # weather params
 def write_sample(scenario_id, s1, s2, s3, s1_names, out_path):
     s2_names = ["runoff", "erosion", "leaching", "soil_water", "rain"]
     s3_names = ['runoff', 'runoff_mass', 'erosion', 'erosion_mass']
-
+    print(len(s1), len(s1_names))
+    print(s1_names)
     print(f"Saving sample scenario to {out_path.format(scenario_id, 'x')}")
     pd.DataFrame({s1_names[i]: [val] for i, val in enumerate(s1)}).T.to_csv(out_path.format(scenario_id, 1))
     pd.DataFrame(np.array(s2).T, columns=s2_names).to_csv(out_path.format(scenario_id, 2))
