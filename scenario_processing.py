@@ -320,7 +320,8 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                     if (sample_row == count) or (sample_scenario == scenario_id):
                         results = stage_two_to_three(*scenario_inputs) # np.array([runoff, runoff_mass, erosion, erosion_mass])
                         s1_params = self.s1.fetch(s1_index, 's2')
-                        write_sample(scenario_id, s1_params, s2_time_series, results, self.sample_path)
+                        s1_names = list(self.sim.fields.fetch('s1_to_s3'))
+                        write_sample(scenario_id, s1_params, s2_time_series, results, s1_names, self.sample_path)
 
                     job = self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs)
                     success += 1
@@ -380,9 +381,7 @@ def stage_one_to_two(precip, pet, temp, new_year,  # weather params
     # Output array order is specified in fields_and_qc.py
     return np.array([runoff, erosion, leaching, soil_water, rain])
 
-def write_sample(scenario_id, s1, s2, s3, out_path):
-    s1_names = ["plant_date", "emergence_date", "maxcover_date", "harvest_date", "max_canopy",
-                "orgC_5", "bd_5", "season"]
+def write_sample(scenario_id, s1, s2, s3, s1_names, out_path):
     s2_names = ["runoff", "erosion", "leaching", "soil_water", "rain"]
     s3_names = ['runoff', 'runoff_mass', 'erosion', 'erosion_mass']
 
