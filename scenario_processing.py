@@ -55,8 +55,7 @@ class StageOneScenarios(MemoryMatrix):
 
         # Designate the fields that carry through to higher-level scenarios
         self.s2_fields = self.sim.fields.fetch('s1_to_s2')
-        # TODO - This should normally be s1_to_s3. Carrying everything through for comparison to PWC
-        self.s3_fields = [self.sim.crop_group_field] + list(self.sim.fields.fetch('s1_to_s2'))
+        self.s3_fields = [self.sim.crop_group_field] + list(self.sim.fields.fetch('s1_to_s3'))
 
         # Create a tabular index of core scenario identifiers
         self.lookup, self.array_fields = self.build_index()
@@ -320,6 +319,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                     # Turn this on for testing
                     if (sample_row == count) or (sample_scenario == scenario_id):
                         results = stage_two_to_three(*scenario_inputs) # np.array([runoff, runoff_mass, erosion, erosion_mass])
+                        s1_params = self.s1.fetch(s1_index, 's2')
                         write_sample(scenario_id, s1_params, s2_time_series, results, self.sample_path)
 
                     job = self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs)
