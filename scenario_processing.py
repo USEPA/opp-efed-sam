@@ -55,7 +55,8 @@ class StageOneScenarios(MemoryMatrix):
 
         # Designate the fields that carry through to higher-level scenarios
         self.s2_fields = self.sim.fields.fetch('s1_to_s2')
-        self.s3_fields = [self.sim.crop_group_field] + list(self.sim.fields.fetch('s1_to_s3'))
+        # TODO - This should normally be s1_to_s3. Carrying everything through for comparison to PWC
+        self.s3_fields = [self.sim.crop_group_field] + list(self.sim.fields.fetch('s1_to_s2'))
 
         # Create a tabular index of core scenario identifiers
         self.lookup, self.array_fields = self.build_index()
