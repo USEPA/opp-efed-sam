@@ -319,8 +319,7 @@ class StageThreeScenarios(DateManager, MemoryMatrix):
                     # Turn this on for testing
                     if (sample_row == count) or (sample_scenario == scenario_id):
                         results = stage_two_to_three(*scenario_inputs) # np.array([runoff, runoff_mass, erosion, erosion_mass])
-                        s1_params = self.s1.fetch(s1_index, 's2')
-                        s1_names = list(self.sim.fields.fetch('s1_to_s2'))
+                        s1_params, s1_names = self.s1.fetch(s1_index, 'all', return_fields=True)
                         write_sample(scenario_id, s1_params, s2_time_series, results, s1_names, self.sample_path)
 
                     job = self.sim.dask_client.submit(stage_two_to_three, *scenario_inputs)
